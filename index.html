@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>萬華世界の維醺志士 — 土佐座敷遊戲</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --bg:#1a1210;--surface:#2a1f1a;--surface-2:#3a2d24;
+    --red:#c0392b;--red-bright:#e74c3c;
+    --gold:#d4a843;--gold-light:#f0d68a;
+    --cream:#f5e6c8;--cream-dim:#b8a68a;--white:#faf3e6;
+    --green:#27ae60;--blue:#3498db;
+  }
+  body{
+    font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--white);
+    min-height:100dvh;display:flex;justify-content:center;align-items:center;
+    overflow-x:hidden;
+  }
+  .app{
+    width:100%;max-width:520px;min-height:100dvh;
+    display:flex;flex-direction:column;align-items:center;
+    justify-content:center;padding:32px 20px;text-align:center;
+    animation:fadeIn 0.6s ease;
+  }
+  @keyframes fadeIn{
+    from{opacity:0;transform:translateY(16px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+  @keyframes glowPulse{
+    0%,100%{text-shadow:0 0 20px rgba(212,168,67,0.3),0 0 40px rgba(212,168,67,0.1);}
+    50%{text-shadow:0 0 30px rgba(212,168,67,0.5),0 0 60px rgba(212,168,67,0.2);}
+  }
+
+  /* === BRANDING === */
+  .brand-icon{font-size:48px;margin-bottom:8px;filter:drop-shadow(0 0 12px rgba(212,168,67,0.4));}
+  .brand-title{
+    font-family:'Noto Serif JP',serif;font-size:28px;font-weight:700;
+    color:var(--cream-dim);letter-spacing:8px;
+    margin-bottom:4px;
+  }
+  .brand-sub{
+    font-family:'Noto Serif JP',serif;font-size:38px;font-weight:900;
+    color:var(--gold-light);letter-spacing:12px;margin-bottom:8px;
+    text-shadow:0 0 20px rgba(212,168,67,0.4),0 0 40px rgba(212,168,67,0.15);
+    animation:glowPulse 3s ease-in-out infinite;
+  }
+  .brand-tagline{
+    font-size:12px;color:var(--cream-dim);margin-bottom:32px;
+    letter-spacing:3px;opacity:0.6;
+  }
+
+  /* === DIVIDER === */
+  .divider{
+    width:80%;max-width:280px;height:1px;
+    background:linear-gradient(90deg,transparent,var(--surface-2),var(--gold),var(--surface-2),transparent);
+    margin:4px 0 28px;
+  }
+
+  /* === GAME CARDS === */
+  .games-label{
+    font-size:13px;color:var(--cream-dim);letter-spacing:3px;
+    margin-bottom:16px;text-transform:uppercase;
+  }
+  .game-grid{
+    display:flex;flex-direction:column;gap:16px;
+    width:100%;max-width:380px;
+  }
+  .game-card{
+    display:flex;align-items:center;gap:16px;
+    padding:20px;border-radius:16px;
+    background:var(--surface);border:2px solid var(--surface-2);
+    cursor:pointer;transition:all 0.25s ease;
+    text-decoration:none;color:inherit;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .game-card:hover,.game-card:active{
+    border-color:var(--gold);
+    background:rgba(212,168,67,0.08);
+    transform:translateY(-2px);
+    box-shadow:0 8px 24px rgba(0,0,0,0.3),0 0 16px rgba(212,168,67,0.1);
+  }
+  .card-icon{
+    font-size:40px;width:60px;height:60px;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--surface-2);border-radius:14px;flex-shrink:0;
+  }
+  .card-body{text-align:left;flex:1;min-width:0;}
+  .card-title{
+    font-family:'Noto Serif JP',serif;font-size:22px;font-weight:900;
+    color:var(--gold-light);margin-bottom:2px;
+  }
+  .card-romaji{
+    font-size:11px;color:var(--cream-dim);letter-spacing:3px;
+    text-transform:uppercase;margin-bottom:6px;
+  }
+  .card-desc{font-size:13px;color:var(--cream);line-height:1.5;opacity:0.85;}
+  .card-arrow{
+    font-size:20px;color:var(--cream-dim);flex-shrink:0;
+    transition:transform 0.2s;
+  }
+  .game-card:hover .card-arrow{transform:translateX(4px);color:var(--gold);}
+
+  /* === BADGE === */
+  .card-badge{
+    display:inline-block;font-size:10px;
+    padding:2px 8px;border-radius:20px;
+    background:rgba(212,168,67,0.15);color:var(--gold);
+    border:1px solid rgba(212,168,67,0.3);
+    margin-left:8px;vertical-align:middle;
+  }
+  .card-badge.new{background:rgba(231,76,60,0.15);color:var(--red-bright);border-color:rgba(231,76,60,0.3);}
+
+  /* === COMING SOON === */
+  .game-card.coming-soon{
+    opacity:0.4;cursor:default;pointer-events:none;
+    border-style:dashed;
+  }
+
+  /* === FOOTER === */
+  .footer{
+    margin-top:40px;font-size:11px;color:var(--cream-dim);
+    opacity:0.5;letter-spacing:1px;
+  }
+
+  /* === LANG TOGGLE === */
+  .lang-btn{
+    position:fixed;top:12px;right:12px;
+    background:var(--surface);border:1px solid var(--surface-2);
+    color:var(--cream);font-size:18px;width:40px;height:40px;
+    border-radius:50%;cursor:pointer;z-index:100;
+    display:flex;align-items:center;justify-content:center;
+    transition:all 0.2s;-webkit-tap-highlight-color:transparent;
+  }
+  .lang-btn:hover{border-color:var(--gold);background:rgba(212,168,67,0.1);}
+
+  /* RWD */
+  @media(max-width:390px){
+    .brand-title{font-size:22px;letter-spacing:5px;}
+    .brand-sub{font-size:30px;letter-spacing:8px;}
+    .game-card{padding:16px;gap:12px;}
+    .card-icon{width:50px;height:50px;font-size:32px;border-radius:12px;}
+    .card-title{font-size:19px;}
+  }
+</style>
+</head>
+<body>
+
+<button class="lang-btn" id="lang-btn" onclick="toggleLang()">🇹🇼</button>
+
+<div class="app">
+  <div class="brand-icon">🏯</div>
+  <div class="brand-title" id="brand-title">萬華世界</div>
+  <h1 class="brand-sub" id="brand-sub">維醺志士</h1>
+  <div class="brand-tagline" id="brand-tagline">土佐座敷遊戲集</div>
+  <div class="divider"></div>
+
+  <div class="games-label" id="games-label">遊戲選單</div>
+  <div class="game-grid">
+
+    <a class="game-card" href="bekuhai.html">
+      <div class="card-icon">👺</div>
+      <div class="card-body">
+        <div class="card-title" id="card1-title">可杯 <span class="card-badge new" id="badge-new">NEW</span></div>
+        <div class="card-romaji">B E K U H A I</div>
+        <div class="card-desc" id="card1-desc">轉動獨樂，醉醺醺之神指向誰，誰就乾杯！</div>
+      </div>
+      <div class="card-arrow">›</div>
+    </a>
+
+    <a class="game-card" href="hashiken.html">
+      <div class="card-icon">🥢</div>
+      <div class="card-body">
+        <div class="card-title" id="card2-title">箸拳</div>
+        <div class="card-romaji">H A S H I K E N</div>
+        <div class="card-desc" id="card2-desc">猜拳鬥智！雙方同時出筷，猜中對方數量者勝。</div>
+      </div>
+      <div class="card-arrow">›</div>
+    </a>
+
+    <div class="game-card coming-soon">
+      <div class="card-icon">🌸</div>
+      <div class="card-body">
+        <div class="card-title" id="card3-title">菊花杯 <span class="card-badge" id="badge-soon">敬請期待</span></div>
+        <div class="card-romaji">K I K U H A I</div>
+        <div class="card-desc" id="card3-desc">俄羅斯輪盤式飲酒！菊花杯中暗藏玄機…</div>
+      </div>
+      <div class="card-arrow" style="opacity:0.3">›</div>
+    </div>
+
+  </div>
+
+  <div class="footer" id="footer">© 萬華世界 — 將土佐座敷文化帶向世界</div>
+</div>
+
+<script>
+const I18N = {
+  _lang: localStorage.getItem('kochi-lang') || 'zh',
+  zh: {
+    brandTitle: '萬華世界',
+    brandSub: '維醺志士',
+    brandTagline: '土佐座敷遊戲集',
+    gamesLabel: '遊戲選單',
+    card1Title: '可杯',
+    card1Desc: '轉動獨樂，醉醺醺之神指向誰，誰就乾杯！',
+    card2Title: '箸拳',
+    card2Desc: '猜拳鬥智！雙方同時出筷，猜中對方數量者勝。',
+    card3Title: '菊花杯',
+    card3Desc: '俄羅斯輪盤式飲酒！菊花杯中暗藏玄機…',
+    badgeNew: 'NEW',
+    badgeSoon: '敬請期待',
+    footer: '© 萬華世界 — 將土佐座敷文化帶向世界',
+  },
+  ja: {
+    brandTitle: '萬華世界',
+    brandSub: '維醺志士',
+    brandTagline: '土佐お座敷遊び集',
+    gamesLabel: 'ゲーム一覧',
+    card1Title: '可杯',
+    card1Desc: '独楽を回せ！べろべろの神様が指した者、飲め！',
+    card2Title: '箸拳',
+    card2Desc: '箸を出し合い、相手の本数を当てた者が勝ち！',
+    card3Title: '菊の杯',
+    card3Desc: 'ロシアンルーレット式の飲み比べ！菊の杯に隠された罠…',
+    badgeNew: 'NEW',
+    badgeSoon: '近日公開',
+    footer: '© 萬華世界 — 土佐の座敷文化を世界へ',
+  }
+};
+
+function applyLang() {
+  const s = I18N[I18N._lang];
+  document.getElementById('brand-title').textContent = s.brandTitle;
+  document.getElementById('brand-sub').textContent = s.brandSub;
+  document.getElementById('brand-tagline').textContent = s.brandTagline;
+  document.getElementById('games-label').textContent = s.gamesLabel;
+  document.getElementById('card1-title').innerHTML = s.card1Title + ' <span class="card-badge new">' + s.badgeNew + '</span>';
+  document.getElementById('card1-desc').textContent = s.card1Desc;
+  document.getElementById('card2-title').textContent = s.card2Title;
+  document.getElementById('card2-desc').textContent = s.card2Desc;
+  document.getElementById('card3-title').innerHTML = s.card3Title + ' <span class="card-badge">' + s.badgeSoon + '</span>';
+  document.getElementById('card3-desc').textContent = s.card3Desc;
+  document.getElementById('footer').textContent = s.footer;
+  document.getElementById('lang-btn').textContent = I18N._lang === 'ja' ? '🇹🇼' : '🇯🇵';
+}
+
+function toggleLang() {
+  I18N._lang = I18N._lang === 'ja' ? 'zh' : 'ja';
+  localStorage.setItem('kochi-lang', I18N._lang);
+  applyLang();
+}
+
+applyLang();
+</script>
+</body>
+</html>

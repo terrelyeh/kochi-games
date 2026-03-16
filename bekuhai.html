@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>可杯 Bekuhai — べろべろの神様</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{--bg:#1a1210;--surface:#2a1f1a;--surface-2:#3a2d24;--red:#c0392b;--red-bright:#e74c3c;--gold:#d4a843;--gold-light:#f0d68a;--cream:#f5e6c8;--cream-dim:#b8a68a;--white:#faf3e6;--green:#27ae60;--blue:#3498db;}
+  body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--white);min-height:100dvh;overflow-x:hidden;display:flex;justify-content:center;align-items:center;}
+  #app{width:100%;max-width:480px;min-height:100dvh;position:relative;overflow:hidden;}
+  .screen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:24px 20px;text-align:center;animation:fadeIn 0.4s ease;}
+  .screen.active{display:flex;}
+
+  /* === Keyframes === */
+  @keyframes fadeIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px) rotate(-2deg);}40%{transform:translateX(8px) rotate(2deg);}60%{transform:translateX(-6px) rotate(-1deg);}80%{transform:translateX(6px) rotate(1deg);}}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+  @keyframes bounceIn{0%{transform:scale(0.3);opacity:0;}50%{transform:scale(1.1);}70%{transform:scale(0.95);}100%{transform:scale(1);opacity:1;}}
+  @keyframes glow{0%,100%{box-shadow:0 0 8px rgba(212,168,67,0.3);}50%{box-shadow:0 0 24px rgba(212,168,67,0.6);}}
+  @keyframes sakeWave{0%,100%{transform:rotate(-3deg);}50%{transform:rotate(3deg);}}
+  @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+  @keyframes toastOut{to{opacity:0;transform:translateX(-50%) translateY(-10px);}}
+
+  /* Koma animations */
+  @keyframes komaWobble{
+    0%,100%{transform:perspective(300px) rotateY(0deg) rotateX(5deg);}
+    50%{transform:perspective(300px) rotateY(15deg) rotateX(5deg);}
+  }
+  @keyframes komaCharge{
+    0%,100%{transform:perspective(400px) rotateX(8deg) scale(1);}
+    50%{transform:perspective(400px) rotateX(8deg) scale(1.1);}
+  }
+  /* Fullscreen spin: rotateZ sweeps the pointer around, rotateX tilts for 3D depth */
+  @keyframes komaFullSpin{
+    0%{transform:rotateX(15deg) rotate(0deg);}
+    100%{transform:rotateX(15deg) rotate(var(--spin-deg,2160deg));}
+  }
+  @keyframes revealSlam{
+    0%{transform:scale(0) rotate(-20deg);opacity:0;}
+    60%{transform:scale(1.15) rotate(3deg);opacity:1;}
+    80%{transform:scale(0.95) rotate(-1deg);}
+    100%{transform:scale(1) rotate(0);opacity:1;}
+  }
+  @keyframes revealBgPulse{
+    0%{background:rgba(26,18,16,0);}
+    30%{background:rgba(26,18,16,0.95);}
+    100%{background:rgba(26,18,16,0.92);}
+  }
+  @keyframes targetFlash{
+    0%,100%{box-shadow:0 0 8px rgba(231,76,60,0.3);}
+    50%{box-shadow:0 0 30px rgba(231,76,60,0.8),0 0 60px rgba(231,76,60,0.3);}
+  }
+  @keyframes drinkPour{
+    0%,100%{transform:rotate(0deg);}
+    25%{transform:rotate(-8deg);}
+    75%{transform:rotate(8deg);}
+  }
+  @keyframes confetti{
+    0%{transform:translateY(0) rotate(0);opacity:1;}
+    100%{transform:translateY(60vh) rotate(720deg);opacity:0;}
+  }
+
+  /* === Controls === */
+  .ctrl-bar{position:fixed;top:12px;right:12px;display:flex;gap:6px;z-index:200;}
+  .ctrl-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--surface-2);background:var(--surface);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;-webkit-tap-highlight-color:transparent;}
+  .ctrl-btn:active{transform:scale(0.9);}
+  #home-btn{font-size:18px;}
+  #bgm-toggle{font-size:16px;display:none;}
+
+  /* === Welcome === */
+  .welcome-deco{font-size:48px;margin-bottom:8px;}
+  .title{font-family:'Noto Serif JP',serif;font-size:52px;font-weight:900;color:var(--gold);text-shadow:0 2px 12px rgba(212,168,67,0.3);letter-spacing:8px;margin-bottom:4px;}
+  .subtitle{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--cream-dim);letter-spacing:4px;margin-bottom:24px;}
+  .tagline{font-size:14px;color:var(--gold-light);background:var(--surface);padding:10px 20px;border-radius:8px;border:1px solid var(--gold);margin-bottom:20px;font-weight:500;}
+  .rules-box{background:var(--surface);border:1px solid var(--surface-2);border-radius:12px;padding:20px;margin-bottom:20px;text-align:left;width:100%;max-width:400px;}
+  .rules-box h3{font-family:'Noto Serif JP',serif;color:var(--gold);margin-bottom:12px;font-size:15px;}
+  .rules-box ul{list-style:none;font-size:13px;line-height:1.8;color:var(--cream);}
+  .rules-box ul li::before{content:'▸ ';color:var(--red-bright);}
+  .cups-showcase{display:flex;gap:8px;justify-content:center;margin-top:16px;width:100%;}
+  .cup-card{flex:1;text-align:center;background:var(--surface-2);border-radius:10px;padding:10px 6px;border:1px solid transparent;transition:border-color 0.3s;}
+  .cup-card:hover{border-color:var(--gold);}
+  .cup-card svg{width:70px;height:70px;display:block;margin:0 auto 6px;}
+  .cup-card .cup-label{font-size:11px;font-weight:700;color:var(--cream);}
+  .cup-card .cup-vol{font-size:10px;color:var(--gold);font-weight:700;}
+  .cup-card .cup-trait{font-size:9px;color:var(--cream-dim);margin-top:2px;}
+
+  /* === Buttons === */
+  .btn{font-family:'Noto Sans JP',sans-serif;font-size:18px;font-weight:700;padding:14px 48px;border:none;border-radius:12px;cursor:pointer;transition:all 0.2s;letter-spacing:2px;}
+  .btn:active{transform:scale(0.96);}
+  .btn-primary{background:linear-gradient(135deg,var(--red),var(--red-bright));color:var(--white);box-shadow:0 4px 16px rgba(192,57,43,0.4);}
+  .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--bg);box-shadow:0 4px 16px rgba(212,168,67,0.4);}
+  .btn-sm{font-size:14px;padding:10px 24px;border-radius:8px;}
+
+  /* === Setup === */
+  #setup-screen{gap:16px;}
+  .setup-title{font-family:'Noto Serif JP',serif;font-size:24px;font-weight:900;color:var(--gold);margin-bottom:8px;}
+  .setup-section-label{font-size:13px;color:var(--cream-dim);letter-spacing:1px;margin-bottom:8px;}
+  .player-count-row{display:flex;gap:8px;justify-content:center;margin-bottom:16px;}
+  .count-btn{width:44px;height:44px;border-radius:50%;background:var(--surface);border:2px solid var(--surface-2);color:var(--white);font-size:20px;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;}
+  .count-btn:active{transform:scale(0.95);}
+  .count-btn.selected{border-color:var(--gold);background:rgba(212,168,67,0.15);color:var(--gold);}
+  .player-list{width:100%;max-width:360px;}
+  .player-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:var(--surface);margin-bottom:8px;border:1px solid var(--surface-2);}
+  .player-row .idx{width:24px;color:var(--cream-dim);font-size:13px;font-weight:700;}
+  .player-row .name-input{flex:1;background:none;border:none;border-bottom:1px solid var(--surface-2);color:var(--white);font-size:15px;font-family:'Noto Sans JP',sans-serif;padding:4px 0;}
+  .player-row .name-input:focus{border-color:var(--gold);outline:none;}
+  .player-row .type-toggle{font-size:22px;cursor:pointer;padding:4px 8px;-webkit-tap-highlight-color:transparent;border:none;background:none;transition:transform 0.2s;}
+  .player-row .type-toggle:active{transform:scale(0.85);}
+  .player-row.is-you{border-color:var(--gold);}
+
+  /* === Table === */
+  #table-screen{justify-content:flex-start;padding-top:16px;gap:0;overflow-y:auto;}
+  .round-info{font-size:12px;color:var(--cream-dim);margin-bottom:6px;letter-spacing:1px;}
+  .spinner-label{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--gold-light);margin-bottom:6px;min-height:24px;}
+  .table-layout{position:relative;width:100%;max-width:320px;aspect-ratio:1;margin:0 auto 4px;}
+  .seat{position:absolute;text-align:center;padding:6px 8px;border-radius:10px;background:var(--surface);border:2px solid transparent;transition:all 0.3s;transform:translate(-50%,-50%);min-width:64px;}
+  .seat .s-name{font-size:12px;font-weight:700;white-space:nowrap;margin-bottom:2px;}
+  .seat .s-ml{font-size:11px;color:var(--gold);font-weight:700;}
+  .seat.is-spinner{border-color:var(--gold);box-shadow:0 0 12px rgba(212,168,67,0.3);animation:glow 2s infinite;}
+  .seat.is-target{border-color:var(--red-bright);animation:targetFlash 0.6s infinite;box-shadow:0 0 20px rgba(231,76,60,0.5);}
+
+  /* Koma on table */
+  .koma-area{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;perspective:400px;}
+  .koma-3d{width:100px;height:120px;position:relative;transform-style:preserve-3d;transform:perspective(400px) rotateX(8deg) rotateY(0deg);transition:transform 0.1s;}
+  .koma-3d.idle{animation:komaWobble 3s ease-in-out infinite;}
+  .koma-3d svg{width:100%;height:100%;}
+  .koma-pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-size:18px;color:var(--red-bright);filter:drop-shadow(0 0 6px rgba(231,76,60,0.7));line-height:1;z-index:11;}
+  .koma-result-face{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--gold-light);font-weight:700;white-space:nowrap;opacity:0;transition:opacity 0.3s;}
+  .koma-result-face.show{opacity:1;}
+  .koma-3d.interactive{cursor:pointer;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
+  .koma-3d.charging{animation:komaCharge 0.25s ease-in-out infinite !important;filter:brightness(1.3) drop-shadow(0 0 24px rgba(212,168,67,0.7));}
+
+  .spin-btn-wrap{margin:4px 0;min-height:50px;display:flex;align-items:center;justify-content:center;}
+  .hold-hint{font-size:13px;color:var(--cream-dim);animation:pulse 1.5s infinite;letter-spacing:1px;}
+
+  .lyrics-box{background:var(--surface);border:1px solid var(--surface-2);border-radius:12px;padding:10px 16px;width:100%;max-width:360px;margin-top:4px;min-height:50px;}
+  .lyric-line{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--cream-dim);transition:color 0.3s;line-height:1.8;display:inline;}
+  .lyric-line.active{color:var(--gold-light);font-weight:700;}
+
+  /* === FULLSCREEN SPIN OVERLAY === */
+  .spin-overlay{
+    position:fixed;top:0;left:0;right:0;bottom:0;
+    background:rgba(26,18,16,0.97);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    z-index:130;gap:16px;
+    animation:fadeIn 0.4s ease;
+  }
+  .spin-overlay .spin-who{
+    font-family:'Noto Serif JP',serif;font-size:15px;color:var(--gold-light);
+    letter-spacing:2px;animation:fadeIn 0.3s ease;
+  }
+  .spin-koma-wrap{
+    width:180px;height:180px;
+    perspective:600px;
+  }
+  .spin-koma-inner{
+    width:100%;height:100%;
+    transform-style:preserve-3d;
+    transform:rotateX(15deg);
+    position:relative;
+  }
+  .spin-koma-inner.spinning{
+    animation:komaFullSpin var(--spin-duration,6s) cubic-bezier(0.25,0,0.05,1) forwards;
+  }
+  .spin-koma-inner svg{width:100%;height:100%;}
+  .spin-koma-inner .spin-arrow{
+    position:absolute;top:-24px;left:50%;
+    transform:translateX(-50%);
+    width:0;height:0;
+    border-left:12px solid transparent;
+    border-right:12px solid transparent;
+    border-bottom:24px solid var(--red-bright);
+    filter:drop-shadow(0 0 10px rgba(231,76,60,0.8));
+    z-index:11;
+  }
+  /* Result face reveal on koma */
+  .spin-result-face{
+    position:absolute;top:50%;left:50%;
+    transform:translate(-50%,-50%) scale(0);
+    width:100px;height:100px;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    z-index:15;
+    opacity:0;
+    pointer-events:none;
+  }
+  .spin-result-face.show{
+    animation:faceReveal 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+  @keyframes faceReveal{
+    0%{transform:translate(-50%,-50%) scale(0) rotate(-30deg);opacity:0;}
+    60%{transform:translate(-50%,-50%) scale(1.15) rotate(5deg);opacity:1;}
+    100%{transform:translate(-50%,-50%) scale(1) rotate(0deg);opacity:1;}
+  }
+  .spin-result-face svg{width:90px;height:90px;filter:drop-shadow(0 0 16px rgba(212,168,67,0.6));}
+  .spin-result-label{
+    position:absolute;bottom:-32px;left:50%;transform:translateX(-50%);
+    white-space:nowrap;font-family:'Noto Serif JP',serif;
+    font-size:18px;font-weight:900;
+    text-shadow:0 0 12px rgba(0,0,0,0.8);
+    animation:fadeIn 0.4s ease 0.3s both;
+  }
+  .spin-lyrics-wrap{
+    background:rgba(42,31,26,0.6);
+    border:1px solid var(--surface-2);
+    border-radius:12px;padding:12px 20px;
+    max-width:340px;width:85%;text-align:center;
+  }
+
+  /* === DRAMATIC REVEAL OVERLAY === */
+  .reveal-overlay{
+    position:fixed;top:0;left:0;right:0;bottom:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    z-index:150;gap:8px;
+    animation:revealBgPulse 0.4s ease forwards;
+    cursor:pointer;-webkit-tap-highlight-color:transparent;
+  }
+  .reveal-overlay .reveal-who{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--cream-dim);letter-spacing:2px;animation:fadeIn 0.3s ease;}
+  .reveal-overlay .reveal-target{font-family:'Noto Serif JP',serif;font-size:36px;font-weight:900;color:var(--white);text-shadow:0 0 30px rgba(255,255,255,0.3);animation:revealSlam 0.5s ease forwards;}
+  .reveal-overlay .reveal-cup-svg{width:180px;height:180px;animation:revealSlam 0.6s 0.1s ease both;filter:drop-shadow(0 0 30px rgba(212,168,67,0.4));}
+  .reveal-overlay .reveal-cup-name{font-family:'Noto Serif JP',serif;font-size:32px;font-weight:900;animation:revealSlam 0.5s 0.2s ease both;text-shadow:0 0 20px currentColor;}
+  .reveal-overlay .reveal-cup-vol{font-size:22px;color:var(--gold);font-weight:700;animation:fadeIn 0.4s 0.4s ease both;}
+  .reveal-overlay .reveal-cup-desc{font-size:14px;color:var(--cream-dim);max-width:280px;animation:fadeIn 0.4s 0.5s ease both;}
+  .reveal-overlay .reveal-tap-hint{font-size:14px;color:var(--cream-dim);margin-top:12px;animation:fadeIn 0.3s 1s ease both,pulse 1s 1.3s infinite;}
+  .confetti-particle{position:fixed;top:-20px;width:8px;height:8px;border-radius:2px;z-index:151;pointer-events:none;animation:confetti var(--dur,3s) linear forwards;}
+
+  /* Floating next button */
+  .next-btn-float{
+    position:absolute;z-index:20;transform:translate(-50%,-50%);
+    animation:bounceIn 0.5s ease;white-space:nowrap;
+    font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;
+    padding:10px 18px;border:none;border-radius:12px;cursor:pointer;
+    background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--bg);
+    box-shadow:0 4px 16px rgba(212,168,67,0.5);-webkit-tap-highlight-color:transparent;
+    text-align:center;line-height:1.4;
+  }
+  .next-btn-float:active{transform:translate(-50%,-50%) scale(0.93);}
+  .next-btn-float .next-name{font-size:11px;display:block;opacity:0.7;}
+
+  /* === Drink Overlay === */
+  .drink-overlay{
+    position:fixed;top:0;left:0;right:0;bottom:0;
+    background:rgba(26,18,16,0.94);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    z-index:160;gap:10px;-webkit-tap-highlight-color:transparent;cursor:pointer;animation:fadeIn 0.3s ease;
+  }
+  .drink-target-name{font-family:'Noto Serif JP',serif;font-size:22px;color:var(--cream);font-weight:700;}
+  .drink-cup-svg{width:150px;height:150px;animation:drinkPour 0.8s infinite;}
+  .drink-cup-name{font-family:'Noto Serif JP',serif;font-size:22px;font-weight:900;}
+  .drink-cup-ml{font-size:16px;color:var(--gold);font-weight:700;}
+  .drink-cup-desc{font-size:12px;color:var(--cream-dim);max-width:260px;}
+  .drink-bar{width:80%;max-width:280px;height:28px;background:var(--surface-2);border-radius:14px;overflow:hidden;border:1px solid var(--surface-2);margin-top:8px;}
+  .drink-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:14px;transition:width 0.1s ease-out;}
+  .drink-pct{font-size:14px;color:var(--gold);font-weight:700;}
+  .drink-tap-hint{font-size:16px;color:var(--cream-dim);animation:pulse 0.6s infinite;}
+  .drink-done-msg{font-family:'Noto Serif JP',serif;font-size:24px;font-weight:900;color:var(--gold);animation:bounceIn 0.5s ease;}
+
+  /* === Game Over === */
+  #gameover-screen{gap:12px;}
+  .gameover-title{font-family:'Noto Serif JP',serif;font-size:28px;font-weight:900;color:var(--gold);margin-bottom:8px;}
+  .leaderboard{width:100%;max-width:360px;}
+  .lb-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;background:var(--surface);margin-bottom:8px;border:1px solid var(--surface-2);animation:fadeIn 0.4s ease;}
+  .lb-row.champion{border:2px solid var(--gold);background:rgba(212,168,67,0.08);}
+  .lb-rank{font-size:24px;width:40px;text-align:center;}
+  .lb-name{flex:1;font-weight:700;font-size:15px;}
+  .lb-ml{font-family:'Noto Serif JP',serif;color:var(--gold);font-size:18px;font-weight:900;}
+  .lb-badge{font-size:12px;color:var(--red-bright);font-weight:700;margin-left:4px;}
+  .gameover-msg{font-size:14px;color:var(--cream);line-height:1.8;max-width:340px;margin:8px 0;}
+  .sake-cup-deco{font-size:64px;animation:sakeWave 1.5s ease-in-out infinite;}
+  .bgm-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--gold);color:var(--gold-light);padding:8px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:300;animation:toastIn 0.3s ease,toastOut 0.3s 1.5s ease forwards;}
+
+  /* === RWD === */
+  @media(max-width:390px){.title{font-size:38px;letter-spacing:4px;}.subtitle{font-size:13px;margin-bottom:16px;}.tagline{font-size:12px;padding:8px 14px;}.rules-box{padding:14px;margin-bottom:14px;}.rules-box ul{font-size:12px;}.btn{font-size:16px;padding:12px 36px;}.cup-card svg{width:56px;height:56px;}.table-layout{max-width:280px;}.koma-3d{width:80px;height:96px;}.seat{padding:4px 6px;min-width:56px;}.seat .s-name{font-size:11px;}.gameover-title{font-size:24px;}.reveal-overlay .reveal-target{font-size:28px;}.reveal-overlay .reveal-cup-svg{width:140px;height:140px;}.reveal-overlay .reveal-cup-name{font-size:26px;}.spin-koma-wrap{width:140px;height:140px;}.next-btn-float{font-size:12px;padding:8px 14px;}}
+  @media(max-height:700px){.screen{padding:16px 16px;}.welcome-deco{font-size:36px;margin-bottom:4px;}.title{font-size:36px;}.subtitle{margin-bottom:12px;}.tagline{margin-bottom:12px;}.rules-box{padding:12px;margin-bottom:12px;}.table-layout{max-width:280px;}.koma-3d{width:80px;height:96px;}.spin-koma-wrap{width:150px;height:150px;}}
+  @media(max-height:550px){.screen{min-height:auto;padding:12px 12px;justify-content:flex-start;}.welcome-deco{display:none;}.title{font-size:30px;margin-bottom:2px;}.subtitle{font-size:12px;margin-bottom:8px;}.tagline{margin-bottom:8px;font-size:11px;}.rules-box{margin-bottom:8px;padding:8px;}.btn{padding:10px 28px;font-size:15px;}.table-layout{max-width:240px;}.koma-3d{width:64px;height:76px;}.spin-koma-wrap{width:120px;height:120px;}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="ctrl-bar">
+    <button class="ctrl-btn" id="home-btn" onclick="goHome()">🏠</button>
+    <button class="ctrl-btn" id="lang-toggle" onclick="toggleLang()"></button>
+    <button class="ctrl-btn" id="bgm-toggle" onclick="toggleBgm()"></button>
+    <button class="ctrl-btn" id="mute-toggle" onclick="toggleMute()"></button>
+  </div>
+
+  <div id="welcome-screen" class="screen active">
+    <div class="welcome-deco">🍶</div>
+    <h1 class="title">可杯</h1>
+    <p class="subtitle" data-i18n="subtitle">B E K U H A I</p>
+    <div class="tagline" data-i18n="tagline"></div>
+    <div class="rules-box">
+      <h3 data-i18n="rulesTitle"></h3>
+      <ul id="rules-list"></ul>
+      <div class="cups-showcase" id="cups-showcase"></div>
+    </div>
+    <button class="btn btn-primary" onclick="goSetup()" data-i18n="startBtn"></button>
+  </div>
+
+  <div id="setup-screen" class="screen">
+    <div class="setup-title" data-i18n="setupTitle"></div>
+    <div class="setup-section-label" data-i18n="setupCount"></div>
+    <div class="player-count-row" id="count-row"></div>
+    <div class="player-list" id="player-list"></div>
+    <button class="btn btn-gold" onclick="startFromSetup()" data-i18n="setupStart" style="margin-top:8px;"></button>
+  </div>
+
+  <div id="table-screen" class="screen">
+    <div class="round-info" id="round-info"></div>
+    <div class="spinner-label" id="spinner-label"></div>
+    <div class="table-layout" id="table-layout">
+      <div class="koma-area" id="koma-area">
+        <div class="koma-3d idle" id="koma-3d">
+          <span class="koma-pointer">▼</span>
+          <div class="koma-result-face" id="koma-result-face"></div>
+        </div>
+      </div>
+    </div>
+    <div class="spin-btn-wrap" id="spin-btn-wrap"></div>
+    <div class="lyrics-box" id="lyrics-box"></div>
+  </div>
+
+  <div id="gameover-screen" class="screen">
+    <div class="sake-cup-deco">🏆</div>
+    <div class="gameover-title" data-i18n="gameoverTitle"></div>
+    <div class="leaderboard" id="leaderboard"></div>
+    <div class="gameover-msg" data-i18n="makeTokuMsg"></div>
+    <button class="btn btn-primary" style="margin-top:8px;" onclick="resetAll()" data-i18n="playAgain"></button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// SVG ASSETS
+// ============================================================
+const SVG_TENGU=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c0392b"/><stop offset="100%" stop-color="#8b1a1a"/></linearGradient>
+<linearGradient id="tgS" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f5e6c8" stop-opacity="0.5"/><stop offset="100%" stop-color="#d4a843" stop-opacity="0.7"/></linearGradient>
+<clipPath id="tc"><path d="M25,35 Q20,38 18,55 L15,90 Q15,105 30,108 L90,108 Q105,105 105,90 L102,55 Q100,38 95,35 Z"/></clipPath></defs>
+<path d="M25,35 Q20,38 18,55 L15,90 Q15,105 30,108 L90,108 Q105,105 105,90 L102,55 Q100,38 95,35 Z" fill="url(#tg)" stroke="#6b1111" stroke-width="1.5"/>
+<rect x="15" y="58" width="90" height="50" fill="url(#tgS)" clip-path="url(#tc)" class="sake-level"/>
+<path d="M25,35 Q60,30 95,35" fill="none" stroke="#e8685a" stroke-width="2"/>
+<ellipse cx="42" cy="56" rx="9" ry="7" fill="#fff8e0" stroke="#4a0a0a" stroke-width="1"/><ellipse cx="78" cy="56" rx="9" ry="7" fill="#fff8e0" stroke="#4a0a0a" stroke-width="1"/>
+<circle cx="42" cy="57" r="3.5" fill="#1a0505"/><circle cx="78" cy="57" r="3.5" fill="#1a0505"/>
+<circle cx="40" cy="55" r="1.2" fill="white" opacity="0.7"/><circle cx="76" cy="55" r="1.2" fill="white" opacity="0.7"/>
+<path d="M30,47 L48,50" stroke="#4a0a0a" stroke-width="3" stroke-linecap="round"/><path d="M90,47 L72,50" stroke="#4a0a0a" stroke-width="3" stroke-linecap="round"/>
+<path d="M55,60 Q52,65 48,80 Q46,88 55,92 L65,92 Q74,88 72,80 Q68,65 65,60 Z" fill="#d45040" stroke="#8b1a1a" stroke-width="1"/>
+<path d="M58,62 Q56,70 55,78" fill="none" stroke="#e8685a" stroke-width="1" opacity="0.5"/>
+<ellipse cx="55" cy="86" rx="3" ry="2" fill="#8b1a1a"/><ellipse cx="65" cy="86" rx="3" ry="2" fill="#8b1a1a"/>
+<path d="M44,96 Q60,102 76,96" fill="none" stroke="#4a0a0a" stroke-width="2" stroke-linecap="round"/>
+</svg>`;
+
+const SVG_HYOTTOKO=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e8d5b0"/><stop offset="100%" stop-color="#b8956a"/></linearGradient>
+<linearGradient id="hgS" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f5e6c8" stop-opacity="0.5"/><stop offset="100%" stop-color="#d4a843" stop-opacity="0.7"/></linearGradient>
+<clipPath id="hc"><path d="M24,33 Q18,38 16,55 L14,88 Q14,106 30,108 L90,108 Q106,106 106,88 L104,55 Q102,38 96,33 Z"/></clipPath></defs>
+<path d="M24,33 Q18,38 16,55 L14,88 Q14,106 30,108 L90,108 Q106,106 106,88 L104,55 Q102,38 96,33 Z" fill="url(#hg)" stroke="#8a7050" stroke-width="1.5"/>
+<rect x="14" y="58" width="92" height="50" fill="url(#hgS)" clip-path="url(#hc)" class="sake-level"/>
+<path d="M24,33 Q60,28 96,33" fill="none" stroke="#c9b896" stroke-width="2.5"/><path d="M24,36 Q60,30 96,36" fill="none" stroke="#7a5c3a" stroke-width="1" opacity="0.5"/>
+<ellipse cx="40" cy="55" rx="11" ry="10" fill="#fff8e0" stroke="#5a4020" stroke-width="1.2"/>
+<circle cx="41" cy="56" r="5" fill="#2a1505"/><circle cx="39" cy="54" r="1.5" fill="white" opacity="0.7"/>
+<path d="M68,52 Q76,48 84,52 Q76,56 68,52 Z" fill="#fff8e0" stroke="#5a4020" stroke-width="1.2"/><circle cx="76" cy="52" r="2.5" fill="#2a1505"/>
+<path d="M30,44 Q40,40 52,44" fill="none" stroke="#5a4020" stroke-width="2" stroke-linecap="round"/><path d="M68,46 Q76,42 86,46" fill="none" stroke="#5a4020" stroke-width="1.5" stroke-linecap="round"/>
+<circle cx="55" cy="82" r="12" fill="#d49870" stroke="#8a6040" stroke-width="1.5"/><circle cx="55" cy="82" r="6" fill="#3a2010" stroke="#2a1505" stroke-width="1"/>
+<path d="M49,72 L51,76 M61,72 L59,76 M44,78 L48,80 M66,78 L62,80 M44,86 L48,84 M66,86 L62,84" stroke="#a07050" stroke-width="0.8"/>
+<path d="M24,36 Q40,42 60,42 Q80,42 96,36" fill="none" stroke="#4a70a0" stroke-width="2" stroke-dasharray="2,4" opacity="0.6"/>
+</svg>`;
+
+const SVG_OKAME=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="og" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f0dcc0"/><stop offset="100%" stop-color="#c4a07a"/></linearGradient>
+<linearGradient id="ogS" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f5e6c8" stop-opacity="0.5"/><stop offset="100%" stop-color="#d4a843" stop-opacity="0.7"/></linearGradient>
+<clipPath id="oc"><path d="M28,36 Q22,40 20,55 L20,85 Q20,108 40,112 L80,112 Q100,108 100,85 L100,55 Q98,40 92,36 Z"/></clipPath></defs>
+<path d="M28,36 Q22,40 20,55 L20,85 Q20,108 40,112 L80,112 Q100,108 100,85 L100,55 Q98,40 92,36 Z" fill="url(#og)" stroke="#9a8060" stroke-width="1.5"/>
+<ellipse cx="60" cy="112" rx="22" ry="6" fill="none" stroke="#9a8060" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+<rect x="20" y="58" width="80" height="54" fill="url(#ogS)" clip-path="url(#oc)" class="sake-level"/>
+<path d="M28,36 Q60,30 92,36" fill="none" stroke="#d4bfa0" stroke-width="2"/><path d="M28,36 Q60,30 92,36" fill="none" stroke="#d4889a" stroke-width="3" opacity="0.4" transform="translate(0,3)"/>
+<path d="M35,58 Q42,52 49,58" fill="none" stroke="#5a3a20" stroke-width="2.5" stroke-linecap="round"/><path d="M71,58 Q78,52 85,58" fill="none" stroke="#5a3a20" stroke-width="2.5" stroke-linecap="round"/>
+<ellipse cx="35" cy="72" rx="10" ry="7" fill="#e8a0a0" opacity="0.5"/><ellipse cx="85" cy="72" rx="10" ry="7" fill="#e8a0a0" opacity="0.5"/>
+<ellipse cx="60" cy="70" rx="4" ry="3" fill="#d4b090" stroke="#a08060" stroke-width="0.8"/>
+<path d="M40,84 Q50,96 60,96 Q70,96 80,84" fill="none" stroke="#5a3a20" stroke-width="2.5" stroke-linecap="round"/>
+<ellipse cx="42" cy="38" rx="8" ry="5" fill="#2a1a10" opacity="0.3"/><ellipse cx="60" cy="36" rx="8" ry="5" fill="#2a1a10" opacity="0.3"/><ellipse cx="78" cy="38" rx="8" ry="5" fill="#2a1a10" opacity="0.3"/>
+</svg>`;
+
+const SVG_KOMA=`<svg viewBox="0 0 100 110" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="w1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c49b6a"/><stop offset="100%" stop-color="#a07848"/></linearGradient>
+<linearGradient id="w2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#b8906a"/><stop offset="50%" stop-color="#d4aa78"/><stop offset="100%" stop-color="#b8906a"/></linearGradient>
+<linearGradient id="wd" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8a6840"/><stop offset="100%" stop-color="#6a4c28"/></linearGradient>
+<linearGradient id="rh" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#d44030"/><stop offset="100%" stop-color="#a02818"/></linearGradient>
+</defs>
+<rect x="43" y="2" width="14" height="22" rx="5" fill="url(#rh)" stroke="#7a1a10" stroke-width="1"/>
+<ellipse cx="50" cy="4" rx="7" ry="3.5" fill="#d44030" stroke="#7a1a10" stroke-width="0.8"/>
+<ellipse cx="50" cy="12" rx="5.5" ry="2" fill="none" stroke="#f0d68a" stroke-width="1" opacity="0.6"/>
+<ellipse cx="50" cy="24" rx="22" ry="6" fill="url(#w2)" stroke="#7a5c3a" stroke-width="1"/>
+<ellipse cx="50" cy="24" rx="22" ry="6" fill="none" stroke="#5a3c1a" stroke-width="0.5" opacity="0.3"/>
+<path d="M13,50 L28,26 L28,74 Z" fill="url(#w1)" stroke="#7a5c3a" stroke-width="1"/>
+<path d="M28,26 L72,26 L72,74 L28,74 Z" fill="url(#w2)" stroke="#7a5c3a" stroke-width="1"/>
+<path d="M72,26 L87,50 L72,74 Z" fill="#a07848" stroke="#7a5c3a" stroke-width="1"/>
+<circle cx="21" cy="50" r="9" fill="#c0392b" opacity="0.85"/><circle cx="19" cy="48" r="1.5" fill="white"/><circle cx="23" cy="48" r="1.5" fill="white"/>
+<path d="M19,46 L17,44" stroke="#4a0a0a" stroke-width="1"/><path d="M23,46 L25,44" stroke="#4a0a0a" stroke-width="1"/>
+<path d="M21,50 L21,56" stroke="#8b1a1a" stroke-width="1.5" stroke-linecap="round"/>
+<circle cx="50" cy="50" r="14" fill="#e8d5b0" stroke="#8a7050" stroke-width="0.8"/>
+<circle cx="45" cy="47" r="2.5" fill="#2a1505"/><path d="M54,45 Q57,43 59,46" fill="none" stroke="#2a1505" stroke-width="1.2"/>
+<circle cx="50" cy="56" r="4" fill="#d49870" stroke="#8a6040" stroke-width="0.8"/><circle cx="50" cy="56" r="2" fill="#3a2010"/>
+<circle cx="79" cy="50" r="9" fill="#f0dcc0" opacity="0.85" stroke="#9a8060" stroke-width="0.5"/>
+<path d="M76,48 Q79,46 82,48" fill="none" stroke="#5a3a20" stroke-width="1.2"/><path d="M75,54 Q79,57 83,54" fill="none" stroke="#5a3a20" stroke-width="1.2"/>
+<ellipse cx="75" cy="52" rx="2.5" ry="1.5" fill="#e8a0a0" opacity="0.5"/><ellipse cx="83" cy="52" rx="2.5" ry="1.5" fill="#e8a0a0" opacity="0.5"/>
+<path d="M28,74 L50,102 L72,74" fill="url(#wd)" stroke="#7a5c3a" stroke-width="1"/>
+<circle cx="50" cy="102" r="3" fill="#5a4028" stroke="#3a2818" stroke-width="1"/>
+<path d="M35,32 L35,68" stroke="#9a7a50" stroke-width="0.4" opacity="0.3"/><path d="M50,28 L50,72" stroke="#9a7a50" stroke-width="0.4" opacity="0.3"/><path d="M65,32 L65,68" stroke="#9a7a50" stroke-width="0.4" opacity="0.3"/>
+</svg>`;
+
+// ============================================================
+// I18N
+// ============================================================
+const I18N={
+  _lang:localStorage.getItem('bekuhai-lang')||'zh',
+  _strings:{
+    ja:{
+      subtitle:'べ く は い',tagline:'「べろべろの神様は 正直な神様よ」',
+      rulesTitle:'📜 ルール',
+      rules:['みんなで座り、順番に<strong>独楽</strong>を回す','三種の杯：<strong>天狗杯</strong>(大)、<strong>ひょっとこ杯</strong>(中)、<strong>おかめ杯</strong>(小)','独楽が指した人が、出た面の杯で飲む','八回合後、最も飲んだ者が<strong>「酒豪」</strong>として勝利！'],
+      startBtn:'乾杯！',setupTitle:'🎴 座席安排',setupCount:'人数',setupStart:'始めよう！',
+      roundInfo:'第 {n} 回合 ／ 全 {max} 回合',spinBtn:'回せ！',spinnerTurn:'{name} の番',aiSpinning:'{name} が回している…',
+      holdToSpin:'独楽を押して放せ！',
+      revealWho:'独楽が指したのは…',
+      drinkTapHint:'タップして飲み干せ！',drinkAutoMsg:'{name} が飲んでいる…',drinkDone:'飲み干した！🍶',
+      nextRound:'次へ',gameoverTitle:'🏆 酒豪決定！',champion:'酒豪！',
+      makeTokuMsg:'「負け得」— 飲んだ者が真の勝者！',playAgain:'もう一局！',
+      confirmHome:'メインに戻りますか？',
+      bgmMiyako:'🌙 静夜',bgmShamisen:'🎶 宴会',bgmMatsuri:'🥁 祭り',
+      cupTengu:'天狗杯',cupHyottoko:'ひょっとこ杯',cupOkame:'おかめ杯',
+      cupTenguDesc:'鼻が邪魔で置けない大杯',cupHyottokoDesc:'口の穴を塞がないと漏れる中杯',cupOkameDesc:'丸底で置けない！一気飲み小杯',
+      cupTenguTrait:'長鼻が邪魔',cupHyottokoTrait:'穴から漏れる',cupOkameTrait:'置けない！',
+      tapToContinue:'タップして続く',you:'あなた',
+      voiceSpin:'べろべろの神様は、正直な神様よ、おささの方へと、おもむきゃね',
+      voiceRevealBig:'{name}、{cup}！大変だ！',
+      voiceRevealMid:'{name}、{cup}！',
+      voiceRevealSmall:'{name}、{cup}、ラッキー！',
+      voiceDrinkDone:'飲み干した！',
+      voiceGameover:'酒豪決定！',
+    },
+    zh:{
+      subtitle:'可 杯',tagline:'「醉醺醺之神 是正直之神」',
+      rulesTitle:'📜 遊戲規則',
+      rules:['眾人圍坐，輪流轉動<strong>獨樂</strong>（陀螺）','三種酒杯：<strong>天狗杯</strong>(大)、<strong>火男杯</strong>(中)、<strong>阿龜杯</strong>(小)','獨樂停下指向誰，誰就用對應的杯喝','八回合後飲最多者為<strong>「酒豪」</strong>勝出！'],
+      startBtn:'乾杯！',setupTitle:'🎴 座席安排',setupCount:'人數',setupStart:'開始！',
+      roundInfo:'第 {n} 回合 ／ 共 {max} 回合',spinBtn:'轉！',spinnerTurn:'輪到 {name}',aiSpinning:'{name} 正在轉…',
+      holdToSpin:'按住獨樂，放開旋轉！',
+      revealWho:'獨樂指向了…',
+      drinkTapHint:'連續點擊喝光！',drinkAutoMsg:'{name} 正在喝…',drinkDone:'喝完了！🍶',
+      nextRound:'繼續',gameoverTitle:'🏆 酒豪決定！',champion:'酒豪！',
+      makeTokuMsg:'「負け得」— 喝最多的人才是真正贏家！',playAgain:'再來一局！',
+      confirmHome:'確定要返回首頁嗎？',
+      bgmMiyako:'🌙 靜夜',bgmShamisen:'🎶 宴會',bgmMatsuri:'🥁 祭典',
+      cupTengu:'天狗杯',cupHyottoko:'火男杯',cupOkame:'阿龜杯',
+      cupTenguDesc:'長鼻擋路，杯子放不平',cupHyottokoDesc:'嘴巴有洞，不堵就漏酒',cupOkameDesc:'圓底放不下！必須一飲而盡',
+      cupTenguTrait:'長鼻擋路',cupHyottokoTrait:'會漏酒！',cupOkameTrait:'放不下！',
+      tapToContinue:'點擊繼續',you:'你',
+      voiceSpin:'醉醺醺的神明呀，正直的神明，朝著酒的方向⋯⋯轉過去吧！',
+      voiceRevealBig:'天哪，{name}！抽到{cup}了！一百四十毫升呢，完蛋了啦！',
+      voiceRevealMid:'噢，{name}被選中了，{cup}，五十毫升，加油哦！',
+      voiceRevealSmall:'{name}，{cup}，才二十毫升而已，算你好運啦！',
+      voiceDrinkDone:'喝完了，好厲害呀！',
+      voiceGameover:'酒豪誕生！恭喜恭喜！太厲害了！',
+    },
+  },
+  get lang(){return this._lang;},
+  setLang(l){this._lang=l;localStorage.setItem('bekuhai-lang',l);this.updateDOM();},
+  t(k,p){let s=this._strings[this._lang][k];if(s==null)s=this._strings['ja'][k]||k;if(p)for(const[a,b]of Object.entries(p))s=s.replace(new RegExp('\\{'+a+'\\}','g'),b);return s;},
+  updateDOM(){document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=this.t(el.getAttribute('data-i18n'));});const rl=document.getElementById('rules-list');if(rl)rl.innerHTML=this._strings[this._lang].rules.map(r=>`<li>${r}</li>`).join('');document.getElementById('lang-toggle').textContent=this._lang==='ja'?'🇹🇼':'🇯🇵';renderCupShowcase();},
+};
+function t(k,p){return I18N.t(k,p);}
+function toggleLang(){const a=document.querySelector('.screen.active');if(a&&a.id==='setup-screen'){document.querySelectorAll('.name-input').forEach((inp,i)=>{if(setupPlayers[i])setupPlayers[i].name=inp.value.trim()||setupPlayers[i].name;});}I18N.setLang(I18N.lang==='ja'?'zh':'ja');if(a&&a.id==='setup-screen')renderSetup();if(a&&a.id==='table-screen')renderTable();}
+function renderCupShowcase(){const b=document.getElementById('cups-showcase');if(!b)return;b.innerHTML=`<div class="cup-card">${SVG_TENGU}<div class="cup-label">${t('cupTengu')}</div><div class="cup-vol">140ml ★★★★★</div><div class="cup-trait">${t('cupTenguTrait')}</div></div><div class="cup-card">${SVG_HYOTTOKO}<div class="cup-label">${t('cupHyottoko')}</div><div class="cup-vol">50ml ★★★</div><div class="cup-trait">${t('cupHyottokoTrait')}</div></div><div class="cup-card">${SVG_OKAME}<div class="cup-label">${t('cupOkame')}</div><div class="cup-vol">20ml ★★</div><div class="cup-trait">${t('cupOkameTrait')}</div></div>`;}
+
+// ============================================================
+// AUDIO — 3 BGM styles: miyako, shamisen, matsuri
+// ============================================================
+const BGM_ORDER=['miyako','shamisen','matsuri'];
+const BGM_ICONS={miyako:'🌙',shamisen:'🎶',matsuri:'🥁'};
+const BGM_KEYS={miyako:'bgmMiyako',shamisen:'bgmShamisen',matsuri:'bgmMatsuri'};
+
+class AudioManager{
+  constructor(){this.ctx=null;this.masterGain=null;this.musicGain=null;this.sfxGain=null;this.muted=false;this.musicPlaying=false;this._musicInterval=null;this._musicNodes=[];this.bgmStyle='miyako';}
+  init(){if(this.ctx)return;this.ctx=new(window.AudioContext||window.webkitAudioContext)();this.masterGain=this.ctx.createGain();this.masterGain.connect(this.ctx.destination);this.musicGain=this.ctx.createGain();this.musicGain.gain.value=0.35;this.musicGain.connect(this.masterGain);this.sfxGain=this.ctx.createGain();this.sfxGain.gain.value=0.3;this.sfxGain.connect(this.masterGain);}
+  ensureResumed(){if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();}
+  toggleMute(){this.muted=!this.muted;if(this.masterGain)this.masterGain.gain.value=this.muted?0:1;document.getElementById('mute-toggle').textContent=this.muted?'🔇':'🔊';if(this.muted)speechSynthesis.cancel();}
+
+  // --- BGM: Miyako (calm koto-like) ---
+  startMusicMiyako(){const c=this.ctx;const d=c.createOscillator();d.type='triangle';d.frequency.value=146.83;const dg=c.createGain();dg.gain.value=0.06;d.connect(dg);dg.connect(this.musicGain);d.start();this._musicNodes.push({osc:d,gain:dg});const ph=[293.66,233.08,220,196,155.56,196,220,196,146.83,155.56,196,233.08,220,196,155.56,146.83];const dur=1.8;let i=0;const p=()=>{if(!this.musicPlaying)return;const o=c.createOscillator();o.type='sine';o.frequency.value=ph[i%ph.length];const e=c.createGain();const n=c.currentTime;e.gain.setValueAtTime(0,n);e.gain.linearRampToValueAtTime(0.08,n+0.3);e.gain.linearRampToValueAtTime(0.04,n+dur*0.7);e.gain.linearRampToValueAtTime(0,n+dur);o.connect(e);e.connect(this.musicGain);o.start(n);o.stop(n+dur);i++;};p();this._musicInterval=setInterval(p,dur*1000);}
+
+  // --- BGM: Shamisen (upbeat pluck) ---
+  startMusicShamisen(){const c=this.ctx;const ph=[293.66,329.63,392,440,493.88,440,392,329.63,293.66,392,493.88,440,329.63,392,440,293.66];const dur=0.4;let i=0;const p=()=>{if(!this.musicPlaying)return;const f=ph[i%ph.length];const o=c.createOscillator();o.type='sawtooth';o.frequency.value=f;const fl=c.createBiquadFilter();fl.type='bandpass';fl.frequency.value=f*2.5;fl.Q.value=3;const e=c.createGain();const n=c.currentTime;e.gain.setValueAtTime(0.14,n);e.gain.exponentialRampToValueAtTime(0.001,n+dur*0.85);o.connect(fl);fl.connect(e);e.connect(this.musicGain);o.start(n);o.stop(n+dur);if(i%4===0){const t=c.createOscillator();t.type='triangle';t.frequency.setValueAtTime(100,n);t.frequency.exponentialRampToValueAtTime(40,n+0.2);const tg=c.createGain();tg.gain.setValueAtTime(0.18,n);tg.gain.exponentialRampToValueAtTime(0.001,n+0.25);t.connect(tg);tg.connect(this.musicGain);t.start(n);t.stop(n+0.25);}i++;};p();this._musicInterval=setInterval(p,dur*1000);}
+
+  // --- BGM: Matsuri (taiko + flute + kane) ---
+  startMusicMatsuri(){
+    const c=this.ctx;const beatDur=0.22;let beat=0;
+    const melody=[392,440,523.25,587.33,659.25,587.33,523.25,440,392,523.25,659.25,587.33,440,523.25,587.33,392];
+    const p=()=>{
+      if(!this.musicPlaying)return;const n=c.currentTime;const bm=beat%8;
+      // Taiko drum
+      if(bm%2===0){
+        const accent=bm===0||bm===6;
+        const o=c.createOscillator();o.type='triangle';
+        o.frequency.setValueAtTime(accent?100:75,n);o.frequency.exponentialRampToValueAtTime(38,n+0.12);
+        const g=c.createGain();g.gain.setValueAtTime(accent?0.28:0.16,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.18);
+        o.connect(g);g.connect(this.musicGain);o.start(n);o.stop(n+0.18);
+        // Snap noise
+        const bs=c.sampleRate*0.015,b=c.createBuffer(1,bs,c.sampleRate),d=b.getChannelData(0);
+        for(let j=0;j<bs;j++)d[j]=(Math.random()*2-1)*Math.pow(1-j/bs,3);
+        const ns=c.createBufferSource();ns.buffer=b;const ng=c.createGain();
+        ng.gain.setValueAtTime(accent?0.14:0.06,n);ng.gain.exponentialRampToValueAtTime(0.001,n+0.06);
+        ns.connect(ng);ng.connect(this.musicGain);ns.start(n);
+      }
+      // Flute melody every 4 beats
+      if(beat%4===0){
+        const freq=melody[(beat/4)%melody.length];
+        const o=c.createOscillator();o.type='sine';o.frequency.value=freq;
+        // Vibrato
+        const lfo=c.createOscillator();lfo.type='sine';lfo.frequency.value=5;
+        const lfoG=c.createGain();lfoG.gain.value=3;
+        lfo.connect(lfoG);lfoG.connect(o.frequency);lfo.start(n);lfo.stop(n+beatDur*3.5);
+        const g=c.createGain();g.gain.setValueAtTime(0.05,n);g.gain.linearRampToValueAtTime(0.07,n+beatDur);
+        g.gain.linearRampToValueAtTime(0.03,n+beatDur*3);g.gain.exponentialRampToValueAtTime(0.001,n+beatDur*3.5);
+        o.connect(g);g.connect(this.musicGain);o.start(n);o.stop(n+beatDur*4);
+      }
+      // Kane bell every 16 beats
+      if(beat%16===0){
+        const o=c.createOscillator();o.type='sine';o.frequency.value=1480;
+        const g=c.createGain();g.gain.setValueAtTime(0.05,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.6);
+        o.connect(g);g.connect(this.musicGain);o.start(n);o.stop(n+0.6);
+      }
+      beat++;
+    };p();this._musicInterval=setInterval(p,beatDur*1000);
+  }
+
+  startMusic(){if(this.musicPlaying)return;this.init();this.musicPlaying=true;if(this.bgmStyle==='shamisen')this.startMusicShamisen();else if(this.bgmStyle==='matsuri')this.startMusicMatsuri();else this.startMusicMiyako();}
+  stopMusic(){this.musicPlaying=false;if(this._musicInterval){clearInterval(this._musicInterval);this._musicInterval=null;}this._musicNodes.forEach(({osc,gain})=>{try{gain.gain.linearRampToValueAtTime(0,this.ctx.currentTime+0.5);osc.stop(this.ctx.currentTime+0.6);}catch(e){}});this._musicNodes=[];}
+  playClick(){this.init();const c=this.ctx,n=c.currentTime;const o=c.createOscillator();o.type='sine';o.frequency.value=1200;const g=c.createGain();g.gain.setValueAtTime(0.15,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.08);o.connect(g);g.connect(this.sfxGain);o.start(n);o.stop(n+0.08);}
+  playCharge(){this.init();const c=this.ctx,n=c.currentTime;const o=c.createOscillator();o.type='sine';o.frequency.setValueAtTime(200,n);o.frequency.linearRampToValueAtTime(400,n+0.15);const g=c.createGain();g.gain.setValueAtTime(0.1,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.2);o.connect(g);g.connect(this.sfxGain);o.start(n);o.stop(n+0.2);}
+  playSpinStart(){this.init();const c=this.ctx,n=c.currentTime;const o=c.createOscillator();o.type='sawtooth';o.frequency.setValueAtTime(80,n);o.frequency.exponentialRampToValueAtTime(600,n+0.5);const g=c.createGain();g.gain.setValueAtTime(0.12,n);g.gain.linearRampToValueAtTime(0.02,n+0.6);g.gain.exponentialRampToValueAtTime(0.001,n+0.8);const f=c.createBiquadFilter();f.type='lowpass';f.frequency.value=800;o.connect(f);f.connect(g);g.connect(this.sfxGain);o.start(n);o.stop(n+0.8);}
+  playSpinStop(){this.init();const c=this.ctx,n=c.currentTime;const o=c.createOscillator();o.type='triangle';o.frequency.setValueAtTime(300,n);o.frequency.exponentialRampToValueAtTime(100,n+0.15);const g=c.createGain();g.gain.setValueAtTime(0.3,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.2);o.connect(g);g.connect(this.sfxGain);o.start(n);o.stop(n+0.2);const bs=c.sampleRate*0.03,b=c.createBuffer(1,bs,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<bs;i++)d[i]=(Math.random()*2-1)*(1-i/bs);const ns=c.createBufferSource();ns.buffer=b;const ng=c.createGain();ng.gain.value=0.15;ns.connect(ng);ng.connect(this.sfxGain);ns.start(n);}
+  playDrinkGulp(){this.init();const c=this.ctx,n=c.currentTime;for(let i=0;i<6;i++){const t=n+i*0.1;const o=c.createOscillator();o.type='sine';o.frequency.setValueAtTime(150+Math.random()*80,t);o.frequency.exponentialRampToValueAtTime(80,t+0.1);const g=c.createGain();g.gain.setValueAtTime(0.12,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.1);o.connect(g);g.connect(this.sfxGain);o.start(t);o.stop(t+0.12);}}
+  playRevealDrum(){this.init();const c=this.ctx,n=c.currentTime;[0,0.15,0.3].forEach((off,i)=>{const o=c.createOscillator();o.type='triangle';const t=n+off;o.frequency.setValueAtTime(80+i*20,t);o.frequency.exponentialRampToValueAtTime(40,t+0.2);const g=c.createGain();g.gain.setValueAtTime(0.4,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.3);o.connect(g);g.connect(this.sfxGain);o.start(t);o.stop(t+0.3);});const bs=c.sampleRate*0.1,b=c.createBuffer(1,bs,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<bs;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/bs,2);const ns=c.createBufferSource();ns.buffer=b;const ng=c.createGain();ng.gain.setValueAtTime(0.2,n+0.35);ng.gain.exponentialRampToValueAtTime(0.001,n+0.8);ns.connect(ng);ng.connect(this.sfxGain);ns.start(n+0.35);}
+  playWin(){this.init();const c=this.ctx,n=c.currentTime;[293.66,392,440,587.33].forEach((f,i)=>{const o=c.createOscillator();o.type='sine';const g=c.createGain();const t=n+i*0.12;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.15,t+0.04);g.gain.exponentialRampToValueAtTime(0.001,t+0.4);o.frequency.value=f;o.connect(g);g.connect(this.sfxGain);o.start(t);o.stop(t+0.4);});}
+  playSake(){this.init();const c=this.ctx,n=c.currentTime;for(let i=0;i<12;i++){const o=c.createOscillator();o.type='sine';o.frequency.value=200+Math.random()*400;const g=c.createGain();const t=n+i*0.08+Math.random()*0.03;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.06,t+0.015);g.gain.exponentialRampToValueAtTime(0.001,t+0.06);o.connect(g);g.connect(this.sfxGain);o.start(t);o.stop(t+0.06);}}
+}
+const audio=new AudioManager();
+function toggleMute(){audio.toggleMute();}
+function toggleBgm(){
+  const cur=BGM_ORDER.indexOf(audio.bgmStyle);
+  audio.bgmStyle=BGM_ORDER[(cur+1)%BGM_ORDER.length];
+  $('bgm-toggle').textContent=BGM_ICONS[audio.bgmStyle];
+  const toast=document.createElement('div');toast.className='bgm-toast';toast.textContent=t(BGM_KEYS[audio.bgmStyle]);
+  document.body.appendChild(toast);setTimeout(()=>toast.remove(),2000);
+  if(audio.musicPlaying){audio.stopMusic();audio.startMusic();}
+}
+
+// ============================================================
+// VOICE — supports Japanese + Chinese
+// ============================================================
+class VoiceManager{
+  constructor(){this.jaVoice=null;this.zhVoice=null;this.ready=false;}
+  init(){
+    if(this.ready)return;const v=speechSynthesis.getVoices();
+    // Japanese: prefer Kyoko or O-Ren
+    this.jaVoice=v.find(x=>x.name==='Kyoko')||v.find(x=>x.name==='O-Ren')||v.find(x=>x.lang&&x.lang.startsWith('ja'))||null;
+    // Chinese: Meijia is clearest for zh-TW, neural voices (Sandy etc.) sound muffled
+    this.zhVoice=
+      v.find(x=>/Meijia|Mei-Jia/i.test(x.name))||
+      v.find(x=>x.lang&&(x.lang==='zh-TW'||x.lang==='zh_TW')&&!/Sandy|Shelley|Flo|Reed|Rocko|Grandma|Grandpa|Eddy/i.test(x.name))||
+      v.find(x=>x.lang&&x.lang.startsWith('zh-TW'))||
+      v.find(x=>x.lang&&x.lang.startsWith('zh'))||null;
+    this.ready=true;
+  }
+  speak(text,opts={}){
+    if(audio.muted)return;if(!this.ready)this.init();
+    const lang=opts.lang||(I18N.lang==='zh'?'zh':'ja');
+    const u=new SpeechSynthesisUtterance(text);
+    if(lang==='zh'){u.lang='zh-TW';if(this.zhVoice)u.voice=this.zhVoice;}
+    else{u.lang='ja-JP';if(this.jaVoice)u.voice=this.jaVoice;}
+    u.rate=opts.rate||1;u.pitch=opts.pitch||1;u.volume=opts.volume||1;
+    speechSynthesis.cancel();speechSynthesis.speak(u);
+  }
+  /** Returns a Promise that resolves when speech finishes (or immediately if muted) */
+  speakAsync(text,opts={}){
+    return new Promise(resolve=>{
+      if(audio.muted||!text){resolve();return;}
+      if(!this.ready)this.init();
+      const lang=opts.lang||(I18N.lang==='zh'?'zh':'ja');
+      const u=new SpeechSynthesisUtterance(text);
+      if(lang==='zh'){u.lang='zh-TW';if(this.zhVoice)u.voice=this.zhVoice;}
+      else{u.lang='ja-JP';if(this.jaVoice)u.voice=this.jaVoice;}
+      u.rate=opts.rate||1;u.pitch=opts.pitch||1;u.volume=opts.volume||1;
+      u.onend=()=>resolve();
+      u.onerror=()=>resolve();
+      // Safety timeout: resolve after 8s max in case onend never fires
+      const timer=setTimeout(()=>resolve(),8000);
+      u.onend=()=>{clearTimeout(timer);resolve();};
+      u.onerror=()=>{clearTimeout(timer);resolve();};
+      speechSynthesis.cancel();speechSynthesis.speak(u);
+    });
+  }
+}
+const voice=new VoiceManager();
+if(typeof speechSynthesis!=='undefined')speechSynthesis.addEventListener('voiceschanged',()=>{voice.ready=false;voice.init();});
+
+// ============================================================
+// CONSTANTS & STATE
+// ============================================================
+const CUP_DATA={
+  tengu:{svg:SVG_TENGU,ml:140,nameKey:'cupTengu',descKey:'cupTenguDesc',color:'var(--red-bright)',size:'big'},
+  hyottoko:{svg:SVG_HYOTTOKO,ml:50,nameKey:'cupHyottoko',descKey:'cupHyottokoDesc',color:'var(--gold)',size:'mid'},
+  okame:{svg:SVG_OKAME,ml:20,nameKey:'cupOkame',descKey:'cupOkameDesc',color:'var(--green)',size:'small'},
+};
+const KOMA_FACES=['tengu','tengu','hyottoko','hyottoko','okame','okame'];
+const DEFAULT_NAMES=['太郎','花子','次郎','美咲','健太'];
+const LYRICS=['べろべろの〜','神様は','正直な','神様よ','おささの方へと','おもむきゃね','おもむきゃね'];
+const CONFETTI_COLORS=['#e74c3c','#d4a843','#f0d68a','#27ae60','#3498db','#f5e6c8'];
+
+const state={round:1,maxRounds:8,currentSpinner:0,players:[],spinning:false};
+let setupCount=4,setupPlayers=[];
+
+function $(id){return document.getElementById(id);}
+function show(sid){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(sid).classList.add('active');$('bgm-toggle').style.display=sid==='welcome-screen'?'none':'flex';}
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function goHome(){const inGame=document.querySelector('#table-screen.active')||document.querySelector('#gameover-screen.active');if(!inGame||confirm(t('confirmHome'))){audio.stopMusic();window.location.href='index.html';}}
+function spawnConfetti(count=20){for(let i=0;i<count;i++){const p=document.createElement('div');p.className='confetti-particle';p.style.left=randInt(10,90)+'vw';p.style.background=CONFETTI_COLORS[randInt(0,CONFETTI_COLORS.length-1)];p.style.setProperty('--dur',(2+Math.random()*2)+'s');p.style.animationDelay=(Math.random()*0.5)+'s';p.style.width=randInt(6,12)+'px';p.style.height=randInt(6,12)+'px';p.style.borderRadius=Math.random()>0.5?'50%':'2px';document.body.appendChild(p);setTimeout(()=>p.remove(),5000);}}
+
+// Voice helper: pick reveal line by cup size
+function getRevealVoice(name,cupName,size){
+  const key=size==='big'?'voiceRevealBig':size==='mid'?'voiceRevealMid':'voiceRevealSmall';
+  return t(key,{name,cup:cupName});
+}
+
+// ============================================================
+// SETUP
+// ============================================================
+function goSetup(){audio.init();audio.ensureResumed();audio.startMusic();setupCount=4;buildSetupPlayers();show('setup-screen');renderSetup();}
+function buildSetupPlayers(){setupPlayers=[];setupPlayers.push({name:t('you'),isHuman:true});for(let i=1;i<setupCount;i++)setupPlayers.push({name:DEFAULT_NAMES[i-1]||('P'+(i+1)),isHuman:false});}
+function setPlayerCount(n){audio.playClick();setupCount=n;while(setupPlayers.length<n){const i=setupPlayers.length-1;setupPlayers.push({name:DEFAULT_NAMES[i]||('P'+(setupPlayers.length+1)),isHuman:false});}while(setupPlayers.length>n)setupPlayers.pop();renderSetup();}
+function togglePlayerType(i){if(i===0)return;audio.playClick();setupPlayers[i].isHuman=!setupPlayers[i].isHuman;renderSetup();}
+function updatePlayerName(i,n){setupPlayers[i].name=n;}
+function renderSetup(){let ch='';for(let n=2;n<=6;n++)ch+=`<button class="count-btn${n===setupCount?' selected':''}" onclick="setPlayerCount(${n})">${n}</button>`;$('count-row').innerHTML=ch;let lh='';for(let i=0;i<setupPlayers.length;i++){const p=setupPlayers[i];lh+=`<div class="player-row${i===0?' is-you':''}"><span class="idx">${i+1}.</span><input class="name-input" value="${p.name}" oninput="updatePlayerName(${i},this.value)" maxlength="8"><button class="type-toggle" onclick="togglePlayerType(${i})" ${i===0?'disabled style="opacity:0.5;cursor:default;"':''}>${p.isHuman?'🧑':'🤖'}</button></div>`;}$('player-list').innerHTML=lh;}
+function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,i)=>{setupPlayers[i].name=inp.value.trim()||('P'+(i+1));});state.players=setupPlayers.map(p=>({name:p.name,isHuman:p.isHuman,ml:0}));state.round=1;state.currentSpinner=0;state.spinning=false;show('table-screen');startRound();}
+
+// ============================================================
+// TABLE
+// ============================================================
+function getSeatPositions(count){const p=[];for(let i=0;i<count;i++){const a=(180+(360/count)*i)%360;const r=a*Math.PI/180;const rad=40;p.push({x:50+rad*Math.sin(r),y:50-rad*Math.cos(r),angle:a});}return p;}
+function renderTable(){const l=$('table-layout');l.querySelectorAll('.seat').forEach(s=>s.remove());l.querySelectorAll('.next-btn-float').forEach(b=>b.remove());const pos=getSeatPositions(state.players.length);state.players.forEach((p,i)=>{const s=document.createElement('div');s.className='seat';s.id='seat-'+i;s.style.left=pos[i].x+'%';s.style.top=pos[i].y+'%';s.innerHTML=`<div class="s-name">${p.isHuman?'🧑':'🤖'} ${p.name}</div><div class="s-ml">${p.ml}ml</div>`;l.appendChild(s);});
+  const kd=$('koma-3d');kd.innerHTML=`<span class="koma-pointer">▼</span>${SVG_KOMA}<div class="koma-result-face" id="koma-result-face"></div>`;
+}
+function updateSeats(){state.players.forEach((p,i)=>{const s=$('seat-'+i);if(!s)return;s.querySelector('.s-ml').textContent=p.ml+'ml';s.classList.toggle('is-spinner',i===state.currentSpinner);s.classList.remove('is-target');});}
+function highlightTarget(idx){state.players.forEach((_,i)=>{const s=$('seat-'+i);if(s){s.classList.toggle('is-target',i===idx);s.classList.remove('is-spinner');}});}
+
+// ============================================================
+// LYRICS
+// ============================================================
+function renderLyrics(){$('lyrics-box').innerHTML=LYRICS.map((l,i)=>`<span class="lyric-line" id="lyric-${i}">${l} </span>`).join('');}
+
+// ============================================================
+// DRAMATIC REVEAL OVERLAY
+// ============================================================
+function showRevealOverlay(targetPlayer,cup,faceKey){
+  return new Promise(resolve=>{
+    const ov=document.createElement('div');ov.className='reveal-overlay';
+    ov.innerHTML=`
+      <div class="reveal-who">${t('revealWho')}</div>
+      <div class="reveal-target">${targetPlayer.name}</div>
+      <div class="reveal-cup-svg">${cup.svg}</div>
+      <div class="reveal-cup-name" style="color:${cup.color}">${t(cup.nameKey)}</div>
+      <div class="reveal-cup-vol">${cup.ml}ml</div>
+      <div class="reveal-cup-desc">${t(cup.descKey)}</div>
+      <div class="reveal-tap-hint" style="visibility:hidden">${t('tapToContinue')}</div>`;
+    document.body.appendChild(ov);
+    audio.playRevealDrum();spawnConfetti(25);
+    // Wait for BOTH voice and minimum time before allowing dismiss
+    let canDismiss=false;
+    const voiceP=voice.speakAsync(getRevealVoice(targetPlayer.name,t(cup.nameKey),cup.size),{rate:1,pitch:1.05});
+    const minTimeP=wait(1500);
+    Promise.all([voiceP,minTimeP]).then(()=>{
+      canDismiss=true;
+      const hint=ov.querySelector('.reveal-tap-hint');if(hint)hint.style.visibility='visible';
+    });
+    const dismiss=(e)=>{e.preventDefault();if(!canDismiss)return;ov.removeEventListener('click',dismiss);ov.removeEventListener('touchstart',dismiss);ov.style.transition='opacity 0.3s';ov.style.opacity='0';setTimeout(()=>{ov.remove();resolve();},300);};
+    ov.addEventListener('click',dismiss);ov.addEventListener('touchstart',dismiss,{passive:false});
+  });
+}
+
+// ============================================================
+// KOMA INTERACTION — Press & Hold
+// ============================================================
+function makeKomaInteractive(){
+  const kd=$('koma-3d');kd.classList.add('interactive');let charging=false;
+  const onDown=(e)=>{e.preventDefault();e.stopPropagation();if(state.spinning)return;charging=true;kd.classList.remove('idle');kd.classList.add('charging');audio.playCharge();};
+  const onUp=(e)=>{e.preventDefault();e.stopPropagation();if(!charging||state.spinning)return;charging=false;kd.classList.remove('charging','interactive');removeKomaListeners();doSpin();};
+  const onCancel=()=>{if(!charging)return;charging=false;kd.classList.remove('charging');kd.classList.add('idle');};
+  kd._kl={onDown,onUp,onCancel};
+  kd.addEventListener('mousedown',onDown);kd.addEventListener('touchstart',onDown,{passive:false});
+  kd.addEventListener('mouseup',onUp);kd.addEventListener('touchend',onUp);
+  kd.addEventListener('mouseleave',onCancel);kd.addEventListener('touchcancel',onCancel);
+}
+function removeKomaListeners(){const kd=$('koma-3d');if(!kd||!kd._kl)return;const{onDown,onUp,onCancel}=kd._kl;kd.removeEventListener('mousedown',onDown);kd.removeEventListener('touchstart',onDown);kd.removeEventListener('mouseup',onUp);kd.removeEventListener('touchend',onUp);kd.removeEventListener('mouseleave',onCancel);kd.removeEventListener('touchcancel',onCancel);kd._kl=null;}
+
+// ============================================================
+// GAME LOGIC
+// ============================================================
+function startRound(){
+  $('round-info').textContent=t('roundInfo',{n:state.round,max:state.maxRounds});
+  renderTable();renderLyrics();updateSeats();
+  const sp=state.players[state.currentSpinner];
+  $('spinner-label').textContent=t('spinnerTurn',{name:sp.name});
+  const kd=$('koma-3d');kd.className='koma-3d idle';
+  const rf=$('koma-result-face');if(rf){rf.className='koma-result-face';rf.textContent='';}
+  if(sp.isHuman){
+    $('spin-btn-wrap').innerHTML=`<div class="hold-hint">${t('holdToSpin')}</div>`;
+    makeKomaInteractive();
+  }else{
+    $('spin-btn-wrap').innerHTML=`<div style="font-size:14px;color:var(--cream-dim)">${t('aiSpinning',{name:sp.name})}</div>`;
+    setTimeout(()=>doSpin(),1200);
+  }
+}
+
+async function doSpin(){
+  if(state.spinning)return;state.spinning=true;
+  $('spin-btn-wrap').innerHTML='';removeKomaListeners();
+  const res=spinKoma();const{face,targetIdx,totalRotation}=res;
+  const cup=CUP_DATA[face];const spinDur=6;
+  const sp=state.players[state.currentSpinner];
+
+  // === FULLSCREEN SPIN OVERLAY (pointer sweeps via rotateZ) ===
+  const ov=document.createElement('div');ov.className='spin-overlay';
+  ov.innerHTML=`
+    <div class="spin-who">${t('spinnerTurn',{name:sp.name})}</div>
+    <div class="spin-koma-wrap">
+      <div class="spin-koma-inner" id="spin-koma-inner">
+        <div class="spin-arrow"></div>
+        ${SVG_KOMA}
+      </div>
+    </div>
+    <div class="spin-lyrics-wrap">
+      ${LYRICS.map((l,i)=>`<span class="lyric-line" id="spin-lyric-${i}">${l} </span>`).join('')}
+    </div>`;
+  document.body.appendChild(ov);
+  await wait(300);
+
+  // Spin with rotateZ (pointer sweeps around!) + slight rotateX tilt for 3D
+  const ski=document.getElementById('spin-koma-inner');
+  ski.style.setProperty('--spin-deg',totalRotation+'deg');
+  ski.style.setProperty('--spin-duration',spinDur+'s');
+  ski.classList.add('spinning');
+  audio.playSpinStart();
+  // Start voice — keep the Promise so we can wait for it to finish
+  const voiceFinished=voice.speakAsync(t('voiceSpin'),{rate:0.95});
+
+  // Lyrics sync — slower pacing (750ms per line) to match longer spin
+  const lyricPace=750;
+  for(let i=0;i<LYRICS.length;i++){
+    await wait(lyricPace);
+    LYRICS.forEach((_,j)=>{const e=document.getElementById('spin-lyric-'+j);if(e)e.classList.toggle('active',j===i);});
+  }
+  const rem=spinDur*1000-LYRICS.length*lyricPace;if(rem>0)await wait(rem);
+
+  // Wait for BOTH the spin animation AND the voice to finish
+  await voiceFinished;
+
+  audio.playSpinStop();await wait(400);
+
+  // Show result face on the koma
+  const resultFace=document.createElement('div');
+  resultFace.className='spin-result-face';
+  resultFace.innerHTML=`${cup.svg}<div class="spin-result-label" style="color:${cup.color}">${t(cup.nameKey)}</div>`;
+  ski.appendChild(resultFace);
+  await wait(50);resultFace.classList.add('show');
+  await wait(1200);
+
+  ov.style.transition='opacity 0.4s';ov.style.opacity='0';
+  await wait(400);ov.remove();
+
+  highlightTarget(targetIdx);
+  const targetPlayer=state.players[targetIdx];
+  await showRevealOverlay(targetPlayer,cup,face);
+  await showDrinking(targetIdx,face);
+  state.players[targetIdx].ml+=cup.ml;updateSeats();
+  await wait(400);
+
+  state.round++;state.currentSpinner=(state.currentSpinner+1)%state.players.length;
+  if(state.round>state.maxRounds){gameOver();}
+  else{showNextButton();state.spinning=false;}
+}
+
+function spinKoma(){
+  const face=KOMA_FACES[randInt(0,5)];const n=state.players.length;
+  const targetIdx=randInt(0,n-1);const pos=getSeatPositions(n);
+  const ta=pos[targetIdx].angle;
+  return{face,targetIdx,totalRotation:360*randInt(6,10)+ta};
+}
+
+function showNextButton(){
+  document.querySelectorAll('.next-btn-float').forEach(b=>b.remove());
+  const nextIdx=state.currentSpinner;const nextP=state.players[nextIdx];
+  const pos=getSeatPositions(state.players.length);const p=pos[nextIdx];
+  const bx=50+(p.x-50)*0.55;const by=50+(p.y-50)*0.55;
+  const btn=document.createElement('button');btn.className='next-btn-float';
+  btn.style.left=bx+'%';btn.style.top=by+'%';
+  btn.innerHTML=`${t('nextRound')}<span class="next-name">${nextP.name}</span>`;
+  btn.onclick=()=>{audio.playClick();btn.remove();state.spinning=false;startRound();};
+  $('table-layout').appendChild(btn);
+}
+
+// ============================================================
+// DRINKING
+// ============================================================
+function showDrinking(playerIdx,faceKey){
+  return new Promise(resolve=>{
+    const player=state.players[playerIdx];const cup=CUP_DATA[faceKey];const isH=player.isHuman;
+    const ov=document.createElement('div');ov.className='drink-overlay';
+    ov.innerHTML=`<div class="drink-target-name">${player.name}</div><div class="drink-cup-svg">${cup.svg}</div><div class="drink-cup-name" style="color:${cup.color}">${t(cup.nameKey)}</div><div class="drink-cup-ml">${cup.ml}ml</div><div class="drink-cup-desc">${t(cup.descKey)}</div><div class="drink-bar"><div class="drink-fill" id="drink-fill"></div></div><div class="drink-pct" id="drink-pct">0%</div><div class="drink-tap-hint" id="drink-hint">${isH?t('drinkTapHint'):t('drinkAutoMsg',{name:player.name})}</div>`;
+    document.body.appendChild(ov);
+    let prog=0;const fill=ov.querySelector('#drink-fill');const pct=ov.querySelector('#drink-pct');const hint=ov.querySelector('#drink-hint');
+    const sakeEls=ov.querySelectorAll('.sake-level');
+    const sakeData=Array.from(sakeEls).map(el=>({el,maxH:parseFloat(el.getAttribute('height'))||50,origY:parseFloat(el.getAttribute('y'))||58}));
+    const updateSake=()=>{sakeData.forEach(({el,maxH,origY})=>{const newH=maxH*(1-prog/100);el.setAttribute('height',Math.max(0,newH));el.setAttribute('y',origY+(maxH-newH));});};
+    const finish=()=>{audio.playDrinkGulp();hint.className='drink-done-msg';hint.textContent=t('drinkDone');voice.speak(t('voiceDrinkDone'),{rate:1,pitch:1.05});setTimeout(()=>{ov.remove();resolve();},1000);};
+    if(isH){
+      const tap=(e)=>{e.preventDefault();if(prog>=100)return;prog=Math.min(100,prog+8);fill.style.width=prog+'%';pct.textContent=Math.round(prog)+'%';updateSake();audio.playClick();if(prog>=100){ov.removeEventListener('click',tap);ov.removeEventListener('touchstart',tap);ov.style.cursor='default';finish();}};
+      ov.addEventListener('click',tap);ov.addEventListener('touchstart',tap,{passive:false});
+    }else{
+      const iv=setInterval(()=>{prog=Math.min(100,prog+4);fill.style.width=prog+'%';pct.textContent=Math.round(prog)+'%';updateSake();if(prog>=100){clearInterval(iv);finish();}},80);
+    }
+  });
+}
+
+// ============================================================
+// GAME OVER
+// ============================================================
+function gameOver(){
+  show('gameover-screen');audio.stopMusic();audio.playSake();audio.playWin();spawnConfetti(30);
+  const sorted=[...state.players].sort((a,b)=>b.ml-a.ml);
+  const ranks=['🥇','🥈','🥉'];
+  let h='';sorted.forEach((p,i)=>{h+=`<div class="lb-row${i===0?' champion':''}" style="animation-delay:${i*0.15}s"><span class="lb-rank">${ranks[i]||`${i+1}`}</span><span class="lb-name">${p.name} ${p.isHuman?'🧑':'🤖'}</span><span class="lb-ml">${p.ml}ml</span>${i===0?`<span class="lb-badge">${t('champion')}</span>`:''}</div>`;});
+  $('leaderboard').innerHTML=h;
+  voice.speak(t('voiceGameover'),{rate:0.95,pitch:1});
+}
+
+function resetAll(){state.players=[];state.round=1;state.currentSpinner=0;state.spinning=false;audio.stopMusic();show('welcome-screen');}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded',()=>{
+  I18N.updateDOM();
+  $('mute-toggle').textContent='🔊';
+  $('bgm-toggle').textContent=BGM_ICONS[audio.bgmStyle];
+  const kd=$('koma-3d');
+  if(kd)kd.innerHTML=`<span class="koma-pointer">▼</span>${SVG_KOMA}<div class="koma-result-face" id="koma-result-face"></div>`;
+  if(typeof speechSynthesis!=='undefined'&&speechSynthesis.getVoices().length>0)voice.init();
+});
+</script>
+</body>
+</html>
