@@ -608,6 +608,21 @@ class VoiceManager{
 const voice=new VoiceManager();
 if(typeof speechSynthesis!=='undefined')speechSynthesis.addEventListener('voiceschanged',()=>{voice.ready=false;voice.init();});
 
+// Mobile browsers require speechSynthesis to be "unlocked" by a user gesture.
+// We do a silent speak on the first tap anywhere to warm it up.
+let _speechUnlocked=false;
+function unlockSpeech(){
+  if(_speechUnlocked||typeof speechSynthesis==='undefined')return;
+  _speechUnlocked=true;
+  const u=new SpeechSynthesisUtterance('');u.volume=0;
+  speechSynthesis.speak(u);
+  voice.init();
+  document.removeEventListener('click',unlockSpeech,true);
+  document.removeEventListener('touchstart',unlockSpeech,true);
+}
+document.addEventListener('click',unlockSpeech,true);
+document.addEventListener('touchstart',unlockSpeech,true);
+
 // ============================================================
 // CONSTANTS & STATE
 // ============================================================
@@ -747,6 +762,13 @@ async function doSpin(){
       ${LYRICS.map((l,i)=>`<span class="lyric-line" id="spin-lyric-${i}">${l} </span>`).join('')}
     </div>`;
   document.body.appendChild(ov);
+
+  // IMPORTANT: Start voice BEFORE any await — mobile browsers require
+  // speechSynthesis.speak() in the same call stack as the user gesture.
+  // Any await/setTimeout breaks the gesture chain and speech gets blocked.
+  audio.playSpinStart();
+  const voiceFinished=voice.speakAsync(t('voiceSpin'),{rate:0.95});
+
   await wait(300);
 
   // Spin with rotateZ (pointer sweeps around!) + slight rotateX tilt for 3D
@@ -754,9 +776,6 @@ async function doSpin(){
   ski.style.setProperty('--spin-deg',totalRotation+'deg');
   ski.style.setProperty('--spin-duration',spinDur+'s');
   ski.classList.add('spinning');
-  audio.playSpinStart();
-  // Start voice — keep the Promise so we can wait for it to finish
-  const voiceFinished=voice.speakAsync(t('voiceSpin'),{rate:0.95});
 
   // Lyrics sync — slower pacing (750ms per line) to match longer spin
   const lyricPace=750;

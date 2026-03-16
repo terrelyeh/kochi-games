@@ -959,6 +959,21 @@ class VoiceManager {
 const voice = new VoiceManager();
 if (typeof speechSynthesis !== 'undefined')
   speechSynthesis.addEventListener('voiceschanged', () => { voice.ready=false; voice.init(); });
+
+// Mobile browsers require speechSynthesis to be "unlocked" by a user gesture.
+let _speechUnlocked=false;
+function unlockSpeech(){
+  if(_speechUnlocked||typeof speechSynthesis==='undefined')return;
+  _speechUnlocked=true;
+  const u=new SpeechSynthesisUtterance('');u.volume=0;
+  speechSynthesis.speak(u);
+  voice.init();
+  document.removeEventListener('click',unlockSpeech,true);
+  document.removeEventListener('touchstart',unlockSpeech,true);
+}
+document.addEventListener('click',unlockSpeech,true);
+document.addEventListener('touchstart',unlockSpeech,true);
+
 const NUMBER_CALLS = {1:'いっぽん', 3:'さんぼん', 5:'ごほん'};
 
 // ============================================================
