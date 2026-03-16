@@ -111,20 +111,6 @@
   .player-row.is-you{border-color:var(--gold);}
   .setup-toggle-hint{font-size:12px;color:var(--cream-dim);margin-bottom:12px;opacity:0.7;}
 
-  /* === Custom Chant === */
-  .chant-section{width:100%;max-width:360px;margin-top:16px;padding-top:14px;border-top:1px solid var(--surface-2);}
-  .chant-label{font-size:13px;color:var(--cream-dim);margin-bottom:8px;}
-  .chant-preview{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--cream-dim);line-height:2;text-align:center;}
-  .chant-preview .chant-fixed{opacity:0.5;}
-  .chant-preview .chant-editable{display:inline-block;margin:0 2px;}
-  .chant-preview .chant-editable input{
-    background:none;border:none;border-bottom:1.5px dashed var(--gold);
-    color:var(--gold-light);font-family:'Noto Serif JP',serif;font-size:13px;
-    text-align:center;width:auto;min-width:80px;max-width:180px;padding:2px 4px;
-  }
-  .chant-preview .chant-editable input:focus{outline:none;border-color:var(--gold-light);}
-  .chant-preview .chant-editable input::placeholder{color:var(--cream-dim);opacity:0.5;}
-
   /* === Table === */
   #table-screen{justify-content:flex-start;padding-top:16px;gap:0;overflow-y:auto;}
   .round-info{font-size:12px;color:var(--cream-dim);margin-bottom:6px;letter-spacing:1px;}
@@ -320,7 +306,6 @@
     <div class="player-count-row" id="count-row"></div>
     <div class="setup-toggle-hint" id="setup-hint"></div>
     <div class="player-list" id="player-list"></div>
-    <div class="chant-section" id="chant-area"></div>
     <button class="btn btn-gold" onclick="startFromSetup()" data-i18n="setupStart" style="margin-top:12px;"></button>
   </div>
 
@@ -440,7 +425,7 @@ const I18N={
       rulesTitle:'📜 ルール',
       rules:['みんなで座り、順番に<strong>独楽</strong>を回す','三種の杯：<strong>天狗杯</strong>(大)、<strong>ひょっとこ杯</strong>(中)、<strong>おかめ杯</strong>(小)','独楽が指した人が、出た面の杯で飲む','八回合後、最も飲んだ者が<strong>「酒豪」</strong>として勝利！'],
       startBtn:'乾杯！',setupTitle:'🎴 座席安排',setupCount:'人数',setupStart:'始めよう！',
-      setupToggleHint:'🤖 をタップで真人に切替',setupChantLabel:'🎤 回す呪文',setupChantPlaceholder:'おささの方へと',
+      setupToggleHint:'🤖 をタップで真人に切替',
       roundInfo:'第 {n} 回合 ／ 全 {max} 回合',spinBtn:'回せ！',spinnerTurn:'{name} の番',aiSpinning:'{name} が回している…',
       holdToSpin:'独楽を押して放せ！',
       revealWho:'独楽が指したのは…',
@@ -465,7 +450,7 @@ const I18N={
       rulesTitle:'📜 遊戲規則',
       rules:['眾人圍坐，輪流轉動<strong>獨樂</strong>（陀螺）','三種酒杯：<strong>天狗杯</strong>(大)、<strong>火男杯</strong>(中)、<strong>阿龜杯</strong>(小)','獨樂停下指向誰，誰就用對應的杯喝','八回合後飲最多者為<strong>「酒豪」</strong>勝出！'],
       startBtn:'乾杯！',setupTitle:'🎴 座席安排',setupCount:'人數',setupStart:'開始！',
-      setupToggleHint:'點 🤖 可切換為真人',setupChantLabel:'🎤 旋轉咒語',setupChantPlaceholder:'朝著酒的方向',
+      setupToggleHint:'點 🤖 可切換為真人',
       roundInfo:'第 {n} 回合 ／ 共 {max} 回合',spinBtn:'轉！',spinnerTurn:'輪到 {name}',aiSpinning:'{name} 正在轉…',
       holdToSpin:'按住獨樂，放開旋轉！',
       revealWho:'獨樂指向了…',
@@ -652,12 +637,7 @@ const CUP_DATA={
 };
 const KOMA_FACES=['tengu','tengu','hyottoko','hyottoko','okame','okame'];
 const DEFAULT_NAMES=['太郎','花子','次郎','美咲','健太'];
-const LYRICS_BASE=['べろべろの〜','神様は','正直な','神様よ','おささの方へと','おもむきゃね','おもむきゃね'];
-const LYRICS_EDITABLE_IDX=4; // "おささの方へと" is the customizable line
-let customChantLine=''; // empty = use default
-function getLyrics(){const l=[...LYRICS_BASE];if(customChantLine.trim())l[LYRICS_EDITABLE_IDX]=customChantLine.trim();return l;}
-// Alias for backward compat
-const LYRICS=LYRICS_BASE;
+const LYRICS=['べろべろの〜','神様は','正直な','神様よ','おささの方へと','おもむきゃね','おもむきゃね'];
 const CONFETTI_COLORS=['#e74c3c','#d4a843','#f0d68a','#27ae60','#3498db','#f5e6c8'];
 
 const state={round:1,maxRounds:8,currentSpinner:0,players:[],spinning:false};
@@ -690,13 +670,6 @@ function renderSetup(){
   $('setup-hint').textContent=t('setupToggleHint');
   // Player list
   let lh='';for(let i=0;i<setupPlayers.length;i++){const p=setupPlayers[i];lh+=`<div class="player-row${i===0?' is-you':''}"><span class="idx">${i+1}.</span><input class="name-input" value="${p.name}" oninput="updatePlayerName(${i},this.value)" maxlength="8"><button class="type-toggle" onclick="togglePlayerType(${i})" ${i===0?'disabled style="opacity:0.5;cursor:default;"':''}>${p.isHuman?'🧑':'🤖'}</button></div>`;}$('player-list').innerHTML=lh;
-  // Chant customizer
-  const lyrics=getLyrics();const def=LYRICS_BASE[LYRICS_EDITABLE_IDX];
-  const chantHtml=lyrics.map((l,i)=>{
-    if(i===LYRICS_EDITABLE_IDX)return `<span class="chant-editable"><input id="chant-input" value="${customChantLine||''}" placeholder="${t('setupChantPlaceholder')}" oninput="customChantLine=this.value" maxlength="15"></span>`;
-    return `<span class="chant-fixed">${l} </span>`;
-  }).join('');
-  $('chant-area').innerHTML=`<div class="chant-label">${t('setupChantLabel')}</div><div class="chant-preview">${chantHtml}</div>`;
 }
 function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,i)=>{setupPlayers[i].name=inp.value.trim()||('P'+(i+1));});state.players=setupPlayers.map(p=>({name:p.name,isHuman:p.isHuman,ml:0}));state.round=1;state.currentSpinner=0;state.spinning=false;show('table-screen');startRound();}
 
@@ -713,7 +686,7 @@ function highlightTarget(idx){state.players.forEach((_,i)=>{const s=$('seat-'+i)
 // ============================================================
 // LYRICS
 // ============================================================
-function renderLyrics(){const ly=getLyrics();$('lyrics-box').innerHTML=ly.map((l,i)=>`<span class="lyric-line" id="lyric-${i}">${l} </span>`).join('');}
+function renderLyrics(){const ly=LYRICS;$('lyrics-box').innerHTML=ly.map((l,i)=>`<span class="lyric-line" id="lyric-${i}">${l} </span>`).join('');}
 
 // ============================================================
 // DRAMATIC REVEAL OVERLAY
@@ -784,7 +757,7 @@ async function doSpin(){
   const res=spinKoma();const{face,targetIdx,totalRotation}=res;
   const cup=CUP_DATA[face];const spinDur=6;
   const sp=state.players[state.currentSpinner];
-  const spinLyrics=getLyrics();
+  const spinLyrics=LYRICS;
 
   // === FULLSCREEN SPIN OVERLAY (pointer sweeps via rotateZ) ===
   const ov=document.createElement('div');ov.className='spin-overlay';
@@ -803,10 +776,8 @@ async function doSpin(){
 
   // IMPORTANT: Start voice BEFORE any await — mobile browsers require
   // speechSynthesis.speak() in the same call stack as the user gesture.
-  // Build voice text from lyrics (with custom chant line if set)
   audio.playSpinStart();
-  const voiceText=spinLyrics.join('、');
-  const voiceFinished=voice.speakAsync(voiceText,{rate:0.95});
+  const voiceFinished=voice.speakAsync(t('voiceSpin'),{rate:0.95});
 
   await wait(300);
 
