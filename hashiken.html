@@ -649,6 +649,16 @@ const I18N = {
       confirmHome: 'メインに戻りますか？',
       bgmMiyako: '🌙 静夜',
       bgmShamisen: '🎶 宴会',
+      voiceRock: '最初はグー',
+      voiceJanken: 'じゃんけんぽん',
+      voiceIrrashai: 'いらっしゃい',
+      voiceSeNo: 'せーの',
+      voiceDase: '出せ',
+      voiceTie: 'あいこ',
+      voiceGochisou: 'ごちそうさまでした',
+      voiceCall1: 'いっぽん',
+      voiceCall3: 'さんぼん',
+      voiceCall5: 'ごほん',
     },
     zh: {
       subtitle: '筷 子 拳',
@@ -663,11 +673,11 @@ const I18N = {
         '總和為偶數 → 平手，交換攻守',
         '三戰兩勝，最終輸家 <strong>罰杯！🍶</strong>',
       ],
-      startBtn: '開始！（いらっしゃい！）',
-      jankenForced: '最初はグー！（第一拳強制出石頭）',
-      jankenGo: 'じゃんけんぽん！（猜拳！）',
+      startBtn: '開始！',
+      jankenForced: '第一拳強制出石頭！',
+      jankenGo: '猜拳！',
       tieJanken: '平手！再來一次',
-      tieForced: '平手！（あいこ）',
+      tieForced: '平手！',
       youWinJanken: '你贏了！',
       oppWinJanken: '對手贏了！',
       roleDecided: '身分決定！',
@@ -687,14 +697,14 @@ const I18N = {
       callPreviewParent: '你的喊數：3',
       callPreviewChildAuto: '出的筷子數決定你的喊數',
       callPreviewChildN: '你的喊數：{n}',
-      irrashai: 'いらっしゃい！（來吧！）',
-      irrashaiOpp: '對手：いらっしゃい！（來吧！）',
+      irrashai: '來吧！',
+      irrashaiOpp: '對手：來吧！',
       pickPrompt: '要出幾根筷子？',
       confirmBtn: '出！',
       selectHint: '選擇出幾根…',
-      seNo: 'せーの...',
-      dase: '出せ！',
-      tieRound: '平手！（あいこ）',
+      seNo: '預備...',
+      dase: '出！',
+      tieRound: '平手！',
       tieDetail: '合計 {n} 根（偶數）→ 交換攻守！',
       winRound: '你贏了！',
       loseRound: '對手贏了…',
@@ -708,12 +718,22 @@ const I18N = {
       gameoverWinTitle: '你贏了！',
       gameoverLoseTitle: '你輸了…',
       gameoverWinMsg: '最終比分：<strong>{ps} - {as}</strong><br><br>對手必須罰杯…🍶<br>但在「負け得」精神中，<br><strong>喝到酒的人才是真正贏家！</strong>',
-      gameoverLoseMsg: '最終比分：<strong>{ps} - {as}</strong><br><br>罰杯是你的！🍶<br>但別忘了——<br><strong>「負け得」＝ 輸了才是贏</strong><br>乾杯之後…',
-      gochisou: 'ごちそうさまでした！（多謝招待！）',
+      gameoverLoseMsg: '最終比分：<strong>{ps} - {as}</strong><br><br>罰杯是你的！🍶<br>但別忘了——<br><strong>輸了才是贏！</strong><br>乾杯之後…',
+      gochisou: '多謝招待！',
       playAgain: '再來一局！',
       confirmHome: '確定要返回首頁嗎？',
       bgmMiyako: '🌙 靜夜',
       bgmShamisen: '🎶 宴會',
+      voiceRock: '剪刀石頭布！',
+      voiceJanken: '出拳！',
+      voiceIrrashai: '來吧，開始囉！',
+      voiceSeNo: '準備好了嗎',
+      voiceDase: '出！',
+      voiceTie: '平手！',
+      voiceGochisou: '多謝招待！太好喝了！',
+      voiceCall1: '一根！',
+      voiceCall3: '三根！',
+      voiceCall5: '五根！',
     },
   },
   get lang() { return this._lang; },
@@ -769,7 +789,7 @@ class AudioManager {
     this.masterGain = this.ctx.createGain();
     this.masterGain.connect(this.ctx.destination);
     this.musicGain = this.ctx.createGain();
-    this.musicGain.gain.value = 0.12;
+    this.musicGain.gain.value = 0.35;
     this.musicGain.connect(this.masterGain);
     this.sfxGain = this.ctx.createGain();
     this.sfxGain.gain.value = 0.3;
@@ -938,20 +958,22 @@ function toggleBgm() {
 // 3. VOICE MANAGER
 // ============================================================
 class VoiceManager {
-  constructor() { this.voice = null; this.ready = false; }
+  constructor() { this.jaVoice = null; this.zhVoice = null; this.ready = false; }
   init() {
     if (this.ready) return;
     const v = speechSynthesis.getVoices();
-    this.voice = v.find(x=>x.name==='Kyoko') || v.find(x=>x.name==='O-Ren') || v.find(x=>x.lang&&x.lang.startsWith('ja')) || null;
+    this.jaVoice = v.find(x=>x.name==='Kyoko') || v.find(x=>x.name==='O-Ren') || v.find(x=>x.lang&&x.lang.startsWith('ja')) || null;
+    this.zhVoice = v.find(x=>/Meijia|Mei-Jia/i.test(x.name)) || v.find(x=>x.lang&&x.lang.startsWith('zh-TW')) || v.find(x=>x.lang&&x.lang.startsWith('zh')) || null;
     this.ready = true;
   }
   speak(text, opts={}) {
     if (audio.muted) return;
     if (!this.ready) this.init();
+    const lang = opts.lang || (I18N.lang === 'zh' ? 'zh' : 'ja');
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'ja-JP';
-    if (this.voice) u.voice = this.voice;
-    u.rate = opts.rate||1; u.pitch = opts.pitch||1; u.volume = opts.volume||0.8;
+    if (lang === 'zh') { u.lang = 'zh-TW'; if (this.zhVoice) u.voice = this.zhVoice; }
+    else { u.lang = 'ja-JP'; if (this.jaVoice) u.voice = this.jaVoice; }
+    u.rate = opts.rate||1; u.pitch = opts.pitch||1; u.volume = opts.volume||1;
     speechSynthesis.cancel();
     speechSynthesis.speak(u);
   }
@@ -974,7 +996,7 @@ function unlockSpeech(){
 document.addEventListener('click',unlockSpeech,true);
 document.addEventListener('touchstart',unlockSpeech,true);
 
-const NUMBER_CALLS = {1:'いっぽん', 3:'さんぼん', 5:'ごほん'};
+function getNumberCall(n) { return t({1:'voiceCall1',3:'voiceCall3',5:'voiceCall5'}[n]||''); }
 
 // ============================================================
 // 4. GAME STATE & LOGIC
@@ -1017,7 +1039,7 @@ function startJanken() {
   $('janken-prompt').textContent = t('jankenForced');
   $('janken-result').textContent = '';
   $('janken-vs').innerHTML = '';
-  voice.speak('最初はグー');
+  voice.speak(t('voiceRock'));
   document.querySelectorAll('.janken-btn').forEach(b => b.classList.toggle('disabled', b.dataset.hand !== 'rock'));
 }
 const HAND_EMOJI = { rock:'✊', scissors:'✌️', paper:'🖐️' };
@@ -1037,7 +1059,7 @@ async function playJanken(hand) {
     jankenForced = false;
     $('janken-prompt').textContent = t('jankenGo');
     $('janken-result').textContent = ''; $('janken-vs').innerHTML = '';
-    voice.speak('じゃんけんぽん', {rate:1.1});
+    voice.speak(t('voiceJanken'), {rate:1.1});
     btns.forEach(b => b.classList.remove('disabled'));
     return;
   }
@@ -1048,7 +1070,7 @@ async function playJanken(hand) {
     $('janken-result').innerHTML = `<span style="color:var(--gold)">${t('tieJanken')}</span>`;
     audio.playTie(); await wait(1000);
     $('janken-result').textContent = ''; $('janken-vs').innerHTML = '';
-    voice.speak('じゃんけんぽん', {rate:1.1});
+    voice.speak(t('voiceJanken'), {rate:1.1});
     btns.forEach(b => b.classList.remove('disabled'));
     return;
   }
@@ -1103,7 +1125,7 @@ function startRound() {
   } else {
     iBox.innerHTML = `<div class="irasshai" style="color:var(--blue)">${t('irrashaiOpp')}</div>`;
   }
-  voice.speak('いらっしゃい', {rate:0.9, pitch:1.1});
+  voice.speak(t('voiceIrrashai'), {rate:0.9, pitch:1.1});
 
   // Reset hand displays
   setHandState('ai-hand', '');
@@ -1196,10 +1218,10 @@ async function showCountdown() {
   ov.className = 'countdown-overlay';
   document.body.appendChild(ov);
   ov.innerHTML = `<div class="countdown-text">${t('seNo')}</div>`;
-  audio.playCountdown(); voice.speak('せーの', {rate:0.8,pitch:0.9});
+  audio.playCountdown(); voice.speak(t('voiceSeNo'), {rate:0.8,pitch:0.9});
   await wait(900);
   ov.innerHTML = `<div class="countdown-text">${t('dase')}</div>`;
-  audio.playCountdown(); voice.speak('出せ', {rate:1.2,pitch:1.2});
+  audio.playCountdown(); voice.speak(t('voiceDase'), {rate:1.2,pitch:1.2});
   await wait(600);
   document.body.removeChild(ov);
 }
@@ -1229,9 +1251,9 @@ function revealResult() {
   }
 
   setTimeout(()=>{
-    if(resultType==='win'){audio.playWin(); voice.speak(NUMBER_CALLS[state.playerRole==='parent'?3:playerCall]||'');}
-    else if(resultType==='lose'){audio.playLose(); voice.speak(NUMBER_CALLS[state.playerRole==='parent'?aiCall:3]||'');}
-    else{audio.playTie(); voice.speak('あいこ');}
+    if(resultType==='win'){audio.playWin(); voice.speak(getNumberCall(state.playerRole==='parent'?3:playerCall));}
+    else if(resultType==='lose'){audio.playLose(); voice.speak(getNumberCall(state.playerRole==='parent'?aiCall:3));}
+    else{audio.playTie(); voice.speak(t('voiceTie'));}
   }, 350);
 
   $('player-score').textContent = state.playerScore;
@@ -1279,7 +1301,7 @@ function gameOver(playerWins) {
     $('gameover-msg').innerHTML = t('gameoverLoseMsg',{ps,as});
     $('gochisou').textContent = t('gochisou');
     $('gochisou').style.display = 'block';
-    setTimeout(()=>voice.speak('ごちそうさまでした',{rate:0.8,pitch:0.9}), 1500);
+    setTimeout(()=>voice.speak(t('voiceGochisou'),{rate:0.8,pitch:0.9}), 1500);
   }
 }
 
