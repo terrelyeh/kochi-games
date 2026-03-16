@@ -1008,7 +1008,7 @@ function show(screenId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   $(screenId).classList.add('active');
   // BGM toggle visibility
-  $('bgm-toggle').style.display = screenId === 'welcome-screen' ? 'none' : 'flex';
+  $('bgm-toggle').style.display = 'flex';
 }
 function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
 function randInt(a,b) { return Math.floor(Math.random()*(b-a+1))+a; }

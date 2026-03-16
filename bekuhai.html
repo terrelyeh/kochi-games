@@ -438,7 +438,7 @@ const I18N={
       cupTenguDesc:'鼻が邪魔で置けない大杯',cupHyottokoDesc:'口の穴を塞がないと漏れる中杯',cupOkameDesc:'丸底で置けない！一気飲み小杯',
       cupTenguTrait:'長鼻が邪魔',cupHyottokoTrait:'穴から漏れる',cupOkameTrait:'置けない！',
       tapToContinue:'タップして続く',you:'あなた',
-      voiceSpin:'べろべろの神様は、正直な神様よ、おささの方へと、おもむきゃね、おもむきゃね',
+      voiceSpin:'べろべろの神様は、正直な神様よ、萬華世界維醺志士の方へと、おもむきゃね、おもむきゃね',
       voiceRevealBig:'うわぁ、{name}！{cup}だ！百四十ミリリットル！これは大変だぁ！',
       voiceRevealMid:'おっと、{name}が当たった！{cup}、五十ミリリットル、頑張れよ！',
       voiceRevealSmall:'{name}、{cup}！二十ミリだけ、ラッキーだね！',
@@ -637,14 +637,16 @@ const CUP_DATA={
 };
 const KOMA_FACES=['tengu','tengu','hyottoko','hyottoko','okame','okame'];
 const DEFAULT_NAMES=['太郎','花子','次郎','美咲','健太'];
-const LYRICS=['べろべろの〜','神様は','正直な','神様よ','おささの方へと','おもむきゃね','おもむきゃね'];
+const LYRICS_JA=['べろべろの〜','神様は','正直な','神様よ','萬華世界維醺志士の方へと','おもむきゃね','おもむきゃね'];
+const LYRICS_ZH=['醉醺醺的神明呀','正直的神明喲','朝著萬華世界','維醺志士的方向','轉過去吧','轉過去吧'];
+function getLyrics(){return I18N.lang==='ja'?LYRICS_JA:LYRICS_ZH;}
 const CONFETTI_COLORS=['#e74c3c','#d4a843','#f0d68a','#27ae60','#3498db','#f5e6c8'];
 
 const state={round:1,maxRounds:8,currentSpinner:0,players:[],spinning:false};
 let setupCount=4,setupPlayers=[];
 
 function $(id){return document.getElementById(id);}
-function show(sid){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(sid).classList.add('active');$('bgm-toggle').style.display=sid==='welcome-screen'?'none':'flex';}
+function show(sid){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(sid).classList.add('active');$('bgm-toggle').style.display='flex';}
 function wait(ms){return new Promise(r=>setTimeout(r,ms));}
 function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
 function goHome(){const inGame=document.querySelector('#table-screen.active')||document.querySelector('#gameover-screen.active');if(!inGame||confirm(t('confirmHome'))){audio.stopMusic();window.location.href='index.html';}}
@@ -686,7 +688,7 @@ function highlightTarget(idx){state.players.forEach((_,i)=>{const s=$('seat-'+i)
 // ============================================================
 // LYRICS
 // ============================================================
-function renderLyrics(){const ly=LYRICS;$('lyrics-box').innerHTML=ly.map((l,i)=>`<span class="lyric-line" id="lyric-${i}">${l} </span>`).join('');}
+function renderLyrics(){const ly=getLyrics();$('lyrics-box').innerHTML=ly.map((l,i)=>`<span class="lyric-line" id="lyric-${i}">${l} </span>`).join('');}
 
 // ============================================================
 // DRAMATIC REVEAL OVERLAY
@@ -757,7 +759,7 @@ async function doSpin(){
   const res=spinKoma();const{face,targetIdx,totalRotation}=res;
   const cup=CUP_DATA[face];const spinDur=6;
   const sp=state.players[state.currentSpinner];
-  const spinLyrics=LYRICS;
+  const spinLyrics=getLyrics();
 
   // === FULLSCREEN SPIN OVERLAY (pointer sweeps via rotateZ) ===
   const ov=document.createElement('div');ov.className='spin-overlay';
