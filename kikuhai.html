@@ -697,6 +697,9 @@ async function flipCup(idx){
   if(state.cups[idx].flipped)return;
   state.busy=true;
 
+  // Stop tension voice before flip
+  speechSynthesis.cancel();
+
   audio.playFlipCup();
   state.cups[idx].flipped=true;
   state.flippedCount++;
@@ -718,7 +721,7 @@ async function flipCup(idx){
   // Remove click from all unflipped during animation
   disableAllCups();
 
-  await wait(650); // wait for flip animation
+  await wait(800); // wait for flip animation + brief pause
 
   if(cup.hasChrysanthemum){
     slot.classList.add('chrysanthemum');
