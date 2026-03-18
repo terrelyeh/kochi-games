@@ -90,11 +90,11 @@
   .game-info-bar .round-info{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--cream-dim);letter-spacing:1px;}
   .game-info-bar .player-info{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--gold-light);font-weight:700;margin-top:2px;}
   .game-hint{position:absolute;bottom:calc(24px + var(--safe-bottom));left:50%;transform:translateX(-50%);font-family:'Noto Serif JP',serif;font-size:14px;color:var(--cream);background:rgba(26,18,16,0.6);padding:8px 20px;border-radius:16px;border:1px solid rgba(212,168,67,0.15);white-space:nowrap;z-index:15;animation:pulse 1.5s infinite;}
-  .cup-tray{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:grid;gap:16px;z-index:10;perspective:800px;}
+  .cup-tray{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:grid;gap:12px;z-index:10;perspective:800px;}
   .cup-tray.cols-3{grid-template-columns:repeat(3,1fr);}
 
   /* === Cup 3D flip === */
-  .cup-slot{width:88px;height:88px;perspective:600px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+  .cup-slot{width:96px;height:96px;perspective:600px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
   .cup-inner{position:relative;width:100%;height:100%;transition:transform 0.6s ease;transform-style:preserve-3d;}
   .cup-slot.flipped .cup-inner{transform:rotateX(180deg);}
   .cup-slot.disabled{pointer-events:none;cursor:default;}
@@ -276,7 +276,7 @@ const I18N={
       cupCountLabel:'杯の数',
       playerCountLabel:'プレイヤー数',
       setupStart:'めくり開始！',
-      cupDesc6:'ライト（最大5杯）',cupDesc9:'ハード（最大8杯）',
+      cupDesc6:'ライト（最大5杯）',cupDesc9:'スタンダード（最大8杯）',cupDesc12:'ハード（最大11杯）',cupDesc15:'地獄モード（最大14杯）',
       roundInfo:'第 {n} ラウンド',
       playerTurn:'第 {n} 番',
       flipHint:'杯を選んでめくれ！',
@@ -300,15 +300,21 @@ const I18N={
       tension:[
         '一番手、どうぞ！',
         '二番手、菊花はまだ眠っている…',
-        'もう二杯めくった、運はいつまで持つ？',
-        '残りが減ってきた…菊花が笑ってるぞ',
-        '五分五分！君か次の人か！',
-        '残り四杯…心臓バクバクだ…',
-        '三杯の中に一輪の菊花、めくれるか？',
-        'あと二杯！二分の一だ！',
+        '二杯めくった、運はいつまで持つ？',
+        '三杯目、菊花が笑ってるぞ…',
+        'どんどん増える、当たったら地獄だぞ～',
+        '五杯目！当たった人は終わりだ',
+        '六杯！誰がこんなに運がいいんだ？',
+        '七杯！罰酒がやばいことに…',
+        '八杯空！菊花はどこに隠れてる？',
+        '九杯目！当たったら救急車だぞ？',
+        '十杯！この運は異常だろ？',
+        '十一杯空！菊花消えたのか？',
+        '十二杯！当たった人、今夜帰れないぞ',
+        'カウントダウン！頼むから俺じゃないで…',
       ],
       // Safe voices
-      safe:['セーフ！助かった～','危なかった！でも次の人はどうかな…','空っぽ！この運を使って大丈夫？'],
+      safe:['セーフ！助かった～','危なかった！でも次の人はどうかな…','空っぽ！この運を使って大丈夫？','また逃げた！菊花が近づいてるぞ…','セーフ！でも罰酒がまた一杯増えたよ～','空！地獄の罰酒が積み上がっていく…'],
       // Chrysanthemum voices
       chrys:[
         '菊花が咲いた！おめでとう！清酒{n}杯どうぞ！',
@@ -332,7 +338,7 @@ const I18N={
       cupCountLabel:'杯數',
       playerCountLabel:'人數',
       setupStart:'開始翻杯！',
-      cupDesc6:'輕鬆版（最多罰 5 杯）',cupDesc9:'刺激版（最多罰 8 杯）',
+      cupDesc6:'輕鬆版（最多罰 5 杯）',cupDesc9:'標準版（最多罰 8 杯）',cupDesc12:'刺激版（最多罰 11 杯）',cupDesc15:'地獄版（最多罰 14 杯）',
       roundInfo:'第 {n} 輪',
       playerTurn:'第 {n} 位',
       flipHint:'選一個杯子翻開！',
@@ -352,19 +358,25 @@ const I18N={
       confirmHome:'確定要返回首頁嗎？',
       lastCupAuto:'最後一杯⋯不用翻了，菊花一定在這！',
       bgmShamisen:'🎶 宴會',bgmMatsuri:'🥁 祭典',
-      // Tension voices
+      // Tension voices (up to 15 cups)
       tension:[
         '第一位勇者，請翻杯！',
         '第二位，菊花還在沉睡中...',
-        '已經翻了兩杯了，運氣還能撐多久？',
-        '剩下的杯子越來越少了...',
-        '五五開！不是你就是下一位！',
-        '只剩四杯了...心跳加速中...',
-        '三杯裡面有一朵菊花，你敢翻嗎？',
-        '就剩兩杯了！二分之一的機率！',
+        '兩杯了，運氣還能撐多久？',
+        '三杯了，菊花在偷笑呢...',
+        '越翻越多，懲罰越重喔～',
+        '已經五杯了！中獎的人可慘了',
+        '六杯了，誰那麼倒楣還沒翻到？',
+        '七杯了！罰酒已經很可怕了...',
+        '八杯空杯！菊花到底躲在哪？',
+        '九杯了！再翻下去要送醫了吧？',
+        '十杯了！這運氣是不是太好了？',
+        '十一杯空的！菊花是不是消失了？',
+        '十二杯了！中獎的人今晚別想回家了',
+        '倒數了！拜託不要是我...',
       ],
       // Safe voices
-      safe:['安全！逃過一劫～','好險！但下一位可沒這麼幸運...','空的！你的好運用在這裡值得嗎？'],
+      safe:['安全！逃過一劫～','好險！但下一位可沒這麼幸運...','空的！你的好運用在這裡值得嗎？','又逃過了！菊花越來越近了...','安全！但罰酒又多了一杯喔～','空杯！繼續累積地獄懲罰中...'],
       // Chrysanthemum voices
       chrys:[
         '菊花綻放！恭喜中獎！{n}杯清酒請笑納！',
@@ -624,9 +636,9 @@ function setPlayerCount(n){audio.playClick();state.playerCount=n;renderSetup();}
 function renderSetup(){
   // Cup count
   let cc='';
-  [6,9].forEach(n=>{cc+=`<button class="option-btn${n===state.cupCount?' selected':''}" onclick="setCupCount(${n})">${n}</button>`;});
+  [6,9,12,15].forEach(n=>{cc+=`<button class="option-btn${n===state.cupCount?' selected':''}" onclick="setCupCount(${n})">${n}</button>`;});
   $('cup-count-row').innerHTML=cc;
-  $('cup-count-desc').textContent=state.cupCount===6?t('cupDesc6'):t('cupDesc9');
+  $('cup-count-desc').textContent=t('cupDesc'+state.cupCount);
   // Player count
   let pc='';
   [4,5,6].forEach(n=>{pc+=`<button class="option-btn${n===state.playerCount?' selected':''}" onclick="setPlayerCount(${n})">${n}</button>`;});
