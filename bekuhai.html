@@ -520,9 +520,9 @@ function renderCupShowcase(){const b=document.getElementById('cups-showcase');if
 // ============================================================
 // AUDIO — 3 BGM styles: miyako, shamisen, matsuri
 // ============================================================
-const BGM_ORDER=['enkai','miyako','shamisen','matsuri'];
-const BGM_ICONS={enkai:'🏋️',miyako:'🌙',shamisen:'🎶',matsuri:'🥁'};
-const BGM_KEYS={enkai:'bgmEnkai',miyako:'bgmMiyako',shamisen:'bgmShamisen',matsuri:'bgmMatsuri'};
+const BGM_ORDER=['enkai','shamisen','matsuri'];
+const BGM_ICONS={enkai:'🏋️',shamisen:'🎶',matsuri:'🥁'};
+const BGM_KEYS={enkai:'bgmEnkai',shamisen:'bgmShamisen',matsuri:'bgmMatsuri'};
 
 class AudioManager{
   constructor(){this.ctx=null;this.masterGain=null;this.musicGain=null;this.sfxGain=null;this.muted=false;this.musicPlaying=false;this._musicInterval=null;this._musicNodes=[];this.bgmStyle='enkai';this._bgmAudio=null;}
