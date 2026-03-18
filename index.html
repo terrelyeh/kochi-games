@@ -51,8 +51,8 @@
     animation:glowPulse 3s ease-in-out infinite;
   }
   .brand-tagline{
-    font-size:13px;color:var(--cream-dim);margin-bottom:32px;
-    letter-spacing:3px;opacity:0.6;
+    font-size:15px;color:var(--cream-dim);margin-bottom:32px;
+    letter-spacing:4px;opacity:0.7;
   }
 
   /* === DIVIDER === */
@@ -165,7 +165,6 @@
   <div class="brand-tagline" id="brand-tagline">土佐座敷遊戲集</div>
   <div class="divider"></div>
 
-  <div class="games-label" id="games-label">遊戲選單</div>
   <div class="game-grid">
 
     <a class="game-card" href="bekuhai.html">
@@ -178,22 +177,22 @@
       <div class="card-arrow">›</div>
     </a>
 
-    <a class="game-card" href="hashiken.html">
-      <div class="card-icon">🥢</div>
-      <div class="card-body">
-        <div class="card-title" id="card2-title">箸拳</div>
-        <div class="card-romaji">H A S H I K E N</div>
-        <div class="card-desc" id="card2-desc">猜拳鬥智！雙方同時出筷，猜中對方數量者勝。</div>
-      </div>
-      <div class="card-arrow">›</div>
-    </a>
-
     <div class="game-card coming-soon">
       <div class="card-icon">🌸</div>
       <div class="card-body">
         <div class="card-title" id="card3-title">菊花杯 <span class="card-badge" id="badge-soon">敬請期待</span></div>
         <div class="card-romaji">K I K U H A I</div>
         <div class="card-desc" id="card3-desc">俄羅斯輪盤式飲酒！菊花杯中暗藏玄機…</div>
+      </div>
+      <div class="card-arrow" style="opacity:0.3">›</div>
+    </div>
+
+    <div class="game-card coming-soon">
+      <div class="card-icon">🥢</div>
+      <div class="card-body">
+        <div class="card-title" id="card2-title">箸拳 <span class="card-badge" id="badge-soon2">敬請期待</span></div>
+        <div class="card-romaji">H A S H I K E N</div>
+        <div class="card-desc" id="card2-desc">猜拳鬥智！雙方同時出筷，猜中對方數量者勝。</div>
       </div>
       <div class="card-arrow" style="opacity:0.3">›</div>
     </div>
@@ -243,15 +242,13 @@ function applyLang() {
   document.getElementById('brand-title').textContent = s.brandTitle;
   document.getElementById('brand-sub').textContent = s.brandSub;
   document.getElementById('brand-tagline').textContent = s.brandTagline;
-  document.getElementById('games-label').textContent = s.gamesLabel;
   document.getElementById('card1-title').innerHTML = s.card1Title + ' <span class="card-badge new">' + s.badgeNew + '</span>';
   document.getElementById('card1-desc').textContent = s.card1Desc;
-  document.getElementById('card2-title').textContent = s.card2Title;
-  document.getElementById('card2-desc').textContent = s.card2Desc;
   document.getElementById('card3-title').innerHTML = s.card3Title + ' <span class="card-badge">' + s.badgeSoon + '</span>';
   document.getElementById('card3-desc').textContent = s.card3Desc;
+  document.getElementById('card2-title').innerHTML = s.card2Title + ' <span class="card-badge">' + s.badgeSoon + '</span>';
+  document.getElementById('card2-desc').textContent = s.card2Desc;
   document.getElementById('footer').textContent = s.footer;
-  document.getElementById('lang-btn').textContent = I18N._lang === 'ja' ? '🇹🇼' : '🇯🇵';
 }
 
 function toggleLang() {
