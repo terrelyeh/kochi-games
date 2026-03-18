@@ -848,8 +848,12 @@ async function doSpin(){
   else{showNextButton();state.spinning=false;}
 }
 
+let _lastFaces=[];
 function spinKoma(){
-  const face=KOMA_FACES[randInt(0,5)];const n=state.players.length;
+  // Avoid same face 3+ times in a row
+  let face;do{face=KOMA_FACES[randInt(0,5)];}while(_lastFaces.length>=2&&_lastFaces.slice(-2).every(f=>f===face));
+  _lastFaces.push(face);if(_lastFaces.length>8)_lastFaces.shift();
+  const n=state.players.length;
   const targetIdx=randInt(0,n-1);const pos=getSeatPositions(n);
   const ta=pos[targetIdx].angle;
   return{face,targetIdx,totalRotation:360*randInt(6,10)+ta};
