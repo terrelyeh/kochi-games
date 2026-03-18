@@ -290,6 +290,15 @@
   .drink-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:14px;transition:width 0.1s ease-out;}
   .drink-pct{font-size:14px;color:var(--gold);font-weight:700;}
   .drink-tap-hint{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--gold-light);animation:pulse 0.8s infinite;margin-top:10px;background:rgba(212,168,67,0.1);padding:8px 24px;border-radius:20px;border:1px solid rgba(212,168,67,0.25);}
+
+  /* === Custom Confirm Dialog === */
+  .confirm-overlay{position:fixed;inset:0;background:rgba(26,18,16,0.85);display:flex;align-items:center;justify-content:center;z-index:9000;animation:fadeIn 0.2s ease;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+  .confirm-box{background:linear-gradient(180deg, #2e2319 0%, #1e1510 100%);border:1px solid rgba(212,168,67,0.3);border-radius:20px;padding:28px 24px;text-align:center;max-width:300px;width:85%;box-shadow:0 8px 40px rgba(0,0,0,0.5);}
+  .confirm-msg{font-family:'Noto Serif JP',serif;font-size:17px;color:var(--cream);margin-bottom:24px;line-height:1.6;}
+  .confirm-btns{display:flex;gap:12px;justify-content:center;}
+  .confirm-btns button{font-family:'Noto Serif JP',serif;font-size:15px;font-weight:700;padding:10px 24px;border:none;border-radius:12px;cursor:pointer;touch-action:manipulation;min-width:100px;}
+  .confirm-yes{background:linear-gradient(135deg,var(--red),var(--red-bright));color:var(--white);}
+  .confirm-no{background:rgba(255,255,255,0.08);color:var(--cream);border:1px solid rgba(255,255,255,0.15) !important;}
   .drink-done-msg{font-family:'Noto Serif JP',serif;font-size:24px;font-weight:900;color:var(--gold);animation:bounceIn 0.5s ease;}
 
   /* === Game Over === */
@@ -716,7 +725,16 @@ function $(id){return document.getElementById(id);}
 function show(sid){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(sid).classList.add('active');$('bgm-toggle').style.display='flex';const isWelcome=sid==='welcome-screen'||sid==='setup-screen';$('lang-toggle').style.display=isWelcome?'flex':'none';}
 function wait(ms){return new Promise(r=>setTimeout(r,ms));}
 function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
-function goHome(){const inGame=document.querySelector('#table-screen.active')||document.querySelector('#gameover-screen.active');if(!inGame||confirm(t('confirmHome'))){audio.stopMusic();window.location.href='index.html';}}
+function goHome(){
+  const inGame=document.querySelector('#table-screen.active')||document.querySelector('#gameover-screen.active');
+  if(!inGame){audio.stopMusic();window.location.href='index.html';return;}
+  const ov=document.createElement('div');ov.className='confirm-overlay';
+  ov.innerHTML=`<div class="confirm-box"><div class="confirm-msg">${t('confirmHome')}</div><div class="confirm-btns"><button class="confirm-no" id="confirm-no">${I18N.lang==='ja'?'いいえ':'取消'}</button><button class="confirm-yes" id="confirm-yes">${I18N.lang==='ja'?'はい':'確定'}</button></div></div>`;
+  document.body.appendChild(ov);
+  ov.querySelector('#confirm-no').onclick=()=>ov.remove();
+  ov.querySelector('#confirm-yes').onclick=()=>{audio.stopMusic();window.location.href='index.html';};
+  ov.addEventListener('click',(e)=>{if(e.target===ov)ov.remove();});
+}
 function spawnConfetti(count=20){for(let i=0;i<count;i++){const p=document.createElement('div');p.className='confetti-particle';p.style.left=randInt(10,90)+'vw';p.style.background=CONFETTI_COLORS[randInt(0,CONFETTI_COLORS.length-1)];p.style.setProperty('--dur',(2+Math.random()*2)+'s');p.style.animationDelay=(Math.random()*0.5)+'s';p.style.width=randInt(6,12)+'px';p.style.height=randInt(6,12)+'px';p.style.borderRadius=Math.random()>0.5?'50%':'2px';document.body.appendChild(p);setTimeout(()=>p.remove(),5000);}}
 
 // Voice helper: pick reveal line by cup size
