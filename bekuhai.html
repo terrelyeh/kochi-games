@@ -929,7 +929,7 @@ function showDrinking(playerIdx,faceKey){
     const sakeEls=ov.querySelectorAll('.sake-level');
     const sakeData=Array.from(sakeEls).map(el=>({el,maxH:parseFloat(el.getAttribute('height'))||50,origY:parseFloat(el.getAttribute('y'))||58}));
     const updateSake=()=>{sakeData.forEach(({el,maxH,origY})=>{const newH=maxH*(1-prog/100);el.setAttribute('height',Math.max(0,newH));el.setAttribute('y',origY+(maxH-newH));});};
-    const finish=()=>{audio.playDrinkGulp();hint.className='drink-done-msg';hint.textContent=t('drinkDone');voice.speak(t('voiceDrinkDone'),{rate:1,pitch:1.05});setTimeout(()=>{ov.remove();resolve();},2500);};
+    const finish=()=>{audio.playDrinkGulp();hint.className='drink-done-msg';hint.textContent=t('drinkDone');voice.speak(t('voiceDrinkDone'),{rate:1,pitch:1.05});setTimeout(()=>{ov.remove();resolve();},3500);};
     if(isH){
       const tap=(e)=>{e.preventDefault();if(prog>=100)return;prog=Math.min(100,prog+8);fill.style.width=prog+'%';pct.textContent=Math.round(prog)+'%';updateSake();audio.playClick();if(prog>=100){ov.removeEventListener('click',tap);ov.removeEventListener('touchstart',tap);ov.style.cursor='default';finish();}};
       ov.addEventListener('click',tap);ov.addEventListener('touchstart',tap,{passive:false});
