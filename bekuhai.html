@@ -507,7 +507,7 @@ const BGM_KEYS={enkai:'bgmEnkai',miyako:'bgmMiyako',shamisen:'bgmShamisen',matsu
 
 class AudioManager{
   constructor(){this.ctx=null;this.masterGain=null;this.musicGain=null;this.sfxGain=null;this.muted=false;this.musicPlaying=false;this._musicInterval=null;this._musicNodes=[];this.bgmStyle='enkai';this._bgmAudio=null;}
-  init(){if(this.ctx)return;this.ctx=new(window.AudioContext||window.webkitAudioContext)();this.masterGain=this.ctx.createGain();this.masterGain.connect(this.ctx.destination);this.musicGain=this.ctx.createGain();this.musicGain.gain.value=0.25;this.musicGain.connect(this.masterGain);this.sfxGain=this.ctx.createGain();this.sfxGain.gain.value=0.5;this.sfxGain.connect(this.masterGain);}
+  init(){if(this.ctx)return;this.ctx=new(window.AudioContext||window.webkitAudioContext)();this.masterGain=this.ctx.createGain();this.masterGain.connect(this.ctx.destination);this.musicGain=this.ctx.createGain();this.musicGain.gain.value=0.4;this.musicGain.connect(this.masterGain);this.sfxGain=this.ctx.createGain();this.sfxGain.gain.value=0.5;this.sfxGain.connect(this.masterGain);}
   ensureResumed(){if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();}
   toggleMute(){this.muted=!this.muted;if(this.masterGain)this.masterGain.gain.value=this.muted?0:1;if(this._bgmAudio)this._bgmAudio.volume=this.muted?0:0.15;document.getElementById('mute-toggle').textContent=this.muted?'🔇':'🔊';if(this.muted)speechSynthesis.cancel();}
 
@@ -599,13 +599,17 @@ class VoiceManager{
       v.find(x=>x.lang&&x.lang.startsWith('zh'))||null;
     this.ready=true;
   }
+  _duckBGM(){if(audio._bgmAudio)audio._bgmAudio.volume=0.03;}
+  _unduckBGM(){if(audio._bgmAudio&&!audio.muted)audio._bgmAudio.volume=0.15;}
   speak(text,opts={}){
     if(audio.muted)return;if(!this.ready)this.init();
+    this._duckBGM();
     const lang=opts.lang||(I18N.lang==='zh'?'zh':'ja');
     const u=new SpeechSynthesisUtterance(text);
     if(lang==='zh'){u.lang='zh-TW';if(this.zhVoice)u.voice=this.zhVoice;}
     else{u.lang='ja-JP';if(this.jaVoice)u.voice=this.jaVoice;}
     u.rate=opts.rate||1;u.pitch=opts.pitch||1;u.volume=opts.volume||1;
+    u.onend=()=>this._unduckBGM();u.onerror=()=>this._unduckBGM();
     speechSynthesis.cancel();speechSynthesis.speak(u);
   }
   /** Returns a Promise that resolves when speech finishes (or immediately if muted) */
@@ -613,17 +617,16 @@ class VoiceManager{
     return new Promise(resolve=>{
       if(audio.muted||!text){resolve();return;}
       if(!this.ready)this.init();
+      this._duckBGM();
       const lang=opts.lang||(I18N.lang==='zh'?'zh':'ja');
       const u=new SpeechSynthesisUtterance(text);
       if(lang==='zh'){u.lang='zh-TW';if(this.zhVoice)u.voice=this.zhVoice;}
       else{u.lang='ja-JP';if(this.jaVoice)u.voice=this.jaVoice;}
       u.rate=opts.rate||1;u.pitch=opts.pitch||1;u.volume=opts.volume||1;
-      u.onend=()=>resolve();
-      u.onerror=()=>resolve();
-      // Safety timeout: resolve after 8s max in case onend never fires
-      const timer=setTimeout(()=>resolve(),8000);
-      u.onend=()=>{clearTimeout(timer);resolve();};
-      u.onerror=()=>{clearTimeout(timer);resolve();};
+      const done=()=>{this._unduckBGM();resolve();};
+      const timer=setTimeout(done,8000);
+      u.onend=()=>{clearTimeout(timer);done();};
+      u.onerror=()=>{clearTimeout(timer);done();};
       speechSynthesis.cancel();speechSynthesis.speak(u);
     });
   }
