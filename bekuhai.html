@@ -908,6 +908,7 @@ function spinKoma(){
 function showNextButton(){
   document.querySelectorAll('.next-btn-float').forEach(b=>b.remove());
   $('table-info-bar').style.opacity='0';
+  updateSeats();
   const nextIdx=state.currentSpinner;const nextP=state.players[nextIdx];
   const pos=getSeatPositions(state.players.length);const p=pos[nextIdx];
   const bx=50+(p.x-50)*0.75;const by=50+(p.y-50)*0.75;
