@@ -88,7 +88,7 @@
   .cups-showcase{display:flex;gap:12px;justify-content:center;margin-top:16px;width:100%;perspective:800px;}
   .cup-card{flex:1;text-align:center;background:linear-gradient(180deg, var(--surface-2) 0%, var(--surface) 100%);border-radius:12px;padding:12px 6px;border:1px solid transparent;transition:all 0.3s;transform:rotateX(8deg);transform-origin:center bottom;}
   .cup-card:hover{border-color:var(--gold);}
-  .cup-card svg{width:70px;height:70px;display:block;margin:0 auto 6px;filter:drop-shadow(0 6px 8px rgba(0,0,0,0.4));}
+  .cup-card svg,.cup-card img{width:70px;height:70px;display:block;margin:0 auto 6px;filter:drop-shadow(0 6px 8px rgba(0,0,0,0.4));object-fit:contain;}
   .cup-card .cup-label{font-size:13px;font-weight:700;color:var(--cream);}
   .cup-card .cup-vol{font-size:10px;color:var(--gold);font-weight:700;}
   .cup-card .cup-trait{font-size:9px;color:var(--cream-dim);margin-top:2px;}
@@ -136,7 +136,7 @@
   .koma-area{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:10;perspective:400px;}
   .koma-3d{width:100px;height:120px;position:relative;transform-style:preserve-3d;transform:perspective(400px) rotateX(8deg) rotateY(0deg);transition:transform 0.1s;filter:drop-shadow(0 8px 12px rgba(0,0,0,0.5));}
   .koma-3d.idle{animation:komaWobble 3s ease-in-out infinite;}
-  .koma-3d svg{width:100%;height:100%;}
+  .koma-3d svg,.koma-3d .koma-img{width:100%;height:100%;object-fit:contain;border-radius:12px;}
   .koma-pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-size:18px;color:var(--red-bright);filter:drop-shadow(0 0 6px rgba(231,76,60,0.7));line-height:1;z-index:11;}
   .koma-result-face{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--gold-light);font-weight:700;white-space:nowrap;opacity:0;transition:opacity 0.3s;}
   .koma-result-face.show{opacity:1;}
@@ -175,7 +175,7 @@
   .spin-koma-inner.spinning{
     animation:komaFullSpin var(--spin-duration,6s) cubic-bezier(0.25,0,0.05,1) forwards;
   }
-  .spin-koma-inner svg{width:100%;height:100%;}
+  .spin-koma-inner svg,.spin-koma-inner img{width:100%;height:100%;object-fit:contain;}
   .spin-koma-inner .spin-arrow{
     position:absolute;top:-24px;left:50%;
     transform:translateX(-50%);
@@ -205,7 +205,7 @@
     60%{transform:translate(-50%,-50%) scale(1.15) rotate(5deg);opacity:1;}
     100%{transform:translate(-50%,-50%) scale(1) rotate(0deg);opacity:1;}
   }
-  .spin-result-face svg{width:90px;height:90px;filter:drop-shadow(0 0 16px rgba(212,168,67,0.6));}
+  .spin-result-face svg,.spin-result-face img{width:90px;height:90px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(212,168,67,0.6));}
   .spin-result-label{
     position:absolute;bottom:-32px;left:50%;transform:translateX(-50%);
     white-space:nowrap;font-family:'Noto Serif JP',serif;
@@ -230,7 +230,7 @@
   }
   .reveal-overlay .reveal-who{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--cream-dim);letter-spacing:2px;animation:fadeIn 0.3s ease;}
   .reveal-overlay .reveal-target{font-family:'Noto Serif JP',serif;font-size:36px;font-weight:900;color:var(--white);text-shadow:0 0 30px rgba(255,255,255,0.3);animation:revealSlam 0.5s ease forwards;}
-  .reveal-overlay .reveal-cup-svg{width:180px;height:180px;animation:revealSlam 0.6s 0.1s ease both;filter:drop-shadow(0 0 30px rgba(212,168,67,0.4));}
+  .reveal-overlay .reveal-cup-svg,.reveal-overlay .reveal-cup-img{width:180px;height:180px;object-fit:contain;animation:revealSlam 0.6s 0.1s ease both;filter:drop-shadow(0 0 30px rgba(212,168,67,0.4));}
   .reveal-overlay .reveal-cup-name{font-family:'Noto Serif JP',serif;font-size:32px;font-weight:900;animation:revealSlam 0.5s 0.2s ease both;text-shadow:0 0 20px currentColor;}
   .reveal-overlay .reveal-cup-vol{font-size:22px;color:var(--gold);font-weight:700;animation:fadeIn 0.4s 0.4s ease both;}
   .reveal-overlay .reveal-cup-desc{font-size:14px;color:var(--cream-dim);max-width:280px;animation:fadeIn 0.4s 0.5s ease both;}
@@ -258,7 +258,7 @@
     z-index:160;gap:10px;padding:var(--safe-top) 20px var(--safe-bottom);-webkit-tap-highlight-color:transparent;cursor:pointer;animation:fadeIn 0.3s ease;
   }
   .drink-target-name{font-family:'Noto Serif JP',serif;font-size:22px;color:var(--cream);font-weight:700;}
-  .drink-cup-svg{width:150px;height:150px;animation:drinkPour 0.8s infinite;}
+  .drink-cup-svg,.drink-cup-img{width:150px;height:150px;object-fit:contain;animation:drinkPour 0.8s infinite;}
   .drink-cup-name{font-family:'Noto Serif JP',serif;font-size:22px;font-weight:900;}
   .drink-cup-ml{font-size:16px;color:var(--gold);font-weight:700;}
   .drink-cup-desc{font-size:14px;color:var(--cream-dim);max-width:260px;}
@@ -496,7 +496,7 @@ const I18N={
 };
 function t(k,p){return I18N.t(k,p);}
 function toggleLang(){const a=document.querySelector('.screen.active');if(a&&a.id==='setup-screen'){document.querySelectorAll('.name-input').forEach((inp,i)=>{if(setupPlayers[i])setupPlayers[i].name=inp.value.trim()||setupPlayers[i].name;});}I18N.setLang(I18N.lang==='ja'?'zh':'ja');if(a&&a.id==='setup-screen')renderSetup();if(a&&a.id==='table-screen')renderTable();}
-function renderCupShowcase(){const b=document.getElementById('cups-showcase');if(!b)return;b.innerHTML=`<div class="cup-card">${SVG_TENGU}<div class="cup-label">${t('cupTengu')}</div><div class="cup-vol">140ml ★★★★★</div><div class="cup-trait">${t('cupTenguTrait')}</div></div><div class="cup-card">${SVG_HYOTTOKO}<div class="cup-label">${t('cupHyottoko')}</div><div class="cup-vol">50ml ★★★</div><div class="cup-trait">${t('cupHyottokoTrait')}</div></div><div class="cup-card">${SVG_OKAME}<div class="cup-label">${t('cupOkame')}</div><div class="cup-vol">20ml ★★</div><div class="cup-trait">${t('cupOkameTrait')}</div></div>`;}
+function renderCupShowcase(){const b=document.getElementById('cups-showcase');if(!b)return;b.innerHTML=`<div class="cup-card"><img src="cup-tengu.png" alt="天狗杯"><div class="cup-label">${t('cupTengu')}</div><div class="cup-vol">140ml ★★★★★</div><div class="cup-trait">${t('cupTenguTrait')}</div></div><div class="cup-card"><img src="cup-hyottoko.png" alt="火男杯"><div class="cup-label">${t('cupHyottoko')}</div><div class="cup-vol">50ml ★★★</div><div class="cup-trait">${t('cupHyottokoTrait')}</div></div><div class="cup-card"><img src="cup-okame.png" alt="阿龜杯"><div class="cup-label">${t('cupOkame')}</div><div class="cup-vol">20ml ★★</div><div class="cup-trait">${t('cupOkameTrait')}</div></div>`;}
 
 // ============================================================
 // AUDIO — 3 BGM styles: miyako, shamisen, matsuri
@@ -653,9 +653,9 @@ document.addEventListener('touchstart',unlockSpeech,true);
 // CONSTANTS & STATE
 // ============================================================
 const CUP_DATA={
-  tengu:{svg:SVG_TENGU,ml:140,nameKey:'cupTengu',descKey:'cupTenguDesc',color:'var(--red-bright)',size:'big'},
-  hyottoko:{svg:SVG_HYOTTOKO,ml:50,nameKey:'cupHyottoko',descKey:'cupHyottokoDesc',color:'var(--gold)',size:'mid'},
-  okame:{svg:SVG_OKAME,ml:20,nameKey:'cupOkame',descKey:'cupOkameDesc',color:'var(--green)',size:'small'},
+  tengu:{svg:SVG_TENGU,img:'cup-tengu.png',ml:140,nameKey:'cupTengu',descKey:'cupTenguDesc',color:'var(--red-bright)',size:'big'},
+  hyottoko:{svg:SVG_HYOTTOKO,img:'cup-hyottoko.png',ml:50,nameKey:'cupHyottoko',descKey:'cupHyottokoDesc',color:'var(--gold)',size:'mid'},
+  okame:{svg:SVG_OKAME,img:'cup-okame.png',ml:20,nameKey:'cupOkame',descKey:'cupOkameDesc',color:'var(--green)',size:'small'},
 };
 const KOMA_FACES=['tengu','tengu','hyottoko','hyottoko','okame','okame'];
 const DEFAULT_NAMES=['太郎','花子','次郎','美咲','健太'];
@@ -702,7 +702,7 @@ function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,
 // ============================================================
 function getSeatPositions(count){const p=[];for(let i=0;i<count;i++){const a=(180+(360/count)*i)%360;const r=a*Math.PI/180;const rad=43;p.push({x:50+rad*Math.sin(r),y:50-rad*Math.cos(r),angle:a});}return p;}
 function renderTable(){const l=$('table-layout');l.querySelectorAll('.seat').forEach(s=>s.remove());l.querySelectorAll('.next-btn-float').forEach(b=>b.remove());const pos=getSeatPositions(state.players.length);state.players.forEach((p,i)=>{const s=document.createElement('div');s.className='seat';s.id='seat-'+i;s.style.left=pos[i].x+'%';s.style.top=pos[i].y+'%';s.innerHTML=`<div class="seat-cushion">${p.isHuman?'🧑':'🤖'}</div><div class="s-name">${p.name}</div><div class="s-ml">${p.ml}ml</div>`;l.appendChild(s);});
-  const kd=$('koma-3d');kd.innerHTML=`<span class="koma-pointer">▼</span>${SVG_KOMA}<div class="koma-result-face" id="koma-result-face"></div>`;
+  const kd=$('koma-3d');kd.innerHTML=`<span class="koma-pointer">▼</span><img src="koma-1.png" class="koma-img" alt=""><div class="koma-result-face" id="koma-result-face"></div>`;
 }
 function updateSeats(){state.players.forEach((p,i)=>{const s=$('seat-'+i);if(!s)return;s.querySelector('.s-ml').textContent=p.ml+'ml';s.classList.toggle('is-spinner',i===state.currentSpinner);s.classList.remove('is-target');});}
 function highlightTarget(idx){state.players.forEach((_,i)=>{const s=$('seat-'+i);if(s){s.classList.toggle('is-target',i===idx);s.classList.remove('is-spinner');}});}
@@ -721,7 +721,7 @@ function showRevealOverlay(targetPlayer,cup,faceKey){
     ov.innerHTML=`
       <div class="reveal-who">${t('revealWho')}</div>
       <div class="reveal-target">${targetPlayer.name}</div>
-      <div class="reveal-cup-svg">${cup.svg}</div>
+      <img class="reveal-cup-img" src="${cup.img}" alt="">
       <div class="reveal-cup-name" style="color:${cup.color}">${t(cup.nameKey)}</div>
       <div class="reveal-cup-vol">${cup.ml}ml</div>
       <div class="reveal-cup-desc">${t(cup.descKey)}</div>
@@ -790,7 +790,7 @@ async function doSpin(){
     <div class="spin-koma-wrap">
       <div class="spin-koma-inner" id="spin-koma-inner">
         <div class="spin-arrow"></div>
-        ${SVG_KOMA}
+        <img src="koma-1.png" class="koma-img" alt="">
       </div>
     </div>
     <div class="spin-lyrics-wrap">
@@ -827,7 +827,7 @@ async function doSpin(){
   // Show result face on the koma
   const resultFace=document.createElement('div');
   resultFace.className='spin-result-face';
-  resultFace.innerHTML=`${cup.svg}<div class="spin-result-label" style="color:${cup.color}">${t(cup.nameKey)}</div>`;
+  resultFace.innerHTML=`<img src="${cup.img}" alt=""><div class="spin-result-label" style="color:${cup.color}">${t(cup.nameKey)}</div>`;
   ski.appendChild(resultFace);
   await wait(50);resultFace.classList.add('show');
   await wait(1200);
@@ -873,7 +873,7 @@ function showDrinking(playerIdx,faceKey){
   return new Promise(resolve=>{
     const player=state.players[playerIdx];const cup=CUP_DATA[faceKey];const isH=player.isHuman;
     const ov=document.createElement('div');ov.className='drink-overlay';
-    ov.innerHTML=`<div class="drink-target-name">${player.name}</div><div class="drink-cup-svg">${cup.svg}</div><div class="drink-cup-name" style="color:${cup.color}">${t(cup.nameKey)}</div><div class="drink-cup-ml">${cup.ml}ml</div><div class="drink-cup-desc">${t(cup.descKey)}</div><div class="drink-bar"><div class="drink-fill" id="drink-fill"></div></div><div class="drink-pct" id="drink-pct">0%</div><div class="drink-tap-hint" id="drink-hint">${isH?t('drinkTapHint'):t('drinkAutoMsg',{name:player.name})}</div>`;
+    ov.innerHTML=`<div class="drink-target-name">${player.name}</div><img class="drink-cup-img" src="${cup.img}" alt=""><div class="drink-cup-name" style="color:${cup.color}">${t(cup.nameKey)}</div><div class="drink-cup-ml">${cup.ml}ml</div><div class="drink-cup-desc">${t(cup.descKey)}</div><div class="drink-bar"><div class="drink-fill" id="drink-fill"></div></div><div class="drink-pct" id="drink-pct">0%</div><div class="drink-tap-hint" id="drink-hint">${isH?t('drinkTapHint'):t('drinkAutoMsg',{name:player.name})}</div>`;
     document.body.appendChild(ov);
     let prog=0;const fill=ov.querySelector('#drink-fill');const pct=ov.querySelector('#drink-pct');const hint=ov.querySelector('#drink-hint');
     const sakeEls=ov.querySelectorAll('.sake-level');
@@ -911,7 +911,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   $('mute-toggle').textContent='🔊';
   $('bgm-toggle').textContent=BGM_ICONS[audio.bgmStyle];
   const kd=$('koma-3d');
-  if(kd)kd.innerHTML=`<span class="koma-pointer">▼</span>${SVG_KOMA}<div class="koma-result-face" id="koma-result-face"></div>`;
+  if(kd)kd.innerHTML=`<span class="koma-pointer">▼</span><img src="koma-1.png" class="koma-img" alt=""><div class="koma-result-face" id="koma-result-face"></div>`;
   if(typeof speechSynthesis!=='undefined'&&speechSynthesis.getVoices().length>0)voice.init();
 });
 </script>
