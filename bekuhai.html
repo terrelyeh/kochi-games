@@ -265,14 +265,14 @@
   .next-btn-float{
     position:absolute;z-index:20;transform:translate(-50%,-50%);
     animation:bounceIn 0.5s ease;white-space:nowrap;
-    font-family:'Noto Sans JP',sans-serif;font-size:13px;font-weight:700;
-    padding:10px 18px;border:none;border-radius:12px;cursor:pointer;
+    font-family:'Noto Serif JP',serif;font-size:16px;font-weight:700;
+    padding:12px 24px;border:none;border-radius:14px;cursor:pointer;
     background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--bg);
-    box-shadow:0 4px 16px rgba(212,168,67,0.5);-webkit-tap-highlight-color:transparent;
-    text-align:center;line-height:1.4;
+    box-shadow:0 4px 20px rgba(212,168,67,0.6);-webkit-tap-highlight-color:transparent;
+    text-align:center;line-height:1.4;touch-action:manipulation;
   }
   .next-btn-float:active{transform:translate(-50%,-50%) scale(0.93);}
-  .next-btn-float .next-name{font-size:11px;display:block;opacity:0.7;}
+  .next-btn-float .next-name{font-size:13px;display:block;opacity:0.7;}
 
   /* === Drink Overlay === */
   .drink-overlay{
@@ -910,7 +910,7 @@ function showNextButton(){
   $('table-info-bar').style.opacity='0';
   const nextIdx=state.currentSpinner;const nextP=state.players[nextIdx];
   const pos=getSeatPositions(state.players.length);const p=pos[nextIdx];
-  const bx=50+(p.x-50)*0.55;const by=50+(p.y-50)*0.55;
+  const bx=50+(p.x-50)*0.75;const by=50+(p.y-50)*0.75;
   const btn=document.createElement('button');btn.className='next-btn-float';
   btn.style.left=bx+'%';btn.style.top=by+'%';
   btn.innerHTML=`${t('nextRound')}<span class="next-name">${nextP.name}</span>`;
