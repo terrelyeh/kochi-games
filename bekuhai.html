@@ -877,7 +877,7 @@ async function doSpin(){
   resultFace.innerHTML=`<img src="${cup.img}" alt=""><div class="spin-result-label" style="color:${cup.color}">${t(cup.nameKey)}</div>`;
   ski.appendChild(resultFace);
   await wait(50);resultFace.classList.add('show');
-  await wait(1200);
+  await wait(2500);
 
   ov.style.transition='opacity 0.4s';ov.style.opacity='0';
   await wait(400);ov.remove();
