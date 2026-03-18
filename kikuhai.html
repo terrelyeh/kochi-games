@@ -228,17 +228,13 @@
       <div class="option-row" id="cup-count-row"></div>
       <div class="setup-desc" id="cup-count-desc"></div>
     </div>
-    <div class="setup-section">
-      <div class="setup-label" data-i18n="playerCountLabel"></div>
-      <div class="option-row" id="player-count-row"></div>
-    </div>
     <button class="btn btn-gold" onclick="startGame()" data-i18n="setupStart" style="margin-top:16px;"></button>
   </div>
 
   <div id="game-screen" class="screen">
     <div class="game-info-bar" id="game-info-bar">
       <div class="round-info" id="game-round-info"></div>
-      <div class="player-info" id="game-player-info"></div>
+      <div class="player-info" id="game-player-info">下一位！</div>
     </div>
     <div class="cup-tray cols-3" id="cup-tray"></div>
     <div class="game-hint" id="game-hint"></div>
@@ -278,7 +274,7 @@ const I18N={
       setupStart:'めくり開始！',
       cupDesc6:'ライト（最大5杯）',cupDesc9:'スタンダード（最大8杯）',cupDesc12:'ハード（最大11杯）',cupDesc15:'地獄モード（最大14杯）',
       roundInfo:'第 {n} ラウンド',
-      playerTurn:'第 {n} 番',
+      playerTurn:'第 {n} 番',nextPerson:'次の人！',
       flipHint:'杯を選んでめくれ！',
       safeText:'セーフ！',
       safeSub:'次の人へ…',
@@ -290,36 +286,68 @@ const I18N={
       drinkTapHint:'タップして飲み干せ！',
       drinkDone:'飲み干した！🍶',
       roundEndTitle:'一ラウンド終了！',
-      roundSummary:'第 {p} 番が菊花を引いた → 罰 {n} 杯',
+      roundSummary:'菊花発見！→ 罰 {n} 杯',
       nextRoundBtn:'もう一ラウンド！',
       backHomeBtn:'トップへ',
       confirmHome:'トップに戻りますか？',
       lastCupAuto:'最後の一杯…めくるまでもない、菊花はここだ！',
       bgmShamisen:'🎶 宴会',bgmMatsuri:'🥁 祭り',
       // Tension voices (0-indexed by flippedCount)
-      tension:[
+      tensionEarly:[
         '一番手、どうぞ！',
-        '二番手、菊花はまだ眠っている…',
-        '二杯めくった、運はいつまで持つ？',
-        '三杯目、菊花が笑ってるぞ…',
-        'どんどん増える、当たったら地獄だぞ～',
-        '五杯目！当たった人は終わりだ',
-        '六杯！誰がこんなに運がいいんだ？',
-        '七杯！罰酒がやばいことに…',
-        '八杯空！菊花はどこに隠れてる？',
-        '九杯目！当たったら救急車だぞ？',
-        '十杯！この運は異常だろ？',
-        '十一杯空！菊花消えたのか？',
-        '十二杯！当たった人、今夜帰れないぞ',
-        'カウントダウン！頼むから俺じゃないで…',
+        'さあ、誰が犠牲者になる？',
+        '萬華世界の勇者たち、スタート！',
+        '菊花はまだ眠っている、めくれ！',
+        '次の人、慎重にね！',
+        '始まったばかり、怖がるな～',
+        '運が良ければ、君じゃない！',
+        'リラックス、菊花はまだ遠い…',
       ],
-      // Safe voices
-      safe:['セーフ！助かった～','危なかった！でも次の人はどうかな…','空っぽ！この運を使って大丈夫？','また逃げた！菊花が近づいてるぞ…','セーフ！でも罰酒がまた一杯増えたよ～','空！地獄の罰酒が積み上がっていく…'],
-      // Chrysanthemum voices
+      tensionMid:[
+        'どんどん増える、当たったら地獄だぞ～',
+        '維醺志士の試練は続く…',
+        '空ばかり、菊花が笑ってるぞ',
+        '誰がこんなに飲まされるんだ？',
+        '萬華世界の清酒は甘くないぞ',
+        '罰酒が増えてきた、覚悟はいいか？',
+        '空杯が増える…プレッシャーやばい',
+        '菊花は隠れ上手だな、でもいつか出る！',
+      ],
+      tensionLate:[
+        'マジか、まだ出ない！',
+        '罰酒がとんでもない量に…',
+        '菊花はどこに隠れてる？',
+        'もう当たったら歩いて帰れないぞ',
+        '維醺志士の究極チャレンジ！',
+        'この運、異常だろ？',
+        '萬華世界が奇跡を目撃中…',
+        '当たった人、今夜帰れないぞ',
+      ],
+      tensionFinal:[
+        '残りわずか、心臓バクバク！',
+        '二分の一の確率！めくれるか？',
+        'カウントダウン！頼むから俺じゃないで…',
+        '維醺志士の最終審判！',
+        '君か次の人か！',
+        '萬華世界の運命の杯！',
+      ],
+      safe:[
+        'セーフ！助かった～',
+        '危なかった！でも次の人はどうかな…',
+        '空っぽ！この運を使って大丈夫？',
+        'また逃げた！菊花が近づいてるぞ…',
+        'セーフ！でも罰酒がまた一杯増えたよ～',
+        '空！地獄の罰酒が積み上がっていく…',
+        '逃げたな、でも誰かは逃げられない',
+        'おめでとう！次の人はお祈りして',
+        'セーフ！今夜の維醺志士は君じゃない',
+      ],
       chrys:[
         '菊花が咲いた！おめでとう！清酒{n}杯どうぞ！',
         'やられた！菊花に選ばれし者！{n}杯いけ！',
         '菊花満開！今夜の維醺志士は君だ！{n}杯飲め！',
+        '当たり！萬華世界から{n}杯の贈り物！',
+        '菊花開花！維醺志士認定、{n}杯飲め！',
       ],
       lastCupVoice:'最後の一杯、自動開封！全部の酒は君のもの！{n}杯だ！',
       voiceDrinkDone:'飲み干した！お見事！',
@@ -340,7 +368,7 @@ const I18N={
       setupStart:'開始翻杯！',
       cupDesc6:'輕鬆版（最多罰 5 杯）',cupDesc9:'標準版（最多罰 8 杯）',cupDesc12:'刺激版（最多罰 11 杯）',cupDesc15:'地獄版（最多罰 14 杯）',
       roundInfo:'第 {n} 輪',
-      playerTurn:'第 {n} 位',
+      playerTurn:'第 {n} 位',nextPerson:'下一位！',
       flipHint:'選一個杯子翻開！',
       safeText:'安全！',
       safeSub:'換下一位…',
@@ -352,36 +380,73 @@ const I18N={
       drinkTapHint:'連續點擊喝光！',
       drinkDone:'喝完了！🍶',
       roundEndTitle:'一輪結束！',
-      roundSummary:'第 {p} 位翻到菊花 → 罰喝 {n} 杯',
+      roundSummary:'菊花現身！→ 罰喝 {n} 杯',
       nextRoundBtn:'再來一輪！',
       backHomeBtn:'回首頁',
       confirmHome:'確定要返回首頁嗎？',
       lastCupAuto:'最後一杯⋯不用翻了，菊花一定在這！',
       bgmShamisen:'🎶 宴會',bgmMatsuri:'🥁 祭典',
-      // Tension voices (up to 15 cups)
-      tension:[
+      // Tension voices — early (cups 1-4)
+      tensionEarly:[
         '第一位勇者，請翻杯！',
-        '第二位，菊花還在沉睡中...',
-        '兩杯了，運氣還能撐多久？',
-        '三杯了，菊花在偷笑呢...',
+        '來吧，誰先當烈士？',
+        '萬華世界的勇者們，開始！',
+        '菊花還在沉睡中，請翻杯！',
+        '下一位，小心翻！',
+        '才剛開始，別怕別怕～',
+        '運氣好的話，不會是你！',
+        '放輕鬆，菊花還很遠...',
+      ],
+      // Tension voices — mid (cups 5-8)
+      tensionMid:[
         '越翻越多，懲罰越重喔～',
-        '已經五杯了！中獎的人可慘了',
-        '六杯了，誰那麼倒楣還沒翻到？',
-        '七杯了！罰酒已經很可怕了...',
-        '八杯空杯！菊花到底躲在哪？',
-        '九杯了！再翻下去要送醫了吧？',
-        '十杯了！這運氣是不是太好了？',
-        '十一杯空的！菊花是不是消失了？',
-        '十二杯了！中獎的人今晚別想回家了',
+        '維醺志士的試煉繼續中...',
+        '已經好幾杯空的了，菊花在偷笑呢',
+        '誰那麼倒楣等一下要喝這麼多？',
+        '萬華世界的清酒可不是開玩笑的',
+        '罰酒越來越多，你準備好了嗎？',
+        '空杯持續增加中...壓力山大',
+        '菊花躲很好嘛，但遲早會出現！',
+      ],
+      // Tension voices — late (cups 9-12)
+      tensionLate:[
+        '太扯了，到現在還沒翻到！',
+        '罰酒已經多到嚇人了...',
+        '菊花到底躲在哪裡？',
+        '再翻下去，中獎的人要扶著回家了',
+        '維醺志士的極限挑戰！',
+        '這運氣也太好了吧？',
+        '萬華世界見證奇蹟的時刻...',
+        '中獎的人今晚別想回家了',
+      ],
+      // Tension voices — final (last 2-3 cups)
+      tensionFinal:[
+        '最後幾杯了，心跳加速！',
+        '二分之一的機率！你敢翻嗎？',
         '倒數了！拜託不要是我...',
+        '維醺志士的最終審判！',
+        '不是你就是下一位！',
+        '萬華世界的命運之杯！',
       ],
       // Safe voices
-      safe:['安全！逃過一劫～','好險！但下一位可沒這麼幸運...','空的！你的好運用在這裡值得嗎？','又逃過了！菊花越來越近了...','安全！但罰酒又多了一杯喔～','空杯！繼續累積地獄懲罰中...'],
+      safe:[
+        '安全！逃過一劫～',
+        '好險！但下一位可沒這麼幸運...',
+        '空的！你的好運用在這裡值得嗎？',
+        '又逃過了！菊花越來越近了...',
+        '安全！但罰酒又多了一杯喔～',
+        '空杯！繼續累積地獄懲罰中...',
+        '你逃了，但有人逃不了的',
+        '恭喜脫身！下一位請自求多福',
+        '安全過關！維醺志士今天不是你',
+      ],
       // Chrysanthemum voices
       chrys:[
         '菊花綻放！恭喜中獎！{n}杯清酒請笑納！',
         '哎呀！被菊花選中的幸運兒！請乾{n}杯！',
         '菊花盛開！今晚的維醺志士就是你！乾{n}杯吧！',
+        '中獎啦！萬華世界敬你{n}杯！',
+        '菊花開了！維醺志士認證，請乾{n}杯！',
       ],
       lastCupVoice:'最後一杯自動開獎！所有的酒都是你的！乾{n}杯吧！',
       voiceDrinkDone:'喝完了，好厲害呀！',
@@ -639,10 +704,6 @@ function renderSetup(){
   [6,9,12,15].forEach(n=>{cc+=`<button class="option-btn${n===state.cupCount?' selected':''}" onclick="setCupCount(${n})">${n}</button>`;});
   $('cup-count-row').innerHTML=cc;
   $('cup-count-desc').textContent=t('cupDesc'+state.cupCount);
-  // Player count
-  let pc='';
-  [4,5,6].forEach(n=>{pc+=`<button class="option-btn${n===state.playerCount?' selected':''}" onclick="setPlayerCount(${n})">${n}</button>`;});
-  $('player-count-row').innerHTML=pc;
 }
 
 function startGame(){
@@ -670,7 +731,7 @@ function initCups(){
 function startTurn(){
   renderCups();
   $('game-round-info').textContent=t('roundInfo',{n:state.round});
-  $('game-player-info').textContent=t('playerTurn',{n:state.currentPlayer});
+  $('game-player-info').textContent=t('nextPerson');
   $('game-hint').textContent=t('flipHint');
   $('game-hint').style.display='block';
 
@@ -682,10 +743,16 @@ function startTurn(){
     return;
   }
 
-  // Tension voice
-  const tensionLines=I18N._strings[I18N.lang].tension;
-  const idx=Math.min(state.flippedCount,tensionLines.length-1);
-  voice.speak(tensionLines[idx],{rate:0.95,pitch:1});
+  // Tension voice — pick from category based on progress
+  const s=I18N._strings[I18N.lang];
+  const rem=state.cupCount-state.flippedCount;
+  let pool;
+  if(rem<=3) pool=s.tensionFinal;
+  else if(state.flippedCount>=8) pool=s.tensionLate;
+  else if(state.flippedCount>=4) pool=s.tensionMid;
+  else pool=s.tensionEarly;
+  const line=pool[randInt(0,pool.length-1)];
+  voice.speak(line,{rate:0.95,pitch:rem<=3?1.1:1});
 }
 
 function renderCups(){
@@ -741,7 +808,6 @@ async function flipCup(idx){
   }else{
     await showSafeOverlay();
     // Advance player
-    state.currentPlayer=((state.currentPlayer-1+1)%state.playerCount)+1;
     state.busy=false;
     startTurn();
   }
