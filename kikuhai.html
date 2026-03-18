@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>菊花杯 Kikuhai — 清酒版俄羅斯輪盤</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&family=Noto+Serif+JP:wght@700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{--bg:#1a1210;--surface:#2a1f1a;--surface-2:#3a2d24;--red:#c0392b;--red-bright:#e74c3c;--gold:#d4a843;--gold-light:#f0d68a;--cream:#f5e6c8;--cream-dim:#c4b496;--white:#faf3e6;--green:#27ae60;--blue:#3498db;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);}
+  body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--white);min-height:100dvh;overflow-x:hidden;display:flex;justify-content:center;align-items:center;}
+  #app{width:100%;max-width:480px;min-height:100dvh;position:relative;overflow:hidden;}
+  .screen{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100dvh;padding:calc(24px + var(--safe-top)) 20px calc(24px + var(--safe-bottom));text-align:center;animation:fadeIn 0.4s ease;}
+  .screen.active{display:flex;}
+
+  /* === Keyframes === */
+  @keyframes fadeIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px) rotate(-2deg);}40%{transform:translateX(8px) rotate(2deg);}60%{transform:translateX(-6px) rotate(-1deg);}80%{transform:translateX(6px) rotate(1deg);}}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+  @keyframes bounceIn{0%{transform:scale(0.3);opacity:0;}50%{transform:scale(1.1);}70%{transform:scale(0.95);}100%{transform:scale(1);opacity:1;}}
+  @keyframes glow{0%,100%{box-shadow:0 0 8px rgba(212,168,67,0.3);}50%{box-shadow:0 0 24px rgba(212,168,67,0.6);}}
+  @keyframes sakeWave{0%,100%{transform:rotate(-3deg);}50%{transform:rotate(3deg);}}
+  @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+  @keyframes toastOut{to{opacity:0;transform:translateX(-50%) translateY(-10px);}}
+  @keyframes drinkPour{0%,100%{transform:rotate(0deg);}25%{transform:rotate(-8deg);}75%{transform:rotate(8deg);}}
+  @keyframes confetti{0%{transform:translateY(0) rotate(0);opacity:1;}100%{transform:translateY(60vh) rotate(720deg);opacity:0;}}
+  @keyframes revealSlam{0%{transform:scale(0) rotate(-20deg);opacity:0;}60%{transform:scale(1.15) rotate(3deg);opacity:1;}80%{transform:scale(0.95) rotate(-1deg);}100%{transform:scale(1) rotate(0);opacity:1;}}
+  @keyframes revealBgPulse{0%{background:rgba(26,18,16,0);}30%{background:rgba(26,18,16,0.95);}100%{background:rgba(26,18,16,0.92);}}
+  @keyframes chrysGlow{0%,100%{box-shadow:0 0 20px rgba(212,168,67,0.4),0 0 40px rgba(212,168,67,0.2);}50%{box-shadow:0 0 40px rgba(212,168,67,0.8),0 0 80px rgba(212,168,67,0.4);}}
+  @keyframes btnGlow{0%,100%{box-shadow:0 4px 16px rgba(192,57,43,0.4);}50%{box-shadow:0 4px 24px rgba(192,57,43,0.7),0 0 40px rgba(192,57,43,0.3);}}
+  @keyframes cupSway{0%,100%{transform:rotate(-2deg);}50%{transform:rotate(2deg);}}
+  @keyframes chrysanthemumSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+  @keyframes chrysanthemumBloom{0%{transform:scale(0) rotate(-180deg);opacity:0;}60%{transform:scale(1.2) rotate(20deg);opacity:1;}100%{transform:scale(1) rotate(0deg);opacity:1;}}
+  @keyframes safeFlash{0%{background:rgba(39,174,96,0);}50%{background:rgba(39,174,96,0.15);}100%{background:rgba(39,174,96,0);}}
+
+  /* === Controls === */
+  .ctrl-left{position:fixed;top:calc(12px + var(--safe-top));left:12px;z-index:200;}
+  .ctrl-right{position:fixed;top:calc(12px + var(--safe-top));right:12px;display:flex;gap:6px;z-index:200;}
+  .ctrl-btn{width:42px;height:42px;border-radius:50%;border:1px solid rgba(58,45,36,0.6);background:rgba(42,31,26,0.7);font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0.6;}
+  .ctrl-btn:active{opacity:1;transform:scale(0.9);}
+  #home-btn{font-size:16px;}
+  #bgm-toggle{font-size:15px;display:none;}
+
+  /* === Welcome === */
+  #welcome-screen{
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(139,90,43,0.12) 0%, transparent 70%),
+      repeating-linear-gradient(90deg, rgba(107,68,35,0.03) 0px, rgba(107,68,35,0.03) 1px, transparent 1px, transparent 8px),
+      linear-gradient(180deg, #1e1510 0%, #120d09 100%);
+  }
+  .title{font-family:'Noto Serif JP',serif;font-size:52px;font-weight:900;color:var(--gold);text-shadow:0 2px 16px rgba(212,168,67,0.4),0 0 60px rgba(212,168,67,0.1);letter-spacing:10px;margin-bottom:0;}
+  .title-romaji{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--cream-dim);letter-spacing:6px;text-transform:uppercase;margin-bottom:6px;}
+  .tagline{font-size:14px;color:var(--gold-light);background:linear-gradient(135deg, rgba(42,31,26,0.9), rgba(58,45,36,0.9));padding:10px 24px;border-radius:20px;border:1px solid rgba(212,168,67,0.4);margin-bottom:18px;font-weight:500;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+  .rules-box{background:linear-gradient(180deg, rgba(46,35,25,0.95) 0%, rgba(37,28,20,0.95) 100%);border:1px solid rgba(212,168,67,0.15);border-radius:16px;padding:18px;margin-bottom:18px;text-align:left;width:100%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.03);position:relative;overflow:hidden;}
+  .rules-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg, transparent, rgba(212,168,67,0.3), transparent);}
+  .rules-box h3{font-family:'Noto Serif JP',serif;color:var(--gold);margin-bottom:10px;font-size:15px;}
+  .rules-box ul{list-style:none;font-size:14px;line-height:1.8;color:var(--cream);}
+  .rules-box ul li::before{content:'▸ ';color:var(--red-bright);}
+  .chrysanthemum-showcase{display:flex;justify-content:center;margin-top:14px;}
+  .chrysanthemum-icon{font-size:56px;filter:drop-shadow(0 4px 16px rgba(212,168,67,0.5));animation:sakeWave 2s ease-in-out infinite;}
+
+  /* === Buttons === */
+  .btn{font-family:'Noto Sans JP',sans-serif;font-size:18px;font-weight:700;padding:16px 48px;border:none;border-radius:14px;cursor:pointer;transition:all 0.2s;letter-spacing:2px;min-height:56px;touch-action:manipulation;}
+  .btn:active{transform:scale(0.96);}
+  .btn-primary{background:linear-gradient(135deg,var(--red),var(--red-bright));color:var(--white);box-shadow:0 4px 16px rgba(192,57,43,0.4);animation:btnGlow 2s infinite;}
+  .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--bg);box-shadow:0 4px 16px rgba(212,168,67,0.4);}
+  .btn-sm{font-size:14px;padding:10px 24px;border-radius:8px;}
+
+  /* === Setup === */
+  #setup-screen{gap:16px;}
+  .setup-title{font-family:'Noto Serif JP',serif;font-size:24px;font-weight:900;color:var(--gold);margin-bottom:8px;}
+  .setup-section{width:100%;max-width:360px;margin-bottom:8px;}
+  .setup-label{font-family:'Noto Serif JP',serif;font-size:15px;color:var(--cream-dim);letter-spacing:1px;margin-bottom:8px;}
+  .option-row{display:flex;gap:8px;justify-content:center;align-items:center;}
+  .option-btn{width:56px;height:56px;border-radius:50%;background:var(--surface);border:2px solid var(--surface-2);color:var(--white);font-size:22px;font-weight:700;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;touch-action:manipulation;}
+  .option-btn:active{transform:scale(0.95);}
+  .option-btn.selected{border-color:var(--gold);background:rgba(212,168,67,0.15);color:var(--gold);}
+  .setup-desc{font-size:12px;color:var(--cream-dim);margin-top:6px;}
+
+  /* === Game Screen === */
+  #game-screen{justify-content:center;padding:0;gap:0;overflow:hidden;position:relative;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(255,255,255,0.04) 0%, transparent 60%),
+      repeating-linear-gradient(90deg, rgba(107,68,35,0.04) 0px, rgba(107,68,35,0.04) 1px, transparent 1px, transparent 6px),
+      linear-gradient(160deg, #6b4423 0%, #8a5e35 25%, #7a4f2b 45%, #5c3a1e 75%, #4a2e15 100%);
+  }
+  .game-info-bar{position:absolute;top:calc(16px + var(--safe-top));left:50%;transform:translateX(-50%);background:rgba(26,18,16,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:16px;padding:6px 18px;z-index:15;text-align:center;border:1px solid rgba(212,168,67,0.15);white-space:nowrap;max-width:80vw;transition:opacity 0.3s ease;}
+  .game-info-bar .round-info{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--cream-dim);letter-spacing:1px;}
+  .game-info-bar .player-info{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--gold-light);font-weight:700;margin-top:2px;}
+  .game-hint{position:absolute;bottom:calc(24px + var(--safe-bottom));left:50%;transform:translateX(-50%);font-family:'Noto Serif JP',serif;font-size:14px;color:var(--cream);background:rgba(26,18,16,0.6);padding:8px 20px;border-radius:16px;border:1px solid rgba(212,168,67,0.15);white-space:nowrap;z-index:15;animation:pulse 1.5s infinite;}
+  .cup-tray{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:grid;gap:16px;z-index:10;perspective:800px;}
+  .cup-tray.cols-3{grid-template-columns:repeat(3,1fr);}
+
+  /* === Cup 3D flip === */
+  .cup-slot{width:88px;height:88px;perspective:600px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+  .cup-inner{position:relative;width:100%;height:100%;transition:transform 0.6s ease;transform-style:preserve-3d;}
+  .cup-slot.flipped .cup-inner{transform:rotateX(180deg);}
+  .cup-slot.disabled{pointer-events:none;cursor:default;}
+  .cup-front,.cup-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+  /* Upside-down cup: dark ceramic */
+  .cup-front{
+    background:radial-gradient(circle at 40% 35%, #6a7b8f 0%, #4a5a6b 40%, #3a4a58 70%, #2a3a48 100%);
+    box-shadow:0 6px 16px rgba(0,0,0,0.5),inset 0 -3px 8px rgba(0,0,0,0.3),inset 0 2px 4px rgba(255,255,255,0.08);
+    border:2px solid rgba(100,120,140,0.3);
+  }
+  .cup-front::after{content:'';position:absolute;top:12%;left:20%;width:25%;height:20%;background:radial-gradient(ellipse, rgba(255,255,255,0.15), transparent);border-radius:50%;transform:rotate(-20deg);}
+  /* Flipped cup: empty, lighter */
+  .cup-back{
+    transform:rotateX(180deg);
+    background:radial-gradient(circle at 50% 50%, #c4b8a8 0%, #a89888 40%, #8a7a6a 100%);
+    box-shadow:0 4px 12px rgba(0,0,0,0.4),inset 0 4px 12px rgba(0,0,0,0.2);
+    border:2px solid rgba(160,140,120,0.4);
+    font-size:28px;
+  }
+  /* Chrysanthemum revealed */
+  .cup-slot.chrysanthemum .cup-back{
+    background:radial-gradient(circle at 50% 50%, #f0d68a 0%, #d4a843 40%, #b8903a 100%);
+    box-shadow:0 0 20px rgba(212,168,67,0.6),0 0 40px rgba(212,168,67,0.3);
+    animation:chrysGlow 1.5s infinite;
+  }
+  .cup-slot.chrysanthemum .cup-back .chrys-emoji{font-size:42px;animation:chrysanthemumBloom 0.8s ease both;}
+
+  /* === Safe Overlay === */
+  .safe-overlay{
+    position:fixed;inset:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    z-index:140;gap:8px;padding:var(--safe-top) 20px var(--safe-bottom);
+    background:rgba(26,18,16,0.85);
+    animation:fadeIn 0.3s ease;
+    pointer-events:none;
+  }
+  .safe-overlay .safe-text{font-family:'Noto Serif JP',serif;font-size:36px;font-weight:900;color:var(--green);animation:bounceIn 0.5s ease;text-shadow:0 0 20px rgba(39,174,96,0.4);}
+  .safe-overlay .safe-sub{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--cream-dim);animation:fadeIn 0.4s 0.3s ease both;}
+
+  /* === Chrysanthemum Reveal Overlay === */
+  .chrys-reveal-overlay{
+    position:fixed;inset:0;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    z-index:150;gap:8px;padding:var(--safe-top) 20px var(--safe-bottom);
+    animation:revealBgPulse 0.4s ease forwards;
+    cursor:pointer;-webkit-tap-highlight-color:transparent;
+  }
+  .chrys-reveal-overlay .chrys-flower{font-size:100px;animation:chrysanthemumBloom 0.8s ease both;filter:drop-shadow(0 0 30px rgba(212,168,67,0.6));}
+  .chrys-reveal-overlay .chrys-title{font-family:'Noto Serif JP',serif;font-size:32px;font-weight:900;color:var(--gold);animation:revealSlam 0.5s ease forwards;text-shadow:0 0 20px rgba(212,168,67,0.5);}
+  .chrys-reveal-overlay .chrys-penalty{font-family:'Noto Serif JP',serif;font-size:22px;font-weight:700;color:var(--red-bright);animation:revealSlam 0.5s 0.15s ease both;text-shadow:0 0 16px rgba(231,76,60,0.4);}
+  .chrys-reveal-overlay .chrys-desc{font-family:'Noto Serif JP',serif;font-size:15px;color:var(--cream-dim);max-width:280px;animation:fadeIn 0.4s 0.4s ease both;margin-top:8px;}
+  .chrys-reveal-overlay .chrys-tap-hint{font-family:'Noto Serif JP',serif;font-size:15px;color:var(--gold-light);margin-top:20px;animation:fadeIn 0.3s 1s ease both,pulse 1s 1.3s infinite;background:rgba(212,168,67,0.1);padding:8px 24px;border-radius:20px;border:1px solid rgba(212,168,67,0.25);}
+  .confetti-particle{position:fixed;top:-20px;width:8px;height:8px;border-radius:2px;z-index:151;pointer-events:none;animation:confetti var(--dur,3s) linear forwards;}
+
+  /* === Drink Overlay === */
+  .drink-overlay{
+    position:fixed;inset:0;
+    background:rgba(26,18,16,0.94);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    z-index:160;gap:10px;padding:var(--safe-top) 20px var(--safe-bottom);
+    -webkit-tap-highlight-color:transparent;cursor:pointer;animation:fadeIn 0.3s ease;
+  }
+  .drink-title{font-family:'Noto Serif JP',serif;font-size:28px;color:var(--white);font-weight:900;text-shadow:0 0 20px rgba(255,255,255,0.2);}
+  .drink-sake-icon{font-size:80px;animation:drinkPour 0.8s infinite;}
+  .drink-cup-count{font-family:'Noto Serif JP',serif;font-size:20px;color:var(--gold);font-weight:700;}
+  .drink-bar{width:80%;max-width:280px;height:28px;background:var(--surface-2);border-radius:14px;overflow:hidden;border:1px solid var(--surface-2);margin-top:8px;}
+  .drink-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:14px;transition:width 0.1s ease-out;}
+  .drink-pct{font-size:14px;color:var(--gold);font-weight:700;}
+  .drink-tap-hint{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--gold-light);animation:pulse 0.8s infinite;margin-top:10px;background:rgba(212,168,67,0.1);padding:8px 24px;border-radius:20px;border:1px solid rgba(212,168,67,0.25);}
+  .drink-done-msg{font-family:'Noto Serif JP',serif;font-size:24px;font-weight:900;color:var(--gold);animation:bounceIn 0.5s ease;}
+
+  /* === Round End === */
+  #roundend-screen{gap:12px;background:radial-gradient(circle at 50% 30%, rgba(212,168,67,0.05) 0%, transparent 60%),linear-gradient(180deg, #1a1210 0%, #0d0a08 100%);}
+  .roundend-title{font-family:'Noto Serif JP',serif;font-size:28px;font-weight:900;color:var(--gold);margin-bottom:8px;text-shadow:0 0 20px rgba(212,168,67,0.4);}
+  .roundend-flower{font-size:60px;animation:chrysanthemumSpin 4s linear infinite;filter:drop-shadow(0 0 20px rgba(212,168,67,0.5));}
+  .roundend-summary{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--cream);line-height:1.8;max-width:320px;margin:8px 0;background:var(--surface);padding:16px 20px;border-radius:14px;border:1px solid var(--surface-2);}
+  .roundend-penalty{font-size:22px;font-weight:900;color:var(--red-bright);margin-top:4px;}
+  .roundend-btns{display:flex;gap:12px;margin-top:12px;}
+
+  /* === Custom Confirm Dialog === */
+  .confirm-overlay{position:fixed;inset:0;background:rgba(26,18,16,0.85);display:flex;align-items:center;justify-content:center;z-index:9000;animation:fadeIn 0.2s ease;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+  .confirm-box{background:linear-gradient(180deg, #2e2319 0%, #1e1510 100%);border:1px solid rgba(212,168,67,0.3);border-radius:20px;padding:28px 24px;text-align:center;max-width:300px;width:85%;box-shadow:0 8px 40px rgba(0,0,0,0.5);}
+  .confirm-msg{font-family:'Noto Serif JP',serif;font-size:17px;color:var(--cream);margin-bottom:24px;line-height:1.6;}
+  .confirm-btns{display:flex;gap:12px;justify-content:center;}
+  .confirm-btns button{font-family:'Noto Serif JP',serif;font-size:15px;font-weight:700;padding:10px 24px;border:none;border-radius:12px;cursor:pointer;touch-action:manipulation;min-width:100px;}
+  .confirm-yes{background:linear-gradient(135deg,var(--red),var(--red-bright));color:var(--white);}
+  .confirm-no{background:rgba(255,255,255,0.08);color:var(--cream);border:1px solid rgba(255,255,255,0.15) !important;}
+  .bgm-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--gold);color:var(--gold-light);padding:8px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:300;animation:toastIn 0.3s ease,toastOut 0.3s 1.5s ease forwards;}
+
+  /* === RWD === */
+  @media(max-width:375px){.ctrl-btn{width:44px;height:44px;font-size:20px;}}
+  @media(max-width:390px){.title{font-size:38px;letter-spacing:4px;}.tagline{font-size:12px;padding:8px 14px;}.rules-box{padding:14px;margin-bottom:14px;}.rules-box ul{font-size:12px;}.btn{font-size:16px;padding:12px 36px;}.cup-slot{width:72px;height:72px;}.chrys-reveal-overlay .chrys-flower{font-size:72px;}.chrys-reveal-overlay .chrys-title{font-size:26px;}}
+  @media(max-height:700px){.screen{padding:16px 16px;}#game-screen{padding:0;}.title{font-size:36px;}.tagline{margin-bottom:12px;}.rules-box{padding:12px;margin-bottom:12px;}}
+  @media(max-height:550px){.screen{min-height:auto;padding:12px 12px;justify-content:flex-start;}#game-screen{padding:0;justify-content:center;}.title{font-size:30px;margin-bottom:2px;}.title-romaji{display:none;}.tagline{margin-bottom:8px;font-size:11px;}.rules-box{margin-bottom:8px;padding:8px;}.btn{padding:10px 28px;font-size:15px;}.cup-slot{width:64px;height:64px;}}
+  @media(orientation:landscape){
+    body::before{content:'';position:fixed;inset:0;background:var(--bg);z-index:99999;}
+    body::after{content:'📱';position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:100000;font-size:48px;animation:rotateTip 1.5s ease-in-out infinite;}
+    @keyframes rotateTip{0%,100%{transform:translate(-50%,-50%) rotate(0deg);}50%{transform:translate(-50%,-50%) rotate(-90deg);}}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="ctrl-left">
+    <button class="ctrl-btn" id="home-btn" onclick="goHome()">🏠</button>
+  </div>
+  <div class="ctrl-right">
+    <button class="ctrl-btn" id="lang-toggle" onclick="toggleLang()"></button>
+    <button class="ctrl-btn" id="bgm-toggle" onclick="toggleBgm()"></button>
+    <button class="ctrl-btn" id="mute-toggle" onclick="toggleMute()"></button>
+  </div>
+
+  <div id="welcome-screen" class="screen active">
+    <h1 class="title">菊花杯</h1>
+    <p class="title-romaji">Kikuhai</p>
+    <div class="tagline" data-i18n="tagline"></div>
+    <div class="rules-box">
+      <h3 data-i18n="rulesTitle"></h3>
+      <ul id="rules-list"></ul>
+      <div class="chrysanthemum-showcase">
+        <div class="chrysanthemum-icon">🌼</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="goSetup()" data-i18n="startBtn"></button>
+  </div>
+
+  <div id="setup-screen" class="screen">
+    <div class="setup-title" data-i18n="setupTitle"></div>
+    <div class="setup-section">
+      <div class="setup-label" data-i18n="cupCountLabel"></div>
+      <div class="option-row" id="cup-count-row"></div>
+      <div class="setup-desc" id="cup-count-desc"></div>
+    </div>
+    <div class="setup-section">
+      <div class="setup-label" data-i18n="playerCountLabel"></div>
+      <div class="option-row" id="player-count-row"></div>
+    </div>
+    <button class="btn btn-gold" onclick="startGame()" data-i18n="setupStart" style="margin-top:16px;"></button>
+  </div>
+
+  <div id="game-screen" class="screen">
+    <div class="game-info-bar" id="game-info-bar">
+      <div class="round-info" id="game-round-info"></div>
+      <div class="player-info" id="game-player-info"></div>
+    </div>
+    <div class="cup-tray cols-3" id="cup-tray"></div>
+    <div class="game-hint" id="game-hint"></div>
+  </div>
+
+  <div id="roundend-screen" class="screen">
+    <div class="roundend-flower">🌼</div>
+    <div class="roundend-title" data-i18n="roundEndTitle"></div>
+    <div class="roundend-summary" id="roundend-summary"></div>
+    <div class="roundend-btns">
+      <button class="btn btn-primary" onclick="nextRound()" data-i18n="nextRoundBtn"></button>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,0.08);color:var(--cream);border:1px solid rgba(255,255,255,0.15);" onclick="backToWelcome()" data-i18n="backHomeBtn"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// I18N
+// ============================================================
+const I18N={
+  _lang:localStorage.getItem('kikuhai-lang')||'zh',
+  _strings:{
+    ja:{
+      tagline:'清酒版ロシアンルーレット！',
+      rulesTitle:'📜 ルール',
+      rules:[
+        '伏せた杯の中に一つだけ<strong>菊花</strong>が隠れている',
+        '順番に杯をめくる——空なら<strong>セーフ</strong>',
+        '菊花が出たら<strong>「当たり！」</strong>',
+        '罰：めくられた杯の数だけ清酒を飲む！',
+      ],
+      startBtn:'入座！',
+      setupTitle:'ゲーム設定',
+      cupCountLabel:'杯の数',
+      playerCountLabel:'プレイヤー数',
+      setupStart:'めくり開始！',
+      cupDesc6:'ライト（最大5杯）',cupDesc9:'ハード（最大8杯）',
+      roundInfo:'第 {n} ラウンド',
+      playerTurn:'第 {n} 番',
+      flipHint:'杯を選んでめくれ！',
+      safeText:'セーフ！',
+      safeSub:'次の人へ…',
+      chrysTitle:'🌼 当たり！',
+      chrysPenalty:'罰：清酒 {n} 杯！',
+      chrysDesc:'めくった杯の数だけ飲め！',
+      drinkTitle:'罰杯タイム！',
+      drinkCount:'清酒 {n} 杯',
+      drinkTapHint:'タップして飲み干せ！',
+      drinkDone:'飲み干した！🍶',
+      roundEndTitle:'一ラウンド終了！',
+      roundSummary:'第 {p} 番が菊花を引いた → 罰 {n} 杯',
+      nextRoundBtn:'もう一ラウンド！',
+      backHomeBtn:'トップへ',
+      confirmHome:'トップに戻りますか？',
+      lastCupAuto:'最後の一杯…めくるまでもない、菊花はここだ！',
+      bgmShamisen:'🎶 宴会',bgmMatsuri:'🥁 祭り',
+      // Tension voices (0-indexed by flippedCount)
+      tension:[
+        '一番手、どうぞ！',
+        '二番手、菊花はまだ眠っている…',
+        'もう二杯めくった、運はいつまで持つ？',
+        '残りが減ってきた…菊花が笑ってるぞ',
+        '五分五分！君か次の人か！',
+        '残り四杯…心臓バクバクだ…',
+        '三杯の中に一輪の菊花、めくれるか？',
+        'あと二杯！二分の一だ！',
+      ],
+      // Safe voices
+      safe:['セーフ！助かった～','危なかった！でも次の人はどうかな…','空っぽ！この運を使って大丈夫？'],
+      // Chrysanthemum voices
+      chrys:[
+        '菊花が咲いた！おめでとう！清酒{n}杯どうぞ！',
+        'やられた！菊花に選ばれし者！{n}杯いけ！',
+        '菊花満開！今夜の維醺志士は君だ！{n}杯飲め！',
+      ],
+      lastCupVoice:'最後の一杯、自動開封！全部の酒は君のもの！{n}杯だ！',
+      voiceDrinkDone:'飲み干した！お見事！',
+    },
+    zh:{
+      tagline:'清酒版俄羅斯輪盤！',
+      rulesTitle:'📜 遊戲規則',
+      rules:[
+        '倒扣的杯子中藏著一朵<strong>菊花</strong>',
+        '眾人輪流翻杯，翻到空杯<strong>安全過關</strong>',
+        '翻到菊花者<strong>「中獎！」</strong>',
+        '懲罰：喝下已翻開杯數的清酒！',
+      ],
+      startBtn:'入座！',
+      setupTitle:'遊戲設定',
+      cupCountLabel:'杯數',
+      playerCountLabel:'人數',
+      setupStart:'開始翻杯！',
+      cupDesc6:'輕鬆版（最多罰 5 杯）',cupDesc9:'刺激版（最多罰 8 杯）',
+      roundInfo:'第 {n} 輪',
+      playerTurn:'第 {n} 位',
+      flipHint:'選一個杯子翻開！',
+      safeText:'安全！',
+      safeSub:'換下一位…',
+      chrysTitle:'🌼 中獎！',
+      chrysPenalty:'罰喝 {n} 杯清酒！',
+      chrysDesc:'翻開了幾杯就喝幾杯！',
+      drinkTitle:'罰酒時間！',
+      drinkCount:'清酒 {n} 杯',
+      drinkTapHint:'連續點擊喝光！',
+      drinkDone:'喝完了！🍶',
+      roundEndTitle:'一輪結束！',
+      roundSummary:'第 {p} 位翻到菊花 → 罰喝 {n} 杯',
+      nextRoundBtn:'再來一輪！',
+      backHomeBtn:'回首頁',
+      confirmHome:'確定要返回首頁嗎？',
+      lastCupAuto:'最後一杯⋯不用翻了，菊花一定在這！',
+      bgmShamisen:'🎶 宴會',bgmMatsuri:'🥁 祭典',
+      // Tension voices
+      tension:[
+        '第一位勇者，請翻杯！',
+        '第二位，菊花還在沉睡中...',
+        '已經翻了兩杯了，運氣還能撐多久？',
+        '剩下的杯子越來越少了...',
+        '五五開！不是你就是下一位！',
+        '只剩四杯了...心跳加速中...',
+        '三杯裡面有一朵菊花，你敢翻嗎？',
+        '就剩兩杯了！二分之一的機率！',
+      ],
+      // Safe voices
+      safe:['安全！逃過一劫～','好險！但下一位可沒這麼幸運...','空的！你的好運用在這裡值得嗎？'],
+      // Chrysanthemum voices
+      chrys:[
+        '菊花綻放！恭喜中獎！{n}杯清酒請笑納！',
+        '哎呀！被菊花選中的幸運兒！請乾{n}杯！',
+        '菊花盛開！今晚的維醺志士就是你！乾{n}杯吧！',
+      ],
+      lastCupVoice:'最後一杯自動開獎！所有的酒都是你的！乾{n}杯吧！',
+      voiceDrinkDone:'喝完了，好厲害呀！',
+    },
+  },
+  get lang(){return this._lang;},
+  setLang(l){this._lang=l;localStorage.setItem('kikuhai-lang',l);this.updateDOM();},
+  t(k,p){let s=this._strings[this._lang][k];if(s==null)s=this._strings['ja'][k]||k;if(p)for(const[a,b]of Object.entries(p))s=s.replace(new RegExp('\\{'+a+'\\}','g'),b);return s;},
+  updateDOM(){
+    document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=this.t(el.getAttribute('data-i18n'));});
+    const rl=document.getElementById('rules-list');
+    if(rl)rl.innerHTML=this._strings[this._lang].rules.map(r=>`<li>${r}</li>`).join('');
+    document.getElementById('lang-toggle').textContent=this._lang==='ja'?'🇹🇼':'🇯🇵';
+  },
+};
+function t(k,p){return I18N.t(k,p);}
+
+function toggleLang(){
+  if(state.busy)return;
+  I18N.setLang(I18N.lang==='ja'?'zh':'ja');
+  const a=document.querySelector('.screen.active');
+  if(a&&a.id==='setup-screen')renderSetup();
+}
+
+// ============================================================
+// AUDIO
+// ============================================================
+const BGM_ORDER=['shamisen','matsuri'];
+const BGM_ICONS={shamisen:'🎶',matsuri:'🥁'};
+const BGM_KEYS={shamisen:'bgmShamisen',matsuri:'bgmMatsuri'};
+
+class AudioManager{
+  constructor(){this.ctx=null;this.masterGain=null;this.musicGain=null;this.sfxGain=null;this.muted=false;this.musicPlaying=false;this._musicInterval=null;this._musicNodes=[];this.bgmStyle='shamisen';}
+  init(){if(this.ctx)return;this.ctx=new(window.AudioContext||window.webkitAudioContext)();this.masterGain=this.ctx.createGain();this.masterGain.connect(this.ctx.destination);this.musicGain=this.ctx.createGain();this.musicGain.gain.value=0.25;this.musicGain.connect(this.masterGain);this.sfxGain=this.ctx.createGain();this.sfxGain.gain.value=0.5;this.sfxGain.connect(this.masterGain);}
+  ensureResumed(){if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();}
+  toggleMute(){this.muted=!this.muted;if(this.masterGain)this.masterGain.gain.value=this.muted?0:1;document.getElementById('mute-toggle').textContent=this.muted?'🔇':'🔊';if(this.muted)speechSynthesis.cancel();}
+
+  // --- BGM: Shamisen ---
+  startMusicShamisen(){const c=this.ctx;const ph=[293.66,329.63,392,440,493.88,440,392,329.63,293.66,392,493.88,440,329.63,392,440,293.66];const dur=0.4;let i=0;const p=()=>{if(!this.musicPlaying)return;const f=ph[i%ph.length];const o=c.createOscillator();o.type='sawtooth';o.frequency.value=f;const fl=c.createBiquadFilter();fl.type='bandpass';fl.frequency.value=f*2.5;fl.Q.value=3;const e=c.createGain();const n=c.currentTime;e.gain.setValueAtTime(0.14,n);e.gain.exponentialRampToValueAtTime(0.001,n+dur*0.85);o.connect(fl);fl.connect(e);e.connect(this.musicGain);o.start(n);o.stop(n+dur);if(i%4===0){const t=c.createOscillator();t.type='triangle';t.frequency.setValueAtTime(100,n);t.frequency.exponentialRampToValueAtTime(40,n+0.2);const tg=c.createGain();tg.gain.setValueAtTime(0.18,n);tg.gain.exponentialRampToValueAtTime(0.001,n+0.25);t.connect(tg);tg.connect(this.musicGain);t.start(n);t.stop(n+0.25);}i++;};p();this._musicInterval=setInterval(p,dur*1000);}
+
+  // --- BGM: Matsuri ---
+  startMusicMatsuri(){
+    const c=this.ctx;const beatDur=0.22;let beat=0;
+    const melody=[392,440,523.25,587.33,659.25,587.33,523.25,440,392,523.25,659.25,587.33,440,523.25,587.33,392];
+    const p=()=>{
+      if(!this.musicPlaying)return;const n=c.currentTime;const bm=beat%8;
+      if(bm%2===0){
+        const accent=bm===0||bm===6;
+        const o=c.createOscillator();o.type='triangle';
+        o.frequency.setValueAtTime(accent?100:75,n);o.frequency.exponentialRampToValueAtTime(38,n+0.12);
+        const g=c.createGain();g.gain.setValueAtTime(accent?0.28:0.16,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.18);
+        o.connect(g);g.connect(this.musicGain);o.start(n);o.stop(n+0.18);
+        const bs=c.sampleRate*0.015,b=c.createBuffer(1,bs,c.sampleRate),d=b.getChannelData(0);
+        for(let j=0;j<bs;j++)d[j]=(Math.random()*2-1)*Math.pow(1-j/bs,3);
+        const ns=c.createBufferSource();ns.buffer=b;const ng=c.createGain();
+        ng.gain.setValueAtTime(accent?0.14:0.06,n);ng.gain.exponentialRampToValueAtTime(0.001,n+0.06);
+        ns.connect(ng);ng.connect(this.musicGain);ns.start(n);
+      }
+      if(beat%4===0){
+        const freq=melody[(beat/4)%melody.length];
+        const o=c.createOscillator();o.type='sine';o.frequency.value=freq;
+        const lfo=c.createOscillator();lfo.type='sine';lfo.frequency.value=5;
+        const lfoG=c.createGain();lfoG.gain.value=3;
+        lfo.connect(lfoG);lfoG.connect(o.frequency);lfo.start(n);lfo.stop(n+beatDur*3.5);
+        const g=c.createGain();g.gain.setValueAtTime(0.05,n);g.gain.linearRampToValueAtTime(0.07,n+beatDur);
+        g.gain.linearRampToValueAtTime(0.03,n+beatDur*3);g.gain.exponentialRampToValueAtTime(0.001,n+beatDur*3.5);
+        o.connect(g);g.connect(this.musicGain);o.start(n);o.stop(n+beatDur*4);
+      }
+      if(beat%16===0){
+        const o=c.createOscillator();o.type='sine';o.frequency.value=1480;
+        const g=c.createGain();g.gain.setValueAtTime(0.05,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.6);
+        o.connect(g);g.connect(this.musicGain);o.start(n);o.stop(n+0.6);
+      }
+      beat++;
+    };p();this._musicInterval=setInterval(p,beatDur*1000);
+  }
+
+  startMusic(){if(this.musicPlaying)return;this.init();this.musicPlaying=true;if(this.bgmStyle==='matsuri')this.startMusicMatsuri();else this.startMusicShamisen();}
+  stopMusic(){this.musicPlaying=false;if(this._musicInterval){clearInterval(this._musicInterval);this._musicInterval=null;}this._musicNodes.forEach(({osc,gain})=>{try{gain.gain.linearRampToValueAtTime(0,this.ctx.currentTime+0.5);osc.stop(this.ctx.currentTime+0.6);}catch(e){}});this._musicNodes=[];}
+
+  playClick(){this.init();const c=this.ctx,n=c.currentTime;const o=c.createOscillator();o.type='sine';o.frequency.value=1200;const g=c.createGain();g.gain.setValueAtTime(0.15,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.08);o.connect(g);g.connect(this.sfxGain);o.start(n);o.stop(n+0.08);}
+
+  playFlipCup(){
+    this.init();const c=this.ctx,n=c.currentTime;
+    // Ceramic clack: noise burst + resonant tone
+    const bs=c.sampleRate*0.04,b=c.createBuffer(1,bs,c.sampleRate),d=b.getChannelData(0);
+    for(let i=0;i<bs;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/bs,4);
+    const ns=c.createBufferSource();ns.buffer=b;
+    const fl=c.createBiquadFilter();fl.type='bandpass';fl.frequency.value=3000;fl.Q.value=2;
+    const ng=c.createGain();ng.gain.setValueAtTime(0.3,n);ng.gain.exponentialRampToValueAtTime(0.001,n+0.12);
+    ns.connect(fl);fl.connect(ng);ng.connect(this.sfxGain);ns.start(n);
+    // Ceramic ring
+    const o=c.createOscillator();o.type='sine';o.frequency.value=1800;
+    const g=c.createGain();g.gain.setValueAtTime(0.08,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.2);
+    o.connect(g);g.connect(this.sfxGain);o.start(n);o.stop(n+0.2);
+  }
+
+  playSafeChime(){
+    this.init();const c=this.ctx,n=c.currentTime;
+    [523.25,659.25,783.99].forEach((f,i)=>{
+      const o=c.createOscillator();o.type='sine';const g=c.createGain();
+      const t=n+i*0.1;g.gain.setValueAtTime(0.12,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
+      o.frequency.value=f;o.connect(g);g.connect(this.sfxGain);o.start(t);o.stop(t+0.3);
+    });
+  }
+
+  playChrysanthemumReveal(){
+    this.init();const c=this.ctx,n=c.currentTime;
+    // Dramatic descending then big chord
+    [587.33,493.88,440,392].forEach((f,i)=>{
+      const o=c.createOscillator();o.type='triangle';const g=c.createGain();
+      const t=n+i*0.12;g.gain.setValueAtTime(0.2,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.25);
+      o.frequency.value=f;o.connect(g);g.connect(this.sfxGain);o.start(t);o.stop(t+0.25);
+    });
+    // Big chord after
+    const chordTime=n+0.55;
+    [293.66,369.99,440,587.33].forEach(f=>{
+      const o=c.createOscillator();o.type='sine';const g=c.createGain();
+      g.gain.setValueAtTime(0.15,chordTime);g.gain.linearRampToValueAtTime(0.1,chordTime+0.3);g.gain.exponentialRampToValueAtTime(0.001,chordTime+1.2);
+      o.frequency.value=f;o.connect(g);g.connect(this.sfxGain);o.start(chordTime);o.stop(chordTime+1.2);
+    });
+    // Crash noise
+    const bs2=c.sampleRate*0.08,b2=c.createBuffer(1,bs2,c.sampleRate),d2=b2.getChannelData(0);
+    for(let i=0;i<bs2;i++)d2[i]=(Math.random()*2-1)*Math.pow(1-i/bs2,2);
+    const ns2=c.createBufferSource();ns2.buffer=b2;const ng2=c.createGain();
+    ng2.gain.setValueAtTime(0.15,chordTime);ng2.gain.exponentialRampToValueAtTime(0.001,chordTime+0.5);
+    ns2.connect(ng2);ng2.connect(this.sfxGain);ns2.start(chordTime);
+  }
+
+  playDrinkGulp(){this.init();const c=this.ctx,n=c.currentTime;for(let i=0;i<6;i++){const t=n+i*0.1;const o=c.createOscillator();o.type='sine';o.frequency.setValueAtTime(150+Math.random()*80,t);o.frequency.exponentialRampToValueAtTime(80,t+0.1);const g=c.createGain();g.gain.setValueAtTime(0.12,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.1);o.connect(g);g.connect(this.sfxGain);o.start(t);o.stop(t+0.12);}}
+  playSake(){this.init();const c=this.ctx,n=c.currentTime;for(let i=0;i<12;i++){const o=c.createOscillator();o.type='sine';o.frequency.value=200+Math.random()*400;const g=c.createGain();const t=n+i*0.08+Math.random()*0.03;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.06,t+0.015);g.gain.exponentialRampToValueAtTime(0.001,t+0.06);o.connect(g);g.connect(this.sfxGain);o.start(t);o.stop(t+0.06);}}
+  playWin(){this.init();const c=this.ctx,n=c.currentTime;[293.66,392,440,587.33].forEach((f,i)=>{const o=c.createOscillator();o.type='sine';const g=c.createGain();const t=n+i*0.12;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.15,t+0.04);g.gain.exponentialRampToValueAtTime(0.001,t+0.4);o.frequency.value=f;o.connect(g);g.connect(this.sfxGain);o.start(t);o.stop(t+0.4);});}
+}
+const audio=new AudioManager();
+function toggleMute(){audio.toggleMute();}
+function toggleBgm(){
+  const cur=BGM_ORDER.indexOf(audio.bgmStyle);
+  audio.bgmStyle=BGM_ORDER[(cur+1)%BGM_ORDER.length];
+  $('bgm-toggle').textContent=BGM_ICONS[audio.bgmStyle];
+  const toast=document.createElement('div');toast.className='bgm-toast';toast.textContent=t(BGM_KEYS[audio.bgmStyle]);
+  document.body.appendChild(toast);setTimeout(()=>toast.remove(),2000);
+  if(audio.musicPlaying){audio.stopMusic();audio.startMusic();}
+}
+
+// ============================================================
+// VOICE
+// ============================================================
+class VoiceManager{
+  constructor(){this.jaVoice=null;this.zhVoice=null;this.ready=false;}
+  init(){
+    if(this.ready)return;const v=speechSynthesis.getVoices();
+    this.jaVoice=v.find(x=>x.name==='Kyoko')||v.find(x=>x.name==='O-Ren')||v.find(x=>x.lang&&x.lang.startsWith('ja'))||null;
+    this.zhVoice=
+      v.find(x=>/Meijia|Mei-Jia/i.test(x.name))||
+      v.find(x=>x.lang&&(x.lang==='zh-TW'||x.lang==='zh_TW')&&!/Sandy|Shelley|Flo|Reed|Rocko|Grandma|Grandpa|Eddy/i.test(x.name))||
+      v.find(x=>x.lang&&x.lang.startsWith('zh-TW'))||
+      v.find(x=>x.lang&&x.lang.startsWith('zh'))||null;
+    this.ready=true;
+  }
+  _duckBGM(){if(audio.musicGain)audio.musicGain.gain.value=0.05;}
+  _unduckBGM(){if(audio.musicGain)audio.musicGain.gain.value=0.25;}
+  speak(text,opts={}){
+    if(audio.muted)return;if(!this.ready)this.init();
+    this._duckBGM();
+    const lang=opts.lang||(I18N.lang==='zh'?'zh':'ja');
+    const u=new SpeechSynthesisUtterance(text);
+    if(lang==='zh'){u.lang='zh-TW';if(this.zhVoice)u.voice=this.zhVoice;}
+    else{u.lang='ja-JP';if(this.jaVoice)u.voice=this.jaVoice;}
+    u.rate=opts.rate||1;u.pitch=opts.pitch||1;u.volume=opts.volume||1;
+    u.onend=()=>this._unduckBGM();u.onerror=()=>this._unduckBGM();
+    speechSynthesis.cancel();speechSynthesis.speak(u);
+  }
+  speakAsync(text,opts={}){
+    return new Promise(resolve=>{
+      if(audio.muted||!text){resolve();return;}
+      if(!this.ready)this.init();
+      this._duckBGM();
+      const lang=opts.lang||(I18N.lang==='zh'?'zh':'ja');
+      const u=new SpeechSynthesisUtterance(text);
+      if(lang==='zh'){u.lang='zh-TW';if(this.zhVoice)u.voice=this.zhVoice;}
+      else{u.lang='ja-JP';if(this.jaVoice)u.voice=this.jaVoice;}
+      u.rate=opts.rate||1;u.pitch=opts.pitch||1;u.volume=opts.volume||1;
+      const done=()=>{this._unduckBGM();resolve();};
+      const timer=setTimeout(done,8000);
+      u.onend=()=>{clearTimeout(timer);done();};
+      u.onerror=()=>{clearTimeout(timer);done();};
+      speechSynthesis.cancel();speechSynthesis.speak(u);
+    });
+  }
+}
+const voice=new VoiceManager();
+if(typeof speechSynthesis!=='undefined')speechSynthesis.addEventListener('voiceschanged',()=>{voice.ready=false;voice.init();});
+
+let _speechUnlocked=false;
+function unlockSpeech(){
+  if(_speechUnlocked||typeof speechSynthesis==='undefined')return;
+  _speechUnlocked=true;
+  const u=new SpeechSynthesisUtterance('');u.volume=0;
+  speechSynthesis.speak(u);
+  voice.init();
+  document.removeEventListener('click',unlockSpeech,true);
+  document.removeEventListener('touchstart',unlockSpeech,true);
+}
+document.addEventListener('click',unlockSpeech,true);
+document.addEventListener('touchstart',unlockSpeech,true);
+
+// ============================================================
+// STATE
+// ============================================================
+const CONFETTI_COLORS=['#e74c3c','#d4a843','#f0d68a','#27ae60','#3498db','#f5e6c8'];
+
+const state={
+  cupCount:9,
+  playerCount:4,
+  currentPlayer:1,
+  cups:[],
+  flippedCount:0,
+  round:1,
+  busy:false,
+};
+
+function $(id){return document.getElementById(id);}
+function show(sid){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(sid).classList.add('active');$('bgm-toggle').style.display='flex';const isWelcome=sid==='welcome-screen'||sid==='setup-screen';$('lang-toggle').style.display=isWelcome?'flex':'none';}
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+function randPick(arr){return arr[randInt(0,arr.length-1)];}
+function spawnConfetti(count=20){for(let i=0;i<count;i++){const p=document.createElement('div');p.className='confetti-particle';p.style.left=randInt(10,90)+'vw';p.style.background=CONFETTI_COLORS[randInt(0,CONFETTI_COLORS.length-1)];p.style.setProperty('--dur',(2+Math.random()*2)+'s');p.style.animationDelay=(Math.random()*0.5)+'s';p.style.width=randInt(6,12)+'px';p.style.height=randInt(6,12)+'px';p.style.borderRadius=Math.random()>0.5?'50%':'2px';document.body.appendChild(p);setTimeout(()=>p.remove(),5000);}}
+
+function goHome(){
+  const inGame=document.querySelector('#game-screen.active')||document.querySelector('#roundend-screen.active');
+  if(!inGame){audio.stopMusic();window.location.href='index.html';return;}
+  const ov=document.createElement('div');ov.className='confirm-overlay';
+  ov.innerHTML=`<div class="confirm-box"><div class="confirm-msg">${t('confirmHome')}</div><div class="confirm-btns"><button class="confirm-no" id="confirm-no">${I18N.lang==='ja'?'いいえ':'取消'}</button><button class="confirm-yes" id="confirm-yes">${I18N.lang==='ja'?'はい':'確定'}</button></div></div>`;
+  document.body.appendChild(ov);
+  ov.querySelector('#confirm-no').onclick=()=>ov.remove();
+  ov.querySelector('#confirm-yes').onclick=()=>{audio.stopMusic();window.location.href='index.html';};
+  ov.addEventListener('click',(e)=>{if(e.target===ov)ov.remove();});
+}
+
+// ============================================================
+// SETUP
+// ============================================================
+function goSetup(){
+  audio.init();audio.ensureResumed();audio.startMusic();
+  state.cupCount=9;state.playerCount=4;
+  show('setup-screen');renderSetup();
+}
+
+function setCupCount(n){audio.playClick();state.cupCount=n;renderSetup();}
+function setPlayerCount(n){audio.playClick();state.playerCount=n;renderSetup();}
+
+function renderSetup(){
+  // Cup count
+  let cc='';
+  [6,9].forEach(n=>{cc+=`<button class="option-btn${n===state.cupCount?' selected':''}" onclick="setCupCount(${n})">${n}</button>`;});
+  $('cup-count-row').innerHTML=cc;
+  $('cup-count-desc').textContent=state.cupCount===6?t('cupDesc6'):t('cupDesc9');
+  // Player count
+  let pc='';
+  [4,5,6].forEach(n=>{pc+=`<button class="option-btn${n===state.playerCount?' selected':''}" onclick="setPlayerCount(${n})">${n}</button>`;});
+  $('player-count-row').innerHTML=pc;
+}
+
+function startGame(){
+  state.round=1;state.currentPlayer=1;state.busy=false;
+  initCups();
+  show('game-screen');
+  startTurn();
+}
+
+// ============================================================
+// CUP INIT
+// ============================================================
+function initCups(){
+  state.cups=[];
+  const chrysIdx=randInt(0,state.cupCount-1);
+  for(let i=0;i<state.cupCount;i++){
+    state.cups.push({flipped:false,hasChrysanthemum:i===chrysIdx});
+  }
+  state.flippedCount=0;
+}
+
+// ============================================================
+// GAME LOGIC
+// ============================================================
+function startTurn(){
+  renderCups();
+  $('game-round-info').textContent=t('roundInfo',{n:state.round});
+  $('game-player-info').textContent=t('playerTurn',{n:state.currentPlayer});
+  $('game-hint').textContent=t('flipHint');
+  $('game-hint').style.display='block';
+
+  // Check if only 1 cup left unflipped -> auto-reveal
+  const remaining=state.cups.filter(c=>!c.flipped);
+  if(remaining.length===1){
+    state.busy=true;
+    autoRevealLast();
+    return;
+  }
+
+  // Tension voice
+  const tensionLines=I18N._strings[I18N.lang].tension;
+  const idx=Math.min(state.flippedCount,tensionLines.length-1);
+  voice.speak(tensionLines[idx],{rate:0.95,pitch:1});
+}
+
+function renderCups(){
+  const tray=$('cup-tray');
+  tray.innerHTML='';
+  state.cups.forEach((cup,i)=>{
+    const slot=document.createElement('div');
+    slot.className='cup-slot'+(cup.flipped?' flipped':'')+(cup.flipped&&cup.hasChrysanthemum?' chrysanthemum':'');
+    if(cup.flipped)slot.classList.add('disabled');
+    slot.innerHTML=`<div class="cup-inner"><div class="cup-front"></div><div class="cup-back">${cup.flipped?(cup.hasChrysanthemum?'<span class="chrys-emoji">🌼</span>':''):''}${!cup.flipped&&!cup.hasChrysanthemum?'':''}${!cup.flipped&&cup.hasChrysanthemum?'':''}</div></div>`;
+    if(!cup.flipped){
+      slot.addEventListener('click',()=>flipCup(i));
+      slot.addEventListener('touchstart',(e)=>{e.preventDefault();flipCup(i);},{passive:false});
+    }
+    tray.appendChild(slot);
+  });
+}
+
+async function flipCup(idx){
+  if(state.busy)return;
+  if(state.cups[idx].flipped)return;
+  state.busy=true;
+
+  audio.playFlipCup();
+  state.cups[idx].flipped=true;
+  state.flippedCount++;
+
+  // Update the specific cup visually
+  const tray=$('cup-tray');
+  const slot=tray.children[idx];
+  const cup=state.cups[idx];
+
+  // Update back face content before flip
+  const back=slot.querySelector('.cup-back');
+  if(cup.hasChrysanthemum){
+    back.innerHTML='<span class="chrys-emoji">🌼</span>';
+  }
+
+  slot.classList.add('flipped','disabled');
+  slot.onclick=null;
+
+  // Remove click from all unflipped during animation
+  disableAllCups();
+
+  await wait(650); // wait for flip animation
+
+  if(cup.hasChrysanthemum){
+    slot.classList.add('chrysanthemum');
+    await showChrysanthemumReveal();
+  }else{
+    await showSafeOverlay();
+    // Advance player
+    state.currentPlayer=((state.currentPlayer-1+1)%state.playerCount)+1;
+    state.busy=false;
+    startTurn();
+  }
+}
+
+async function autoRevealLast(){
+  $('game-hint').style.display='none';
+
+  // Speak last cup line
+  const voiceP=voice.speakAsync(t('lastCupAuto'),{rate:0.9,pitch:1.05});
+  await wait(2000);
+  await voiceP;
+
+  // Find the last cup
+  const lastIdx=state.cups.findIndex(c=>!c.flipped);
+  if(lastIdx===-1)return;
+
+  audio.playFlipCup();
+  state.cups[lastIdx].flipped=true;
+  state.flippedCount++;
+
+  const tray=$('cup-tray');
+  const slot=tray.children[lastIdx];
+  const back=slot.querySelector('.cup-back');
+  back.innerHTML='<span class="chrys-emoji">🌼</span>';
+  slot.classList.add('flipped','disabled','chrysanthemum');
+
+  await wait(650);
+  await showChrysanthemumReveal();
+}
+
+function disableAllCups(){
+  const tray=$('cup-tray');
+  Array.from(tray.children).forEach(s=>s.classList.add('disabled'));
+}
+
+async function showSafeOverlay(){
+  const safeLines=I18N._strings[I18N.lang].safe;
+  const line=randPick(safeLines);
+
+  audio.playSafeChime();
+
+  const ov=document.createElement('div');ov.className='safe-overlay';
+  ov.innerHTML=`<div class="safe-text">${t('safeText')}</div><div class="safe-sub">${line}</div>`;
+  document.body.appendChild(ov);
+
+  voice.speak(line,{rate:1,pitch:1.05});
+
+  await wait(1800);
+  ov.style.transition='opacity 0.3s';ov.style.opacity='0';
+  await wait(300);
+  ov.remove();
+}
+
+async function showChrysanthemumReveal(){
+  $('game-hint').style.display='none';
+  const penalty=state.flippedCount;
+
+  audio.playChrysanthemumReveal();
+  spawnConfetti(30);
+
+  // Pick voice line
+  let voiceLine;
+  const remaining=state.cups.filter(c=>!c.flipped).length;
+  if(remaining===0&&state.flippedCount===state.cupCount){
+    // Last cup auto
+    voiceLine=t('lastCupVoice',{n:penalty});
+  }else{
+    const chrysLines=I18N._strings[I18N.lang].chrys;
+    voiceLine=randPick(chrysLines).replace(/\{n\}/g,penalty);
+  }
+
+  const ov=document.createElement('div');ov.className='chrys-reveal-overlay';
+  ov.innerHTML=`
+    <div class="chrys-flower">🌼</div>
+    <div class="chrys-title">${t('chrysTitle')}</div>
+    <div class="chrys-penalty">${t('chrysPenalty',{n:penalty})}</div>
+    <div class="chrys-desc">${t('chrysDesc')}</div>
+    <div class="chrys-tap-hint" style="visibility:hidden">${I18N.lang==='ja'?'タップして続く':'點擊繼續'}</div>`;
+  document.body.appendChild(ov);
+
+  let canDismiss=false;
+  const voiceP=voice.speakAsync(voiceLine,{rate:1,pitch:1.05});
+  const minTimeP=wait(2000);
+  Promise.all([voiceP,minTimeP]).then(()=>{
+    canDismiss=true;
+    const hint=ov.querySelector('.chrys-tap-hint');if(hint)hint.style.visibility='visible';
+  });
+
+  await new Promise(resolve=>{
+    const dismiss=(e)=>{
+      e.preventDefault();if(!canDismiss)return;
+      ov.removeEventListener('click',dismiss);ov.removeEventListener('touchstart',dismiss);
+      ov.style.transition='opacity 0.3s';ov.style.opacity='0';
+      setTimeout(()=>{ov.remove();resolve();},300);
+    };
+    ov.addEventListener('click',dismiss);ov.addEventListener('touchstart',dismiss,{passive:false});
+  });
+
+  // Show drinking
+  await showDrinking(penalty);
+
+  // Show round end
+  showRoundEnd(penalty);
+}
+
+function showDrinking(penalty){
+  return new Promise(resolve=>{
+    const ov=document.createElement('div');ov.className='drink-overlay';
+    ov.innerHTML=`
+      <div class="drink-title">${t('drinkTitle')}</div>
+      <div class="drink-sake-icon">🍶</div>
+      <div class="drink-cup-count">${t('drinkCount',{n:penalty})}</div>
+      <div class="drink-bar"><div class="drink-fill" id="drink-fill"></div></div>
+      <div class="drink-pct" id="drink-pct">0%</div>
+      <div class="drink-tap-hint" id="drink-hint">${t('drinkTapHint')}</div>`;
+    document.body.appendChild(ov);
+
+    let prog=0;
+    const fill=ov.querySelector('#drink-fill');
+    const pct=ov.querySelector('#drink-pct');
+    const hint=ov.querySelector('#drink-hint');
+
+    const finish=()=>{
+      audio.playDrinkGulp();
+      hint.className='drink-done-msg';
+      hint.textContent=t('drinkDone');
+      voice.speak(t('voiceDrinkDone'),{rate:1,pitch:1.05});
+      setTimeout(()=>{ov.remove();resolve();},3500);
+    };
+
+    const tap=(e)=>{
+      e.preventDefault();if(prog>=100)return;
+      prog=Math.min(100,prog+8);
+      fill.style.width=prog+'%';
+      pct.textContent=Math.round(prog)+'%';
+      audio.playClick();
+      if(prog>=100){
+        ov.removeEventListener('click',tap);ov.removeEventListener('touchstart',tap);
+        ov.style.cursor='default';finish();
+      }
+    };
+    ov.addEventListener('click',tap);ov.addEventListener('touchstart',tap,{passive:false});
+  });
+}
+
+function showRoundEnd(penalty){
+  show('roundend-screen');
+  $('roundend-summary').innerHTML=t('roundSummary',{p:state.currentPlayer,n:penalty})+'<div class="roundend-penalty">🍶 x '+penalty+'</div>';
+  audio.playSake();
+  spawnConfetti(15);
+}
+
+function nextRound(){
+  audio.playClick();
+  state.round++;
+  state.currentPlayer=1;
+  state.busy=false;
+  initCups();
+  show('game-screen');
+  startTurn();
+}
+
+function backToWelcome(){
+  audio.stopMusic();
+  state.busy=false;
+  show('welcome-screen');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded',()=>{
+  I18N.updateDOM();
+  $('mute-toggle').textContent='🔊';
+  $('bgm-toggle').textContent=BGM_ICONS[audio.bgmStyle];
+  if(typeof speechSynthesis!=='undefined'&&speechSynthesis.getVoices().length>0)voice.init();
+});
+</script>
+</body>
+</html>
