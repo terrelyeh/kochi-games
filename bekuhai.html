@@ -451,7 +451,7 @@ const I18N={
       nextRound:'次へ',gameoverTitle:'🏆 酒豪決定！',champion:'酒豪！',
       makeTokuMsg:'「負け得」— 飲んだ者が真の勝者！',playAgain:'もう一局！',
       confirmHome:'メインに戻りますか？',
-      bgmEnkai:'🍻 宴席',bgmMiyako:'🌙 静夜',bgmShamisen:'🎶 宴会',bgmMatsuri:'🥁 祭り',
+      bgmEnkai:'🏋️ 健身操',bgmMiyako:'🌙 静夜',bgmShamisen:'🎶 宴会',bgmMatsuri:'🥁 祭り',
       cupTengu:'天狗杯',cupHyottoko:'ひょっとこ杯',cupOkame:'おかめ杯',
       cupTenguDesc:'鼻が邪魔で置けない大杯',cupHyottokoDesc:'口の穴を塞がないと漏れる中杯',cupOkameDesc:'丸底で置けない！一気飲み小杯',
       cupTenguTrait:'長鼻が邪魔',cupHyottokoTrait:'穴から漏れる',cupOkameTrait:'置けない！',
@@ -476,7 +476,7 @@ const I18N={
       nextRound:'繼續',gameoverTitle:'🏆 酒豪決定！',champion:'酒豪！',
       makeTokuMsg:'「負け得」— 喝最多的人才是真正贏家！',playAgain:'再來一局！',
       confirmHome:'確定要返回首頁嗎？',
-      bgmEnkai:'🍻 宴席',bgmMiyako:'🌙 靜夜',bgmShamisen:'🎶 宴會',bgmMatsuri:'🥁 祭典',
+      bgmEnkai:'🏋️ 健身操',bgmMiyako:'🌙 靜夜',bgmShamisen:'🎶 宴會',bgmMatsuri:'🥁 祭典',
       cupTengu:'天狗杯',cupHyottoko:'火男杯',cupOkame:'阿龜杯',
       cupTenguDesc:'長鼻擋路，杯子放不平',cupHyottokoDesc:'嘴巴有洞，不堵就漏酒',cupOkameDesc:'圓底放不下！必須一飲而盡',
       cupTenguTrait:'長鼻擋路',cupHyottokoTrait:'會漏酒！',cupOkameTrait:'放不下！',
@@ -502,7 +502,7 @@ function renderCupShowcase(){const b=document.getElementById('cups-showcase');if
 // AUDIO — 3 BGM styles: miyako, shamisen, matsuri
 // ============================================================
 const BGM_ORDER=['enkai','miyako','shamisen','matsuri'];
-const BGM_ICONS={enkai:'🍻',miyako:'🌙',shamisen:'🎶',matsuri:'🥁'};
+const BGM_ICONS={enkai:'🏋️',miyako:'🌙',shamisen:'🎶',matsuri:'🥁'};
 const BGM_KEYS={enkai:'bgmEnkai',miyako:'bgmMiyako',shamisen:'bgmShamisen',matsuri:'bgmMatsuri'};
 
 class AudioManager{
@@ -559,7 +559,7 @@ class AudioManager{
     };p();this._musicInterval=setInterval(p,beatDur*1000);
   }
 
-  startMusicEnkai(){if(!this._bgmAudio){this._bgmAudio=new Audio('bgm-enkai.mp3');this._bgmAudio.loop=true;}this._bgmAudio.volume=this.muted?0:0.4;this._bgmAudio.play().catch(()=>{});}
+  startMusicEnkai(){if(!this._bgmAudio){this._bgmAudio=new Audio('bgm-kenshinso.mp3');this._bgmAudio.loop=true;}this._bgmAudio.volume=this.muted?0:0.4;this._bgmAudio.play().catch(()=>{});}
   startMusic(){if(this.musicPlaying)return;this.init();this.musicPlaying=true;if(this.bgmStyle==='enkai')this.startMusicEnkai();else if(this.bgmStyle==='shamisen')this.startMusicShamisen();else if(this.bgmStyle==='matsuri')this.startMusicMatsuri();else this.startMusicMiyako();}
   stopMusic(){this.musicPlaying=false;if(this._bgmAudio){this._bgmAudio.pause();this._bgmAudio.currentTime=0;}if(this._musicInterval){clearInterval(this._musicInterval);this._musicInterval=null;}this._musicNodes.forEach(({osc,gain})=>{try{gain.gain.linearRampToValueAtTime(0,this.ctx.currentTime+0.5);osc.stop(this.ctx.currentTime+0.6);}catch(e){}});this._musicNodes=[];}
   playClick(){this.init();const c=this.ctx,n=c.currentTime;const o=c.createOscillator();o.type='sine';o.frequency.value=1200;const g=c.createGain();g.gain.setValueAtTime(0.15,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.08);o.connect(g);g.connect(this.sfxGain);o.start(n);o.stop(n+0.08);}
