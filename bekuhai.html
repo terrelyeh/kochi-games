@@ -526,7 +526,7 @@ const BGM_KEYS={enkai:'bgmEnkai',miyako:'bgmMiyako',shamisen:'bgmShamisen',matsu
 
 class AudioManager{
   constructor(){this.ctx=null;this.masterGain=null;this.musicGain=null;this.sfxGain=null;this.muted=false;this.musicPlaying=false;this._musicInterval=null;this._musicNodes=[];this.bgmStyle='enkai';this._bgmAudio=null;}
-  init(){if(this.ctx)return;this.ctx=new(window.AudioContext||window.webkitAudioContext)();this.masterGain=this.ctx.createGain();this.masterGain.connect(this.ctx.destination);this.musicGain=this.ctx.createGain();this.musicGain.gain.value=0.4;this.musicGain.connect(this.masterGain);this.sfxGain=this.ctx.createGain();this.sfxGain.gain.value=0.5;this.sfxGain.connect(this.masterGain);}
+  init(){if(this.ctx)return;this.ctx=new(window.AudioContext||window.webkitAudioContext)();this.masterGain=this.ctx.createGain();this.masterGain.connect(this.ctx.destination);this.musicGain=this.ctx.createGain();this.musicGain.gain.value=0.2;this.musicGain.connect(this.masterGain);this.sfxGain=this.ctx.createGain();this.sfxGain.gain.value=0.5;this.sfxGain.connect(this.masterGain);}
   ensureResumed(){if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();}
   toggleMute(){this.muted=!this.muted;if(this.masterGain)this.masterGain.gain.value=this.muted?0:1;if(this._bgmAudio)this._bgmAudio.volume=this.muted?0:0.15;document.getElementById('mute-toggle').textContent=this.muted?'🔇':'🔊';if(this.muted)speechSynthesis.cancel();}
 
