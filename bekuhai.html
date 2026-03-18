@@ -231,6 +231,7 @@
   .reveal-overlay .reveal-who{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--cream-dim);letter-spacing:2px;animation:fadeIn 0.3s ease;}
   .reveal-overlay .reveal-target{font-family:'Noto Serif JP',serif;font-size:36px;font-weight:900;color:var(--white);text-shadow:0 0 30px rgba(255,255,255,0.3);animation:revealSlam 0.5s ease forwards;}
   .reveal-overlay .reveal-cup-svg,.reveal-overlay .reveal-cup-img{width:180px;height:180px;object-fit:contain;animation:revealSlam 0.6s 0.1s ease both;filter:drop-shadow(0 0 30px rgba(212,168,67,0.4));}
+  .reveal-overlay .reveal-cup-img.splash{width:300px;height:200px;}
   .reveal-overlay .reveal-cup-name{font-family:'Noto Serif JP',serif;font-size:32px;font-weight:900;animation:revealSlam 0.5s 0.2s ease both;text-shadow:0 0 20px currentColor;}
   .reveal-overlay .reveal-cup-vol{font-size:22px;color:var(--gold);font-weight:700;animation:fadeIn 0.4s 0.4s ease both;}
   .reveal-overlay .reveal-cup-desc{font-size:14px;color:var(--cream-dim);max-width:280px;animation:fadeIn 0.4s 0.5s ease both;}
@@ -653,7 +654,7 @@ document.addEventListener('touchstart',unlockSpeech,true);
 // CONSTANTS & STATE
 // ============================================================
 const CUP_DATA={
-  tengu:{svg:SVG_TENGU,img:'cup-tengu.png',ml:140,nameKey:'cupTengu',descKey:'cupTenguDesc',color:'var(--red-bright)',size:'big'},
+  tengu:{svg:SVG_TENGU,img:'cup-tengu.png',splashImg:'cup-tengu-splash.png',ml:140,nameKey:'cupTengu',descKey:'cupTenguDesc',color:'var(--red-bright)',size:'big'},
   hyottoko:{svg:SVG_HYOTTOKO,img:'cup-hyottoko.png',ml:50,nameKey:'cupHyottoko',descKey:'cupHyottokoDesc',color:'var(--gold)',size:'mid'},
   okame:{svg:SVG_OKAME,img:'cup-okame.png',ml:20,nameKey:'cupOkame',descKey:'cupOkameDesc',color:'var(--green)',size:'small'},
 };
@@ -721,7 +722,7 @@ function showRevealOverlay(targetPlayer,cup,faceKey){
     ov.innerHTML=`
       <div class="reveal-who">${t('revealWho')}</div>
       <div class="reveal-target">${targetPlayer.name}</div>
-      <img class="reveal-cup-img" src="${cup.img}" alt="">
+      <img class="reveal-cup-img ${cup.splashImg?'splash':''}" src="${cup.splashImg||cup.img}" alt="">
       <div class="reveal-cup-name" style="color:${cup.color}">${t(cup.nameKey)}</div>
       <div class="reveal-cup-vol">${cup.ml}ml</div>
       <div class="reveal-cup-desc">${t(cup.descKey)}</div>
