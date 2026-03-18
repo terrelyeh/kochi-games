@@ -618,8 +618,8 @@ class VoiceManager{
       v.find(x=>x.lang&&x.lang.startsWith('zh'))||null;
     this.ready=true;
   }
-  _duckBGM(){if(audio._bgmAudio)audio._bgmAudio.volume=0.03;}
-  _unduckBGM(){if(audio._bgmAudio&&!audio.muted)audio._bgmAudio.volume=0.08;}
+  _duckBGM(){if(audio._bgmAudio)audio._bgmAudio.volume=0.01;if(audio.musicGain)audio.musicGain.gain.value=0.05;}
+  _unduckBGM(){if(audio._bgmAudio&&!audio.muted)audio._bgmAudio.volume=0.08;if(audio.musicGain)audio.musicGain.gain.value=0.35;}
   speak(text,opts={}){
     if(audio.muted)return;if(!this.ready)this.init();
     this._duckBGM();
