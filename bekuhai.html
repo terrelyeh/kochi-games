@@ -137,7 +137,7 @@
       repeating-linear-gradient(90deg, rgba(107,68,35,0.04) 0px, rgba(107,68,35,0.04) 1px, transparent 1px, transparent 6px),
       linear-gradient(160deg, #6b4423 0%, #8a5e35 25%, #7a4f2b 45%, #5c3a1e 75%, #4a2e15 100%);
   }
-  .table-info-bar{position:absolute;top:calc(20px + var(--safe-top));left:50%;transform:translateX(-50%);background:rgba(26,18,16,0.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:16px;padding:4px 14px;z-index:15;text-align:center;border:1px solid rgba(212,168,67,0.15);white-space:nowrap;max-width:55vw;}
+  .table-info-bar{position:absolute;top:calc(20px + var(--safe-top));left:50%;transform:translateX(-50%);background:rgba(26,18,16,0.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:16px;padding:4px 14px;z-index:15;text-align:center;border:1px solid rgba(212,168,67,0.15);white-space:nowrap;max-width:55vw;transition:opacity 0.3s ease;}
   .round-info{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--cream-dim);letter-spacing:1px;}
   .spinner-label{font-family:'Noto Serif JP',serif;font-size:14px;color:var(--gold-light);min-height:20px;}
   .table-surface{position:relative;width:100vw;height:calc(100dvh - 60px);flex-shrink:0;}
@@ -806,6 +806,7 @@ function removeKomaListeners(){const kd=$('koma-3d');if(!kd||!kd._kl)return;cons
 // GAME LOGIC
 // ============================================================
 function startRound(){
+  $('table-info-bar').style.opacity='1';
   $('round-info').textContent=t('roundInfo',{n:state.round,max:state.maxRounds});
   renderTable();renderLyrics();updateSeats();
   const sp=state.players[state.currentSpinner];
@@ -906,6 +907,7 @@ function spinKoma(){
 
 function showNextButton(){
   document.querySelectorAll('.next-btn-float').forEach(b=>b.remove());
+  $('table-info-bar').style.opacity='0';
   const nextIdx=state.currentSpinner;const nextP=state.players[nextIdx];
   const pos=getSeatPositions(state.players.length);const p=pos[nextIdx];
   const bx=50+(p.x-50)*0.55;const by=50+(p.y-50)*0.55;
