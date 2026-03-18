@@ -171,14 +171,17 @@
   /* === FULLSCREEN SPIN OVERLAY === */
   .spin-overlay{
     position:fixed;top:0;left:0;right:0;bottom:0;
-    background:rgba(26,18,16,0.97);
+    background:
+      radial-gradient(circle at 50% 45%, rgba(107,68,35,0.15) 0%, transparent 60%),
+      #1a1210;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
-    z-index:130;gap:16px;padding:var(--safe-top) 20px var(--safe-bottom);
+    z-index:130;gap:12px;padding:var(--safe-top) 20px var(--safe-bottom);
     animation:fadeIn 0.4s ease;
   }
   .spin-overlay .spin-who{
-    font-family:'Noto Serif JP',serif;font-size:15px;color:var(--gold-light);
-    letter-spacing:2px;animation:fadeIn 0.3s ease;
+    font-family:'Noto Serif JP',serif;font-size:22px;color:var(--gold-light);
+    letter-spacing:3px;animation:fadeIn 0.3s ease;font-weight:700;
+    margin-bottom:8px;
   }
   .spin-koma-wrap{
     width:180px;height:180px;
@@ -225,18 +228,20 @@
   }
   .spin-result-face svg,.spin-result-face img{width:90px;height:90px;object-fit:contain;filter:drop-shadow(0 0 16px rgba(212,168,67,0.6));}
   .spin-result-label{
-    position:absolute;bottom:-32px;left:50%;transform:translateX(-50%);
+    position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);
     white-space:nowrap;font-family:'Noto Serif JP',serif;
-    font-size:18px;font-weight:900;
-    text-shadow:0 0 12px rgba(0,0,0,0.8);
+    font-size:24px;font-weight:900;
+    text-shadow:0 0 16px rgba(0,0,0,0.9);
     animation:fadeIn 0.4s ease 0.3s both;
   }
   .spin-lyrics-wrap{
     background:rgba(42,31,26,0.6);
-    border:1px solid var(--surface-2);
-    border-radius:12px;padding:12px 20px;
-    max-width:340px;width:85%;text-align:center;
+    border:1px solid rgba(212,168,67,0.15);
+    border-radius:16px;padding:16px 24px;
+    max-width:360px;width:90%;text-align:center;
+    margin-top:12px;
   }
+  .spin-lyrics-wrap .lyric-line{font-size:16px;letter-spacing:1px;line-height:2;}
 
   /* === DRAMATIC REVEAL OVERLAY === */
   .reveal-overlay{
@@ -298,7 +303,7 @@
   .lb-ml{font-family:'Noto Serif JP',serif;color:var(--gold);font-size:18px;font-weight:900;}
   .lb-badge{font-size:13px;color:var(--red-bright);font-weight:700;margin-left:4px;}
   .gameover-msg{font-size:14px;color:var(--cream);line-height:1.8;max-width:340px;margin:8px 0;}
-  .sake-cup-deco{font-size:64px;animation:sakeWave 1.5s ease-in-out infinite;}
+  .gameover-cup-img{width:100px;height:100px;object-fit:contain;filter:drop-shadow(0 4px 16px rgba(212,168,67,0.4));animation:sakeWave 1.5s ease-in-out infinite;}
   .bgm-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--gold);color:var(--gold-light);padding:8px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:300;animation:toastIn 0.3s ease,toastOut 0.3s 1.5s ease forwards;}
 
   /* === RWD === */
@@ -363,7 +368,7 @@
   </div>
 
   <div id="gameover-screen" class="screen">
-    <div class="sake-cup-deco">🏆</div>
+    <img class="gameover-cup-img" src="cup-tengu.png" alt="">
     <div class="gameover-title" data-i18n="gameoverTitle"></div>
     <div class="leaderboard" id="leaderboard"></div>
     <div class="gameover-msg" data-i18n="makeTokuMsg"></div>
@@ -469,7 +474,7 @@ const I18N={
       holdToSpin:'独楽を押して放せ！',
       revealWho:'独楽が指したのは…',
       drinkTapHint:'タップして飲み干せ！',drinkAutoMsg:'{name} が飲んでいる…',drinkDone:'飲み干した！🍶',
-      nextRound:'次へ',gameoverTitle:'🏆 酒豪決定！',champion:'酒豪！',
+      nextRound:'次へ',gameoverTitle:'維醺志士・酒豪決定！',champion:'酒豪！',
       makeTokuMsg:'「負け得」— 飲んだ者が真の勝者！',playAgain:'もう一局！',
       confirmHome:'メインに戻りますか？',
       bgmEnkai:'🏋️ 健身操',bgmMiyako:'🌙 静夜',bgmShamisen:'🎶 宴会',bgmMatsuri:'🥁 祭り',
@@ -504,7 +509,7 @@ const I18N={
       holdToSpin:'按住獨樂，放開旋轉！',
       revealWho:'獨樂指向了…',
       drinkTapHint:'連續點擊喝光！',drinkAutoMsg:'{name} 正在喝…',drinkDone:'喝完了！🍶',
-      nextRound:'繼續',gameoverTitle:'🏆 酒豪決定！',champion:'酒豪！',
+      nextRound:'繼續',gameoverTitle:'維醺志士・酒豪決定！',champion:'酒豪！',
       makeTokuMsg:'「負け得」— 喝最多的人才是真正贏家！',playAgain:'再來一局！',
       confirmHome:'確定要返回首頁嗎？',
       bgmEnkai:'🏋️ 健身操',bgmMiyako:'🌙 靜夜',bgmShamisen:'🎶 宴會',bgmMatsuri:'🥁 祭典',
@@ -924,7 +929,7 @@ function showDrinking(playerIdx,faceKey){
     const sakeEls=ov.querySelectorAll('.sake-level');
     const sakeData=Array.from(sakeEls).map(el=>({el,maxH:parseFloat(el.getAttribute('height'))||50,origY:parseFloat(el.getAttribute('y'))||58}));
     const updateSake=()=>{sakeData.forEach(({el,maxH,origY})=>{const newH=maxH*(1-prog/100);el.setAttribute('height',Math.max(0,newH));el.setAttribute('y',origY+(maxH-newH));});};
-    const finish=()=>{audio.playDrinkGulp();hint.className='drink-done-msg';hint.textContent=t('drinkDone');voice.speak(t('voiceDrinkDone'),{rate:1,pitch:1.05});setTimeout(()=>{ov.remove();resolve();},1000);};
+    const finish=()=>{audio.playDrinkGulp();hint.className='drink-done-msg';hint.textContent=t('drinkDone');voice.speak(t('voiceDrinkDone'),{rate:1,pitch:1.05});setTimeout(()=>{ov.remove();resolve();},2500);};
     if(isH){
       const tap=(e)=>{e.preventDefault();if(prog>=100)return;prog=Math.min(100,prog+8);fill.style.width=prog+'%';pct.textContent=Math.round(prog)+'%';updateSake();audio.playClick();if(prog>=100){ov.removeEventListener('click',tap);ov.removeEventListener('touchstart',tap);ov.style.cursor='default';finish();}};
       ov.addEventListener('click',tap);ov.addEventListener('touchstart',tap,{passive:false});
