@@ -810,7 +810,7 @@ function renderCups(){
     const slot=document.createElement('div');
     slot.className='cup-slot'+(cup.flipped?' flipped':'')+(cup.flipped&&cup.hasChrysanthemum?' chrysanthemum':'');
     if(cup.flipped)slot.classList.add('disabled');
-    const backImg=cup.flipped&&cup.hasChrysanthemum?'Flower_cup.png':'Cup_up.png';
+    const backImg=cup.flipped&&cup.hasChrysanthemum?'cup-flower.png':'Cup-top.png';
     slot.innerHTML=`<div class="cup-inner"><div class="cup-front"><img src="Cup_down.png" alt=""></div><div class="cup-back"><img src="${backImg}" alt="">${cup.flipped&&cup.hasChrysanthemum?'<span class="chrys-emoji">🌼</span>':''}</div></div>`;
     if(!cup.flipped){
       slot.addEventListener('click',()=>flipCup(i));
