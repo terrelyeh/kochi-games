@@ -1009,11 +1009,16 @@ function spinKoma(){
   return{face,targetIdx,totalRotation:360*randInt(6,10)+ta};
 }
 
-function showNextButton(){
+async function showNextButton(){
   document.querySelectorAll('.next-btn-float').forEach(b=>b.remove());
   $('table-info-bar').style.opacity='0';
   updateSeats();
   const nextIdx=state.currentSpinner;const nextP=state.players[nextIdx];
+  // Voice: "下一位，{name}"
+  await wait(500);
+  const nextCall=I18N.lang==='ja'?`次は、${nextP.name}！`:`下一位，${nextP.name}！`;
+  await voice.speakAsync(nextCall,{rate:0.9,pitch:1.05});
+  // Show button after voice
   const pos=getSeatPositions(state.players.length);const p=pos[nextIdx];
   const bx=50+(p.x-50)*0.75;const by=50+(p.y-50)*0.75;
   const btn=document.createElement('button');btn.className='next-btn-float';
