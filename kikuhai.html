@@ -242,7 +242,7 @@
 <body>
 <div id="app">
   <div class="ctrl-left">
-    <button class="ctrl-btn" id="home-btn" onclick="goHome()">🏠</button>
+    <button class="ctrl-btn" id="home-btn" onclick="goHome()">↩</button>
   </div>
   <div class="ctrl-right">
     <button class="ctrl-btn" id="lang-toggle" onclick="toggleLang()"></button>
@@ -251,6 +251,7 @@
   </div>
 
   <div id="welcome-screen" class="screen active">
+    <a href="index.html" style="font-size:13px;color:var(--cream-dim);text-decoration:none;margin-bottom:12px;opacity:0.6;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">← 返回選單</a>
     <h1 class="title">菊花杯</h1>
     <p class="title-romaji">Kikuhai</p>
     <div class="tagline" data-i18n="tagline"></div>
@@ -722,13 +723,16 @@ function randPick(arr){return arr[randInt(0,arr.length-1)];}
 function spawnConfetti(count=20){for(let i=0;i<count;i++){const p=document.createElement('div');p.className='confetti-particle';p.style.left=randInt(10,90)+'vw';p.style.background=CONFETTI_COLORS[randInt(0,CONFETTI_COLORS.length-1)];p.style.setProperty('--dur',(2+Math.random()*2)+'s');p.style.animationDelay=(Math.random()*0.5)+'s';p.style.width=randInt(6,12)+'px';p.style.height=randInt(6,12)+'px';p.style.borderRadius=Math.random()>0.5?'50%':'2px';document.body.appendChild(p);setTimeout(()=>p.remove(),5000);}}
 
 function goHome(){
-  const inGame=document.querySelector('#game-screen.active')||document.querySelector('#roundend-screen.active');
-  if(!inGame){audio.stopMusic();window.location.href='index.html';return;}
+  const onWelcome=document.querySelector('#welcome-screen.active');
+  if(onWelcome){window.location.href='index.html';return;}
+  const onSetup=document.querySelector('#setup-screen.active');
+  if(onSetup){audio.stopMusic();show('welcome-screen');return;}
   const ov=document.createElement('div');ov.className='confirm-overlay';
-  ov.innerHTML=`<div class="confirm-box"><div class="confirm-msg">${t('confirmHome')}</div><div class="confirm-btns"><button class="confirm-no" id="confirm-no">${I18N.lang==='ja'?'いいえ':'取消'}</button><button class="confirm-yes" id="confirm-yes">${I18N.lang==='ja'?'はい':'確定'}</button></div></div>`;
+  const msg=I18N.lang==='ja'?'ゲームを終了しますか？':'確定要結束遊戲嗎？';
+  ov.innerHTML=`<div class="confirm-box"><div class="confirm-msg">${msg}</div><div class="confirm-btns"><button class="confirm-no" id="confirm-no">${I18N.lang==='ja'?'いいえ':'取消'}</button><button class="confirm-yes" id="confirm-yes">${I18N.lang==='ja'?'はい':'確定'}</button></div></div>`;
   document.body.appendChild(ov);
   ov.querySelector('#confirm-no').onclick=()=>ov.remove();
-  ov.querySelector('#confirm-yes').onclick=()=>{audio.stopMusic();window.location.href='index.html';};
+  ov.querySelector('#confirm-yes').onclick=()=>{ov.remove();audio.stopMusic();show('welcome-screen');};
   ov.addEventListener('click',(e)=>{if(e.target===ov)ov.remove();});
 }
 
@@ -740,7 +744,7 @@ function goSetup(){
   state.cupCount=9;state.playerCount=4;
   show('setup-screen');renderSetup();showSoundToast();
 }
-function showSoundToast(){const t=document.createElement('div');t.className='sound-toast';t.textContent='🔊 '+(I18N.lang==='ja'?'音声をオンにしてお楽しみください！':'請開啟手機聲音，體驗最佳效果！');document.body.appendChild(t);setTimeout(()=>{t.style.transition='opacity 0.5s';t.style.opacity='0';setTimeout(()=>t.remove(),500);},3000);}
+function showSoundToast(){const t=document.createElement('div');t.className='sound-toast';t.textContent='🔊 '+(I18N.lang==='ja'?'音声をオンにしてお楽しみください！':'請開啟手機聲音，體驗最佳效果！');document.body.appendChild(t);setTimeout(()=>{t.style.transition='opacity 0.5s';t.style.opacity='0';setTimeout(()=>t.remove(),500);},1800);}
 
 function setCupCount(n){audio.playClick();state.cupCount=n;renderSetup();}
 function setPlayerCount(n){audio.playClick();state.playerCount=n;renderSetup();}

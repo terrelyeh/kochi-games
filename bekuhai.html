@@ -397,7 +397,7 @@
 <body>
 <div id="app">
   <div class="ctrl-left">
-    <button class="ctrl-btn" id="home-btn" onclick="goHome()">🏠</button>
+    <button class="ctrl-btn" id="home-btn" onclick="goHome()">↩</button>
   </div>
   <div class="ctrl-right">
     <button class="ctrl-btn" id="lang-toggle" onclick="toggleLang()"></button>
@@ -406,6 +406,7 @@
   </div>
 
   <div id="welcome-screen" class="screen active">
+    <a href="index.html" style="font-size:13px;color:var(--cream-dim);text-decoration:none;margin-bottom:12px;opacity:0.6;transition:opacity 0.2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">← 返回選單</a>
     <h1 class="title">可杯</h1>
     <p class="title-romaji">Bekuhai</p>
     <div class="subtitle-hokkien" data-i18n="subtitleHokkien"></div>
@@ -721,7 +722,7 @@ class VoiceManager{
     this.ready=true;
   }
   _duckBGM(){if(audio._bgmAudio)audio._bgmAudio.volume=0.01;if(audio.musicGain)audio.musicGain.gain.value=0.05;}
-  _unduckBGM(){if(audio._bgmAudio&&!audio.muted)audio._bgmAudio.volume=0.08;if(audio.musicGain)audio.musicGain.gain.value=0.6;}
+  _unduckBGM(){if(audio.muted)return;if(audio._bgmAudio)audio._bgmAudio.volume=0.08;if(audio.musicGain)audio.musicGain.gain.value=0.6;}
   speak(text,opts={}){
     if(audio.muted)return;if(!this.ready)this.init();
     this._duckBGM();
@@ -793,13 +794,16 @@ function show(sid){document.querySelectorAll('.screen').forEach(s=>s.classList.r
 function wait(ms){return new Promise(r=>setTimeout(r,ms));}
 function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
 function goHome(){
-  const inGame=document.querySelector('#table-screen.active')||document.querySelector('#gameover-screen.active');
-  if(!inGame){audio.stopMusic();window.location.href='index.html';return;}
+  const onWelcome=document.querySelector('#welcome-screen.active');
+  if(onWelcome){window.location.href='index.html';return;}
+  const onSetup=document.querySelector('#setup-screen.active');
+  if(onSetup){audio.stopMusic();show('welcome-screen');return;}
   const ov=document.createElement('div');ov.className='confirm-overlay';
-  ov.innerHTML=`<div class="confirm-box"><div class="confirm-msg">${t('confirmHome')}</div><div class="confirm-btns"><button class="confirm-no" id="confirm-no">${I18N.lang==='ja'?'いいえ':'取消'}</button><button class="confirm-yes" id="confirm-yes">${I18N.lang==='ja'?'はい':'確定'}</button></div></div>`;
+  const msg=I18N.lang==='ja'?'ゲームを終了しますか？':'確定要結束遊戲嗎？';
+  ov.innerHTML=`<div class="confirm-box"><div class="confirm-msg">${msg}</div><div class="confirm-btns"><button class="confirm-no" id="confirm-no">${I18N.lang==='ja'?'いいえ':'取消'}</button><button class="confirm-yes" id="confirm-yes">${I18N.lang==='ja'?'はい':'確定'}</button></div></div>`;
   document.body.appendChild(ov);
   ov.querySelector('#confirm-no').onclick=()=>ov.remove();
-  ov.querySelector('#confirm-yes').onclick=()=>{audio.stopMusic();window.location.href='index.html';};
+  ov.querySelector('#confirm-yes').onclick=()=>{ov.remove();audio.stopMusic();show('welcome-screen');};
   ov.addEventListener('click',(e)=>{if(e.target===ov)ov.remove();});
 }
 function spawnConfetti(count=20){for(let i=0;i<count;i++){const p=document.createElement('div');p.className='confetti-particle';p.style.left=randInt(10,90)+'vw';p.style.background=CONFETTI_COLORS[randInt(0,CONFETTI_COLORS.length-1)];p.style.setProperty('--dur',(2+Math.random()*2)+'s');p.style.animationDelay=(Math.random()*0.5)+'s';p.style.width=randInt(6,12)+'px';p.style.height=randInt(6,12)+'px';p.style.borderRadius=Math.random()>0.5?'50%':'2px';document.body.appendChild(p);setTimeout(()=>p.remove(),5000);}}
@@ -815,7 +819,7 @@ function getRevealVoice(name,cupName,size){
 // SETUP
 // ============================================================
 function goSetup(){audio.init();audio.ensureResumed();audio.startMusic();setupCount=4;buildSetupPlayers();show('setup-screen');renderSetup();showSoundToast();}
-function showSoundToast(){const t=document.createElement('div');t.className='sound-toast';t.textContent='🔊 '+( I18N.lang==='ja'?'音声をオンにしてお楽しみください！':'請開啟手機聲音，體驗最佳效果！');document.body.appendChild(t);setTimeout(()=>{t.style.transition='opacity 0.5s';t.style.opacity='0';setTimeout(()=>t.remove(),500);},3000);}
+function showSoundToast(){const t=document.createElement('div');t.className='sound-toast';t.textContent='🔊 '+( I18N.lang==='ja'?'音声をオンにしてお楽しみください！':'請開啟手機聲音，體驗最佳效果！');document.body.appendChild(t);setTimeout(()=>{t.style.transition='opacity 0.5s';t.style.opacity='0';setTimeout(()=>t.remove(),500);},1800);}
 function buildSetupPlayers(){setupPlayers=[];setupPlayers.push({name:t('you'),isHuman:true});for(let i=1;i<setupCount;i++)setupPlayers.push({name:DEFAULT_NAMES[i-1]||('P'+(i+1)),isHuman:false});}
 function setPlayerCount(n){audio.playClick();setupCount=n;while(setupPlayers.length<n){const i=setupPlayers.length-1;setupPlayers.push({name:DEFAULT_NAMES[i]||('P'+(setupPlayers.length+1)),isHuman:false});}while(setupPlayers.length>n)setupPlayers.pop();renderSetup();}
 function togglePlayerType(i){if(i===0)return;audio.playClick();setupPlayers[i].isHuman=!setupPlayers[i].isHuman;renderSetup();}
