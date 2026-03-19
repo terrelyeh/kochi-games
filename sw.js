@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ishin-v16';
+const CACHE_NAME = 'ishin-v17';
 const ASSETS = [
   '/',
   '/index.html',
@@ -25,7 +25,7 @@ const ASSETS = [
   '/manifest.json'
 ];
 
-// Install — cache all assets
+// Install — cache all assets for offline use
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_NAME)
@@ -43,31 +43,21 @@ self.addEventListener('activate', e => {
   );
 });
 
-// Fetch — cache first, then network
+// Fetch — NETWORK FIRST: always try server, fallback to cache if offline
 self.addEventListener('fetch', e => {
-  // Skip non-GET requests
   if (e.request.method !== 'GET') return;
 
-  // For Google Fonts, use network first (they have their own caching)
-  if (e.request.url.includes('fonts.googleapis.com') || e.request.url.includes('fonts.gstatic.com')) {
-    e.respondWith(
-      fetch(e.request).catch(() => caches.match(e.request))
-    );
-    return;
-  }
-
-  // For app assets: cache first, fallback to network
   e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-      return fetch(e.request).then(response => {
-        // Cache new assets dynamically
-        if (response.ok) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
-        }
-        return response;
-      });
+    fetch(e.request).then(response => {
+      // Got fresh response from server — update cache
+      if (response.ok) {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+      }
+      return response;
+    }).catch(() => {
+      // Network failed — use cached version (offline mode)
+      return caches.match(e.request);
     })
   );
 });
