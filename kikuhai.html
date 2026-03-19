@@ -110,8 +110,7 @@
   .cup-front{filter:drop-shadow(0 4px 8px rgba(0,0,0,0.4));}
   /* Flipped cup: empty */
   .cup-back{transform:rotateX(180deg);filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3));}
-  .cup-slot.flipped{z-index:5;opacity:0.5;}
-  .cup-slot.flipped.just-flipped{opacity:1;z-index:10;}
+  .cup-slot.flipped{z-index:5;}
   /* Chrysanthemum revealed */
   .cup-slot.chrysanthemum .cup-back{filter:drop-shadow(0 0 16px rgba(212,168,67,0.6));animation:chrysGlow 1.5s infinite;}
   .cup-slot.chrysanthemum .cup-back .chrys-emoji{display:none;}
@@ -847,7 +846,7 @@ async function flipCup(idx){
     back.innerHTML='<img src="Cup-top.png" alt="">';
   }
 
-  slot.classList.add('flipped','disabled','just-flipped');
+  slot.classList.add('flipped','disabled');
   slot.onclick=null;
 
   // Remove click from all unflipped during animation
@@ -858,10 +857,8 @@ async function flipCup(idx){
   if(cup.hasChrysanthemum){
     slot.classList.add('chrysanthemum');
     await showChrysanthemumReveal();
-    slot.classList.remove('just-flipped');
   }else{
     await showSafeOverlay();
-    slot.classList.remove('just-flipped');
     // Advance player
     state.busy=false;
     startTurn();
