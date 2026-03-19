@@ -171,7 +171,8 @@
   .koma-3d.interactive{cursor:pointer;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
   .koma-3d.charging{animation:komaCharge 0.25s ease-in-out infinite !important;filter:brightness(1.3) drop-shadow(0 0 24px rgba(212,168,67,0.7));}
 
-  .spin-btn-wrap{position:absolute;bottom:calc(12px + var(--safe-bottom));left:50%;transform:translateX(-50%);z-index:20;min-height:30px;display:flex;align-items:center;justify-content:center;}
+  .spin-btn-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,100px);z-index:20;min-height:30px;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+  .spin-btn-wrap *{pointer-events:auto;}
   .hold-hint{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--cream);text-shadow:0 1px 6px rgba(0,0,0,0.8);animation:pulse 1.5s infinite;letter-spacing:1px;background:rgba(26,18,16,0.5);padding:5px 16px;border-radius:12px;white-space:nowrap;}
 
   .lyrics-float{display:none;}
@@ -271,18 +272,18 @@
   .reveal-overlay .reveal-tap-hint{font-family:'Noto Serif JP',serif;font-size:15px;color:var(--gold-light);margin-top:20px;animation:fadeIn 0.3s 1s ease both,pulse 1s 1.3s infinite;background:rgba(212,168,67,0.1);padding:8px 24px;border-radius:20px;border:1px solid rgba(212,168,67,0.25);}
   .confetti-particle{position:fixed;top:-20px;width:8px;height:8px;border-radius:2px;z-index:151;pointer-events:none;animation:confetti var(--dur,3s) linear forwards;}
 
-  /* Floating next button */
+  /* Floating next button — near avatar, smaller */
   .next-btn-float{
-    position:absolute;z-index:20;transform:translate(-50%,-50%);
+    position:absolute;z-index:20;transform:translate(-50%,-120%);
     animation:bounceIn 0.5s ease;white-space:nowrap;
-    font-family:'Noto Serif JP',serif;font-size:16px;font-weight:700;
-    padding:12px 24px;border:none;border-radius:14px;cursor:pointer;
+    font-family:'Noto Serif JP',serif;font-size:12px;font-weight:700;
+    padding:6px 14px;border:none;border-radius:10px;cursor:pointer;
     background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--bg);
-    box-shadow:0 4px 20px rgba(212,168,67,0.6);-webkit-tap-highlight-color:transparent;
-    text-align:center;line-height:1.4;touch-action:manipulation;
+    box-shadow:0 3px 12px rgba(212,168,67,0.5);-webkit-tap-highlight-color:transparent;
+    text-align:center;line-height:1.3;touch-action:manipulation;
   }
-  .next-btn-float:active{transform:translate(-50%,-50%) scale(0.93);}
-  .next-btn-float .next-name{font-size:13px;display:block;opacity:0.7;}
+  .next-btn-float:active{transform:translate(-50%,-120%) scale(0.93);}
+  .next-btn-float .next-name{font-size:11px;display:block;opacity:0.7;}
 
   /* === Drink Overlay === */
   .drink-overlay{
@@ -857,7 +858,7 @@ function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,
 // ============================================================
 // TABLE
 // ============================================================
-function getSeatPositions(count){const p=[];for(let i=0;i<count;i++){const a=(180+(360/count)*i)%360;const r=a*Math.PI/180;const radX=42;const radY=37;const x=Math.max(8,Math.min(92,50+radX*Math.sin(r)));const y=Math.max(12,Math.min(88,54-radY*Math.cos(r)));p.push({x,y,angle:a});}return p;}
+function getSeatPositions(count){const p=[];for(let i=0;i<count;i++){const a=(180+(360/count)*i)%360;const r=a*Math.PI/180;const radX=40;const radY=36;const x=Math.max(12,Math.min(88,50+radX*Math.sin(r)));const y=Math.max(14,Math.min(86,54-radY*Math.cos(r)));p.push({x,y,angle:a});}return p;}
 function renderTable(){const l=$('table-layout');l.querySelectorAll('.seat').forEach(s=>s.remove());l.querySelectorAll('.next-btn-float').forEach(b=>b.remove());const pos=getSeatPositions(state.players.length);state.players.forEach((p,i)=>{const s=document.createElement('div');s.className='seat';s.id='seat-'+i;s.style.left=pos[i].x+'%';s.style.top=pos[i].y+'%';s.innerHTML=`<div class="seat-cushion${hasPhoto(p.name)?' has-photo':''}">${getAvatar(p.name)}</div><div class="s-name">${p.name}</div><div class="s-ml">${p.ml}ml</div>`;l.appendChild(s);});
   const kd=$('koma-3d');kd.innerHTML=`<span class="koma-pointer">▼</span><img src="koma-1.png" class="koma-img" alt=""><div class="koma-result-face" id="koma-result-face"></div>`;
 }
@@ -1022,11 +1023,8 @@ async function showNextButton(){
   await voice.speakAsync(nextCall,{rate:0.9,pitch:1.05});
   // Show button after voice
   const pos=getSeatPositions(state.players.length);const p=pos[nextIdx];
-  // Position button between seat and center, shifted to not cover face
-  const dx=p.x-50;const dy=p.y-50;
-  const bx=50+dx*0.5;const by=50+dy*0.5;
   const btn=document.createElement('button');btn.className='next-btn-float';
-  btn.style.left=bx+'%';btn.style.top=by+'%';
+  btn.style.left=p.x+'%';btn.style.top=p.y+'%';
   btn.innerHTML=`${t('nextRound')}<span class="next-name">${nextP.name}</span>`;
   btn.onclick=()=>{audio.playClick();btn.remove();state.spinning=false;startRound();};
   $('table-layout').appendChild(btn);
