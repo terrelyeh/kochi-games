@@ -105,28 +105,27 @@
   .cup-slot.flipped .cup-inner{transform:rotateX(180deg);}
   .cup-slot.disabled{pointer-events:none;cursor:default;}
   .cup-front,.cup-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:50%;display:flex;align-items:center;justify-content:center;}
-  /* Upside-down cup: dark ceramic */
+  /* Upside-down cup: real photo */
   .cup-front{
-    background:radial-gradient(circle at 40% 35%, #6a7b8f 0%, #4a5a6b 40%, #3a4a58 70%, #2a3a48 100%);
-    box-shadow:0 6px 16px rgba(0,0,0,0.5),inset 0 -3px 8px rgba(0,0,0,0.3),inset 0 2px 4px rgba(255,255,255,0.08);
-    border:2px solid rgba(100,120,140,0.3);
+    background:url('Cup_down.png') center/contain no-repeat;
+    border-radius:0;border:none;
+    filter:drop-shadow(0 4px 8px rgba(0,0,0,0.4));
   }
-  .cup-front::after{content:'';position:absolute;top:12%;left:20%;width:25%;height:20%;background:radial-gradient(ellipse, rgba(255,255,255,0.15), transparent);border-radius:50%;transform:rotate(-20deg);}
-  /* Flipped cup: empty, lighter */
+  /* Flipped cup: empty, real photo */
   .cup-back{
     transform:rotateX(180deg);
-    background:radial-gradient(circle at 50% 50%, #c4b8a8 0%, #a89888 40%, #8a7a6a 100%);
-    box-shadow:0 4px 12px rgba(0,0,0,0.4),inset 0 4px 12px rgba(0,0,0,0.2);
-    border:2px solid rgba(160,140,120,0.4);
-    font-size:28px;
+    background:url('Cup_up.png') center/contain no-repeat;
+    border-radius:0;border:none;
+    filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3));
   }
-  /* Chrysanthemum revealed */
+  /* Chrysanthemum revealed: flower cup photo */
   .cup-slot.chrysanthemum .cup-back{
-    background:radial-gradient(circle at 50% 50%, #f0d68a 0%, #d4a843 40%, #b8903a 100%);
-    box-shadow:0 0 20px rgba(212,168,67,0.6),0 0 40px rgba(212,168,67,0.3);
+    background:url('Flower_cup.png') center/contain no-repeat;
+    border-radius:0;border:none;
+    filter:drop-shadow(0 0 16px rgba(212,168,67,0.6));
     animation:chrysGlow 1.5s infinite;
   }
-  .cup-slot.chrysanthemum .cup-back .chrys-emoji{font-size:42px;animation:chrysanthemumBloom 0.8s ease both;}
+  .cup-slot.chrysanthemum .cup-back .chrys-emoji{display:none;}
 
   /* === Safe Overlay === */
   .safe-overlay{
