@@ -923,6 +923,7 @@ function removeKomaListeners(){const kd=$('koma-3d');if(!kd||!kd._kl)return;cons
 // GAME LOGIC
 // ============================================================
 function startRound(){
+  state.spinning=false;
   $('table-info-bar').style.opacity='1';
   $('round-info').textContent=t('roundInfo',{n:state.round,max:state.maxRounds});
   renderTable();renderLyrics();updateSeats();
@@ -930,6 +931,7 @@ function startRound(){
   $('spinner-label').textContent=t('spinnerTurn',{name:sp.name});
   const kd=$('koma-3d');kd.className='koma-3d idle';
   const rf=$('koma-result-face');if(rf){rf.className='koma-result-face';rf.textContent='';}
+  removeKomaListeners();
   $('spin-btn-wrap').innerHTML=`<div class="hold-hint">${t('holdToSpin')}</div>`;
   makeKomaInteractive();
 }
