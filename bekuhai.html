@@ -149,7 +149,7 @@
   .seat{position:absolute;text-align:center;transform:translate(-50%,-50%);z-index:5;}
   .seat-cushion{width:72px;height:72px;border-radius:50%;background:radial-gradient(circle at 40% 35%, #8b2020 0%, #6b1515 50%, #4a0e0e 100%);box-shadow:0 4px 12px rgba(0,0,0,0.6),inset 0 1px 3px rgba(255,255,255,0.1);margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:36px;border:3px solid transparent;transition:all 0.3s;overflow:hidden;}
   .seat-cushion.has-photo{background:none;box-shadow:0 4px 12px rgba(0,0,0,0.4);animation:bobble 3s ease-in-out infinite;}
-  .seat-cushion.has-photo img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+  .seat-cushion.has-photo img{width:100%;height:100%;object-fit:contain;border-radius:0;}
   @keyframes bobble{0%,100%{transform:rotate(-3deg);}25%{transform:rotate(2deg) scale(1.02);}50%{transform:rotate(-2deg);}75%{transform:rotate(3deg) scale(0.98);}}
   .seat .s-name{font-family:'Noto Serif JP',serif;font-size:16px;font-weight:700;white-space:nowrap;color:var(--cream);text-shadow:0 1px 6px rgba(0,0,0,1);}
   .seat .s-ml{display:none;}
