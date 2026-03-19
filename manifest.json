@@ -1,0 +1,26 @@
+{
+  "name": "萬華世界の維醺志士 — 土佐座敷遊戲",
+  "short_name": "維醺志士",
+  "description": "高知傳統飲酒遊戲：可杯、菊花杯、箸拳",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#1a1210",
+  "background_color": "#1a1210",
+  "lang": "zh-Hant",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
