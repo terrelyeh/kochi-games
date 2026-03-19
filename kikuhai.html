@@ -841,7 +841,9 @@ async function flipCup(idx){
   // Update back face content before flip
   const back=slot.querySelector('.cup-back');
   if(cup.hasChrysanthemum){
-    back.innerHTML='<span class="chrys-emoji">🌼</span>';
+    back.innerHTML='<img src="cup-flower.png" alt=""><span class="chrys-emoji">🌼</span>';
+  }else{
+    back.innerHTML='<img src="Cup-top.png" alt="">';
   }
 
   slot.classList.add('flipped','disabled');
