@@ -820,7 +820,7 @@ function startTurn(){
   }
 
   // Tension voice + text — speak first, then enable cups
-  setTimeout(async()=>{
+  setTimeout(()=>{
   const s=I18N._strings[I18N.lang];
   const rem=state.cupCount-state.flippedCount;
   let pool;
@@ -831,11 +831,13 @@ function startTurn(){
   const line=randPick(pool,'tension');
   $('tension-text').textContent=line;
   $('tension-text').style.opacity='1';
-  await voice.speakAsync(line,{rate:0.95,pitch:rem<=3?1.1:1});
-  // Voice done → enable cups + show CTA
-  enableUnflippedCups();
-  $('game-hint').textContent=t('flipHint');
-  $('game-hint').style.display='block';
+  const voiceP=voice.speakAsync(line,{rate:0.95,pitch:rem<=3?1.1:1});
+  const minWait=wait(2000);
+  Promise.all([voiceP,minWait]).then(()=>{
+    enableUnflippedCups();
+    $('game-hint').textContent=t('flipHint');
+    $('game-hint').style.display='block';
+  });
   },800);
 }
 
