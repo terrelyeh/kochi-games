@@ -314,6 +314,7 @@
   .gameover-msg{font-size:14px;color:var(--cream);line-height:1.8;max-width:340px;margin:8px 0;}
   .gameover-cup-img{width:100px;height:100px;object-fit:contain;filter:drop-shadow(0 4px 16px rgba(212,168,67,0.4));animation:sakeWave 1.5s ease-in-out infinite;}
   .bgm-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--gold);color:var(--gold-light);padding:8px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:300;animation:toastIn 0.3s ease,toastOut 0.3s 1.5s ease forwards;}
+  .sound-toast{position:fixed;top:calc(50% - 30px);left:50%;transform:translateX(-50%);background:rgba(42,31,26,0.95);border:1.5px solid var(--gold);color:var(--gold-light);padding:14px 28px;border-radius:14px;font-family:'Noto Sans JP',sans-serif;font-size:15px;font-weight:500;z-index:300;animation:toastIn 0.3s ease;white-space:nowrap;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
 
   /* === RWD === */
   @media(max-width:375px){.ctrl-btn{width:44px;height:44px;font-size:20px;}}
@@ -808,7 +809,8 @@ function getRevealVoice(name,cupName,size){
 // ============================================================
 // SETUP
 // ============================================================
-function goSetup(){audio.init();audio.ensureResumed();audio.startMusic();setupCount=4;buildSetupPlayers();show('setup-screen');renderSetup();}
+function goSetup(){audio.init();audio.ensureResumed();audio.startMusic();setupCount=4;buildSetupPlayers();show('setup-screen');renderSetup();showSoundToast();}
+function showSoundToast(){const t=document.createElement('div');t.className='sound-toast';t.textContent='🔊 '+( I18N.lang==='ja'?'音声をオンにしてお楽しみください！':'請開啟手機聲音，體驗最佳效果！');document.body.appendChild(t);setTimeout(()=>{t.style.transition='opacity 0.5s';t.style.opacity='0';setTimeout(()=>t.remove(),500);},3000);}
 function buildSetupPlayers(){setupPlayers=[];setupPlayers.push({name:t('you'),isHuman:true});for(let i=1;i<setupCount;i++)setupPlayers.push({name:DEFAULT_NAMES[i-1]||('P'+(i+1)),isHuman:false});}
 function setPlayerCount(n){audio.playClick();setupCount=n;while(setupPlayers.length<n){const i=setupPlayers.length-1;setupPlayers.push({name:DEFAULT_NAMES[i]||('P'+(setupPlayers.length+1)),isHuman:false});}while(setupPlayers.length>n)setupPlayers.pop();renderSetup();}
 function togglePlayerType(i){if(i===0)return;audio.playClick();setupPlayers[i].isHuman=!setupPlayers[i].isHuman;renderSetup();}
