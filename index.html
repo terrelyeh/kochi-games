@@ -134,6 +134,17 @@
   }
 
   /* === LANG TOGGLE === */
+  .install-btn{
+    position:fixed;top:calc(12px + var(--safe-top));left:12px;
+    background:var(--surface);border:1px solid var(--surface-2);
+    color:var(--cream-dim);font-size:18px;width:48px;height:48px;
+    border-radius:50%;cursor:pointer;z-index:100;
+    display:flex;align-items:center;justify-content:center;
+    transition:all 0.2s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;
+    text-decoration:none;font-weight:700;font-family:'Noto Serif JP',serif;
+  }
+  .install-btn:hover{border-color:var(--gold);color:var(--gold);}
+  @media(max-width:375px){.install-btn{width:44px;height:44px;font-size:16px;}}
   .lang-btn{
     position:fixed;top:calc(12px + var(--safe-top));right:12px;
     background:var(--surface);border:1px solid var(--surface-2);
@@ -162,6 +173,7 @@
 </head>
 <body>
 
+<a class="install-btn" href="install.html" aria-label="安裝教學">ⓘ</a>
 
 <div class="app">
   <div class="brand-icon">🏯</div>

@@ -132,10 +132,23 @@
   .done-emoji{font-size:36px;margin-bottom:8px;}
   .done-text{font-family:'Noto Serif JP',serif;font-size:18px;font-weight:700;color:var(--gold-light);}
   .done-sub{font-size:13px;color:var(--cream);opacity:0.7;margin-top:4px;}
+  .back-home{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:14px;color:var(--cream);opacity:0.7;
+    text-decoration:none;margin-bottom:24px;
+    transition:opacity 0.2s;touch-action:manipulation;
+  }
+  .back-home:hover{opacity:1;color:var(--gold);}
+  .back-home svg{width:16px;height:16px;}
 </style>
 </head>
 <body>
 <div class="page">
+
+  <a class="back-home" href="index.html">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+    返回首頁
+  </a>
 
   <img class="app-icon" src="icon-512.png" alt="App Icon">
   <div class="app-name">乾杯！維醺志士</div>
