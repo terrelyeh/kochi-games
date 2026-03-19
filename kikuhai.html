@@ -804,10 +804,12 @@ function updateInfoBar(){
 function startTurn(){
   renderCups();
   updateInfoBar();
-  $('game-hint').textContent=t('flipHint');
-  $('game-hint').style.display='block';
+  $('game-hint').style.display='none';
   $('tension-text').style.opacity='0';
   $('tension-text').textContent='';
+
+  // Disable all cups until voice finishes
+  disableAllCups();
 
   // Check if only 1 cup left unflipped -> auto-reveal
   const remaining=state.cups.filter(c=>!c.flipped);
@@ -817,8 +819,8 @@ function startTurn(){
     return;
   }
 
-  // Tension voice + text — pick from category based on progress
-  setTimeout(()=>{
+  // Tension voice + text — speak first, then enable cups
+  setTimeout(async()=>{
   const s=I18N._strings[I18N.lang];
   const rem=state.cupCount-state.flippedCount;
   let pool;
@@ -829,8 +831,21 @@ function startTurn(){
   const line=randPick(pool,'tension');
   $('tension-text').textContent=line;
   $('tension-text').style.opacity='1';
-  voice.speak(line,{rate:0.95,pitch:rem<=3?1.1:1});
+  await voice.speakAsync(line,{rate:0.95,pitch:rem<=3?1.1:1});
+  // Voice done → enable cups + show CTA
+  enableUnflippedCups();
+  $('game-hint').textContent=t('flipHint');
+  $('game-hint').style.display='block';
   },800);
+}
+
+function enableUnflippedCups(){
+  const tray=$('cup-tray');
+  Array.from(tray.children).forEach((s,i)=>{
+    if(!state.cups[i].flipped){
+      s.classList.remove('disabled');
+    }
+  });
 }
 
 function renderCups(){
