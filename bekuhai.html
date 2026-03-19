@@ -810,7 +810,7 @@ const state={round:1,maxRounds:8,currentSpinner:0,players:[],spinning:false};
 let setupCount=4,setupPlayers=[];
 
 function $(id){return document.getElementById(id);}
-function show(sid){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(sid).classList.add('active');$('bgm-toggle').style.display='flex';const isWelcome=sid==='welcome-screen'||sid==='setup-screen';$('lang-toggle').style.display=isWelcome?'flex':'none';}
+function show(sid){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(sid).classList.add('active');$('bgm-toggle').style.display='flex';const isWelcome=sid==='welcome-screen';const isSetup=sid==='setup-screen';$('lang-toggle').style.display=(isWelcome||isSetup)?'flex':'none';$('home-btn').textContent=isWelcome?'🏠':'↩';}
 function wait(ms){return new Promise(r=>setTimeout(r,ms));}
 function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
 function goHome(){
