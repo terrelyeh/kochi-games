@@ -438,7 +438,7 @@
   </div>
 
   <div id="gameover-screen" class="screen">
-    <img class="gameover-cup-img" src="cup-tengu.png" alt="">
+    <img class="gameover-cup-img" src="cup-tengu-clear.png" alt="">
     <div class="gameover-title" data-i18n="gameoverTitle"></div>
     <div class="leaderboard" id="leaderboard"></div>
     <div class="gameover-msg" data-i18n="makeTokuMsg"></div>
@@ -611,7 +611,7 @@ const I18N={
 };
 function t(k,p){return I18N.t(k,p);}
 function toggleLang(){if(state.spinning)return;const a=document.querySelector('.screen.active');if(a&&a.id==='setup-screen'){document.querySelectorAll('.name-input').forEach((inp,i)=>{if(setupPlayers[i])setupPlayers[i].name=inp.value.trim()||setupPlayers[i].name;});}I18N.setLang(I18N.lang==='ja'?'zh':'ja');if(a&&a.id==='setup-screen')renderSetup();if(a&&a.id==='table-screen'){renderTable();renderLyrics();updateSeats();}}
-function renderCupShowcase(){const b=document.getElementById('cups-showcase');if(!b)return;b.innerHTML=`<div class="cup-card"><img src="cup-tengu.png" alt="天狗杯"><div class="cup-label">${t('cupTengu')}</div><div class="cup-vol">140ml ★★★★★</div><div class="cup-trait">${t('cupTenguTrait')}</div></div><div class="cup-card"><img src="cup-hyottoko.png" alt="火男杯"><div class="cup-label">${t('cupHyottoko')}</div><div class="cup-vol">50ml ★★★</div><div class="cup-trait">${t('cupHyottokoTrait')}</div></div><div class="cup-card"><img src="cup-okame.png" alt="阿龜杯"><div class="cup-label">${t('cupOkame')}</div><div class="cup-vol">20ml ★★</div><div class="cup-trait">${t('cupOkameTrait')}</div></div>`;}
+function renderCupShowcase(){const b=document.getElementById('cups-showcase');if(!b)return;b.innerHTML=`<div class="cup-card"><img src="cup-tengu-clear.png" alt="天狗杯"><div class="cup-label">${t('cupTengu')}</div><div class="cup-vol">140ml ★★★★★</div><div class="cup-trait">${t('cupTenguTrait')}</div></div><div class="cup-card"><img src="cup-hyottoko-clear.png" alt="火男杯"><div class="cup-label">${t('cupHyottoko')}</div><div class="cup-vol">50ml ★★★</div><div class="cup-trait">${t('cupHyottokoTrait')}</div></div><div class="cup-card"><img src="cup-okame-clear.png" alt="阿龜杯"><div class="cup-label">${t('cupOkame')}</div><div class="cup-vol">20ml ★★</div><div class="cup-trait">${t('cupOkameTrait')}</div></div>`;}
 
 // ============================================================
 // AUDIO — 3 BGM styles: miyako, shamisen, matsuri
@@ -768,9 +768,9 @@ document.addEventListener('touchstart',unlockSpeech,true);
 // CONSTANTS & STATE
 // ============================================================
 const CUP_DATA={
-  tengu:{svg:SVG_TENGU,img:'cup-tengu.png',splashImg:'cup-tengu-splash.png',ml:140,nameKey:'cupTengu',descKey:'cupTenguDesc',color:'var(--red-bright)',size:'big'},
-  hyottoko:{svg:SVG_HYOTTOKO,img:'cup-hyottoko.png',ml:50,nameKey:'cupHyottoko',descKey:'cupHyottokoDesc',color:'var(--gold)',size:'mid'},
-  okame:{svg:SVG_OKAME,img:'cup-okame.png',ml:20,nameKey:'cupOkame',descKey:'cupOkameDesc',color:'var(--green)',size:'small'},
+  tengu:{svg:SVG_TENGU,img:'cup-tengu-clear.png',splashImg:'cup-tengu-splash.png',ml:140,nameKey:'cupTengu',descKey:'cupTenguDesc',color:'var(--red-bright)',size:'big'},
+  hyottoko:{svg:SVG_HYOTTOKO,img:'cup-hyottoko-clear.png',ml:50,nameKey:'cupHyottoko',descKey:'cupHyottokoDesc',color:'var(--gold)',size:'mid'},
+  okame:{svg:SVG_OKAME,img:'cup-okame-clear.png',ml:20,nameKey:'cupOkame',descKey:'cupOkameDesc',color:'var(--green)',size:'small'},
 };
 const KOMA_FACES=['tengu','tengu','hyottoko','hyottoko','okame','okame'];
 const DEFAULT_NAMES=['政道','Fish','Winnie','蔡旻誠','小光頭'];
