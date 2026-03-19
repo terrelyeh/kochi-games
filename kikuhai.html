@@ -956,10 +956,14 @@ async function showSafeOverlay(){
   ov.innerHTML=`<div class="safe-text">${t('safeText')}</div><div class="safe-sub">${line}</div><div class="safe-next-btn" style="visibility:hidden">${I18N.lang==='ja'?'次の人〜 ▶':'下面一位〜 ▶'}</div>`;
   document.body.appendChild(ov);
 
-  // Wait for voice to finish, then show "next" button
+  // Wait for safe voice to finish, then say "next player"
   const voiceP=voice.speakAsync(line,{rate:1,pitch:1.05});
   const minTimeP=wait(1500);
   await Promise.all([voiceP,minTimeP]);
+
+  // "下面一位～" voice prompt
+  const nextCall=I18N.lang==='ja'?'次の人〜':'下面一位〜';
+  await voice.speakAsync(nextCall,{rate:0.85,pitch:1.1});
 
   const nextBtn=ov.querySelector('.safe-next-btn');
   if(nextBtn)nextBtn.style.visibility='visible';
