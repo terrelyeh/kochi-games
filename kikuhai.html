@@ -94,6 +94,7 @@
   .game-info-bar{position:absolute;top:calc(16px + var(--safe-top));left:50%;transform:translateX(-50%);background:rgba(26,18,16,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:16px;padding:6px 18px;z-index:15;text-align:center;border:1px solid rgba(212,168,67,0.15);white-space:nowrap;max-width:80vw;transition:opacity 0.3s ease;}
   .game-info-bar .round-info{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--cream-dim);letter-spacing:1px;}
   .game-info-bar .player-info{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--gold-light);font-weight:700;margin-top:2px;}
+  .tension-text{position:absolute;top:calc(80px + var(--safe-top));left:50%;transform:translateX(-50%);font-family:'Noto Serif JP',serif;font-size:17px;color:var(--cream);text-align:center;z-index:15;max-width:85vw;line-height:1.6;opacity:0;transition:opacity 0.4s ease;pointer-events:none;text-shadow:0 2px 8px rgba(0,0,0,0.6);}
   .game-hint{position:absolute;bottom:calc(24px + var(--safe-bottom));left:50%;transform:translateX(-50%);font-family:'Noto Serif JP',serif;font-size:14px;color:var(--cream);background:rgba(26,18,16,0.6);padding:8px 20px;border-radius:16px;border:1px solid rgba(212,168,67,0.15);white-space:nowrap;z-index:15;animation:pulse 1.5s infinite;}
   .cup-tray{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:grid;gap:12px;z-index:10;perspective:800px;}
   .cup-tray.cols-3{grid-template-columns:repeat(3,1fr);}
@@ -215,6 +216,7 @@
     .game-info-bar .round-info{font-size:16px;}
     .game-info-bar .player-info{font-size:20px;}
     .game-hint{font-size:18px;padding:12px 28px;}
+    .tension-text{font-size:22px;top:calc(100px + var(--safe-top));}
     .ctrl-btn{width:52px;height:52px;font-size:24px;}
     .safe-overlay .safe-text{font-size:48px;}
     .safe-overlay .safe-sub{font-size:20px;}
@@ -275,8 +277,9 @@
   <div id="game-screen" class="screen">
     <div class="game-info-bar" id="game-info-bar">
       <div class="round-info" id="game-round-info"></div>
-      <div class="player-info" id="game-player-info">下一位！</div>
+      <div class="player-info" id="game-player-info"></div>
     </div>
+    <div class="tension-text" id="tension-text"></div>
     <div class="cup-tray cols-3" id="cup-tray"></div>
     <div class="game-hint" id="game-hint"></div>
   </div>
@@ -316,6 +319,7 @@ const I18N={
       cupDesc6:'ライト（最大5杯）',cupDesc9:'スタンダード（最大8杯）',cupDesc12:'ハード（最大11杯）',cupDesc15:'地獄モード（最大14杯）',
       roundInfo:'第 {n} ラウンド',
       playerTurn:'第 {n} 番',nextPerson:'次の人！',
+      cupStatus:'めくり {flipped}/{total} ｜ 罰酒 {penalty} 杯',
       flipHint:'杯を選んでめくれ！',
       safeText:'セーフ！',
       safeSub:'次の人へ…',
@@ -410,6 +414,7 @@ const I18N={
       cupDesc6:'輕鬆版（最多罰 5 杯）',cupDesc9:'標準版（最多罰 8 杯）',cupDesc12:'刺激版（最多罰 11 杯）',cupDesc15:'地獄版（最多罰 14 杯）',
       roundInfo:'第 {n} 輪',
       playerTurn:'第 {n} 位',nextPerson:'下一位！',
+      cupStatus:'已翻 {flipped}/{total} ｜ 累積罰酒 {penalty} 杯',
       flipHint:'選一個杯子翻開！',
       safeText:'安全！',
       safeSub:'換下一位…',
@@ -770,12 +775,18 @@ function initCups(){
 // ============================================================
 // GAME LOGIC
 // ============================================================
+function updateInfoBar(){
+  $('game-round-info').textContent=t('roundInfo',{n:state.round});
+  $('game-player-info').textContent=t('cupStatus',{flipped:state.flippedCount,total:state.cupCount,penalty:state.flippedCount});
+}
+
 function startTurn(){
   renderCups();
-  $('game-round-info').textContent=t('roundInfo',{n:state.round});
-  $('game-player-info').textContent=t('nextPerson');
+  updateInfoBar();
   $('game-hint').textContent=t('flipHint');
   $('game-hint').style.display='block';
+  $('tension-text').style.opacity='0';
+  $('tension-text').textContent='';
 
   // Check if only 1 cup left unflipped -> auto-reveal
   const remaining=state.cups.filter(c=>!c.flipped);
@@ -785,7 +796,7 @@ function startTurn(){
     return;
   }
 
-  // Tension voice — pick from category based on progress (delay so it doesn't feel rushed)
+  // Tension voice + text — pick from category based on progress
   setTimeout(()=>{
   const s=I18N._strings[I18N.lang];
   const rem=state.cupCount-state.flippedCount;
@@ -795,6 +806,8 @@ function startTurn(){
   else if(state.flippedCount>=4) pool=s.tensionMid;
   else pool=s.tensionEarly;
   const line=pool[randInt(0,pool.length-1)];
+  $('tension-text').textContent=line;
+  $('tension-text').style.opacity='1';
   voice.speak(line,{rate:0.95,pitch:rem<=3?1.1:1});
   },800);
 }
@@ -826,6 +839,8 @@ async function flipCup(idx){
   audio.playFlipCup();
   state.cups[idx].flipped=true;
   state.flippedCount++;
+  updateInfoBar();
+  $('tension-text').style.opacity='0';
 
   // Update the specific cup visually
   const tray=$('cup-tray');
@@ -872,6 +887,8 @@ async function autoRevealLast(){
   audio.playFlipCup();
   state.cups[lastIdx].flipped=true;
   state.flippedCount++;
+  updateInfoBar();
+  $('tension-text').style.opacity='0';
 
   const tray=$('cup-tray');
   const slot=tray.children[lastIdx];
