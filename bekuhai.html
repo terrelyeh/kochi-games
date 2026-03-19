@@ -550,7 +550,7 @@ const I18N={
       rulesTitle:'📜 ルール',
       rules:['みんなで座り、順番に<strong>独楽</strong>を回す','三種の杯：<strong>天狗杯・火男杯・阿亀杯</strong>','独楽が指した人が、出た面の杯で飲む','八回合後、最も飲んだ者が<strong>「酒豪」</strong>として勝利！'],
       startBtn:'入座！',setupTitle:'座席安排',setupCount:'人数',setupStart:'開始喝酒！',
-      setupToggleHint:'👇 アイコンタップ → 真人/AI切替 ｜ 名前タップ → 編集',
+      setupToggleHint:'👆 名前タップで編集できます',
       roundInfo:'第 {n} 回合 ／ 全 {max} 回合',spinBtn:'回せ！',spinnerTurn:'{name} の番',aiSpinning:'{name} が回している…',
       holdToSpin:'独楽を押して放せ！',
       revealWho:'独楽が指したのは…',
@@ -591,7 +591,7 @@ const I18N={
       rulesTitle:'📜 遊戲規則',
       rules:['眾人圍坐，輪流轉動<strong>獨樂</strong>（陀螺）','三種酒杯：<strong>天狗杯・火男杯・阿龜杯</strong>','獨樂停下指向誰，誰就用對應的杯喝','八回合後飲最多者為<strong>「酒豪」</strong>勝出！'],
       startBtn:'入座！',setupTitle:'座席安排',setupCount:'人數',setupStart:'開始喝酒！',
-      setupToggleHint:'👇 點頭像切換 真人/AI ｜ 點名字可修改',
+      setupToggleHint:'👆 點名字可修改',
       roundInfo:'第 {n} 回合 ／ 共 {max} 回合',spinBtn:'轉！',spinnerTurn:'輪到 {name}',aiSpinning:'{name} 正在轉…',
       holdToSpin:'按住獨樂，放開旋轉！',
       revealWho:'獨樂指向了…',
@@ -797,9 +797,9 @@ const CUP_DATA={
 };
 const KOMA_FACES=['tengu','tengu','hyottoko','hyottoko','okame','okame'];
 const DEFAULT_NAMES=['政道','Fish','Winnie','蔡旻辰','小光頭'];
-const PLAYER_AVATARS={'小光頭':'Sin-head.png'};
+const PLAYER_AVATARS={'你':'你-head.png','政道':'政道-head.png','Fish':'fish-head.png','Winnie':'winnie-head.png','蔡旻辰':'蔡旻辰-head.png','小光頭':'小光頭-head.png'};
 function hasPhoto(name){return!!PLAYER_AVATARS[name];}
-function getAvatar(name,isHuman){if(PLAYER_AVATARS[name])return`<img src="${PLAYER_AVATARS[name]}" alt="${name}">`;return isHuman?'🧑':'🤖';}
+function getAvatar(name){if(PLAYER_AVATARS[name])return`<img src="${PLAYER_AVATARS[name]}" alt="${name}">`;return'🧑';}
 const LYRICS_JA=['べろべろの〜','神様は','正直な','神様よ','萬華世界維醺志士の方へと','おもむきゃね','おもむきゃね'];
 const LYRICS_ZH=['醉醺醺的神明呀','正直的神明喲','朝著萬華世界','維醺志士的方向','轉過去吧'];
 function getLyrics(){return I18N.lang==='ja'?LYRICS_JA:LYRICS_ZH;}
@@ -842,24 +842,23 @@ function getRevealVoice(name,cupName,size){
 // ============================================================
 function goSetup(){audio.init();audio.ensureResumed();setupCount=4;buildSetupPlayers();show('setup-screen');renderSetup();showSoundToast();}
 function showSoundToast(){const t=document.createElement('div');t.className='sound-toast';t.textContent='🔊 '+( I18N.lang==='ja'?'音声をオンにしてお楽しみください！':'請開啟手機聲音，體驗最佳效果！');document.body.appendChild(t);setTimeout(()=>{t.style.transition='opacity 0.5s';t.style.opacity='0';setTimeout(()=>t.remove(),500);},1800);}
-function buildSetupPlayers(){setupPlayers=[];setupPlayers.push({name:t('you'),isHuman:true});for(let i=1;i<setupCount;i++)setupPlayers.push({name:DEFAULT_NAMES[i-1]||('P'+(i+1)),isHuman:false});}
-function setPlayerCount(n){audio.playClick();setupCount=n;while(setupPlayers.length<n){const i=setupPlayers.length-1;setupPlayers.push({name:DEFAULT_NAMES[i]||('P'+(setupPlayers.length+1)),isHuman:false});}while(setupPlayers.length>n)setupPlayers.pop();renderSetup();}
-function togglePlayerType(i){if(i===0)return;audio.playClick();setupPlayers[i].isHuman=!setupPlayers[i].isHuman;renderSetup();}
+function buildSetupPlayers(){setupPlayers=[];setupPlayers.push({name:t('you')});for(let i=1;i<setupCount;i++)setupPlayers.push({name:DEFAULT_NAMES[i-1]||('P'+(i+1))});}
+function setPlayerCount(n){audio.playClick();setupCount=n;while(setupPlayers.length<n){const i=setupPlayers.length-1;setupPlayers.push({name:DEFAULT_NAMES[i]||('P'+(setupPlayers.length+1))});}while(setupPlayers.length>n)setupPlayers.pop();renderSetup();}
 function updatePlayerName(i,n){setupPlayers[i].name=n;}
 function renderSetup(){
   let ch=`<span class="count-label">${t('setupCount')}</span>`;for(let n=4;n<=6;n++)ch+=`<button class="count-btn${n===setupCount?' selected':''}" onclick="setPlayerCount(${n})">${n}</button>`;$('count-row').innerHTML=ch;
   // Hint text
   $('setup-hint').textContent=t('setupToggleHint');
   // Player list
-  let lh='';for(let i=0;i<setupPlayers.length;i++){const p=setupPlayers[i];const av=PLAYER_AVATARS[p.name]?`<img src="${PLAYER_AVATARS[p.name]}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`:(p.isHuman?'🧑':'🤖');lh+=`<div class="player-row${i===0?' is-you':''}"><span class="idx">${i+1}</span><input class="name-input" value="${p.name}" oninput="updatePlayerName(${i},this.value)" maxlength="8"><button class="type-toggle" onclick="togglePlayerType(${i})" ${i===0?'disabled style="opacity:0.5;cursor:default;"':''}>${av}</button></div>`;}$('player-list').innerHTML=lh;
+  let lh='';for(let i=0;i<setupPlayers.length;i++){const p=setupPlayers[i];const av=PLAYER_AVATARS[p.name]?`<img src="${PLAYER_AVATARS[p.name]}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`:'🧑';lh+=`<div class="player-row${i===0?' is-you':''}"><span class="idx">${i+1}</span><input class="name-input" value="${p.name}" oninput="updatePlayerName(${i},this.value)" maxlength="8"><div class="type-toggle">${av}</div></div>`;}$('player-list').innerHTML=lh;
 }
-function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,i)=>{setupPlayers[i].name=inp.value.trim()||('P'+(i+1));});state.players=setupPlayers.map(p=>({name:p.name,isHuman:p.isHuman,ml:0}));state.round=1;state.currentSpinner=0;state.spinning=false;audio.startMusic();show('table-screen');startRound();}
+function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,i)=>{setupPlayers[i].name=inp.value.trim()||('P'+(i+1));});state.players=setupPlayers.map(p=>({name:p.name,ml:0}));state.round=1;state.currentSpinner=0;state.spinning=false;audio.startMusic();show('table-screen');startRound();}
 
 // ============================================================
 // TABLE
 // ============================================================
 function getSeatPositions(count){const p=[];for(let i=0;i<count;i++){const a=(180+(360/count)*i)%360;const r=a*Math.PI/180;const radX=42;const radY=37;const x=Math.max(8,Math.min(92,50+radX*Math.sin(r)));const y=Math.max(12,Math.min(88,54-radY*Math.cos(r)));p.push({x,y,angle:a});}return p;}
-function renderTable(){const l=$('table-layout');l.querySelectorAll('.seat').forEach(s=>s.remove());l.querySelectorAll('.next-btn-float').forEach(b=>b.remove());const pos=getSeatPositions(state.players.length);state.players.forEach((p,i)=>{const s=document.createElement('div');s.className='seat';s.id='seat-'+i;s.style.left=pos[i].x+'%';s.style.top=pos[i].y+'%';s.innerHTML=`<div class="seat-cushion${hasPhoto(p.name)?' has-photo':''}">${getAvatar(p.name,p.isHuman)}</div><div class="s-name">${p.name}</div><div class="s-ml">${p.ml}ml</div>`;l.appendChild(s);});
+function renderTable(){const l=$('table-layout');l.querySelectorAll('.seat').forEach(s=>s.remove());l.querySelectorAll('.next-btn-float').forEach(b=>b.remove());const pos=getSeatPositions(state.players.length);state.players.forEach((p,i)=>{const s=document.createElement('div');s.className='seat';s.id='seat-'+i;s.style.left=pos[i].x+'%';s.style.top=pos[i].y+'%';s.innerHTML=`<div class="seat-cushion${hasPhoto(p.name)?' has-photo':''}">${getAvatar(p.name)}</div><div class="s-name">${p.name}</div><div class="s-ml">${p.ml}ml</div>`;l.appendChild(s);});
   const kd=$('koma-3d');kd.innerHTML=`<span class="koma-pointer">▼</span><img src="koma-1.png" class="koma-img" alt=""><div class="koma-result-face" id="koma-result-face"></div>`;
 }
 function updateSeats(){state.players.forEach((p,i)=>{const s=$('seat-'+i);if(!s)return;s.querySelector('.s-ml').textContent=p.ml+'ml';s.classList.toggle('is-spinner',i===state.currentSpinner);s.classList.remove('is-target');});}
@@ -925,13 +924,8 @@ function startRound(){
   $('spinner-label').textContent=t('spinnerTurn',{name:sp.name});
   const kd=$('koma-3d');kd.className='koma-3d idle';
   const rf=$('koma-result-face');if(rf){rf.className='koma-result-face';rf.textContent='';}
-  if(sp.isHuman){
-    $('spin-btn-wrap').innerHTML=`<div class="hold-hint">${t('holdToSpin')}</div>`;
-    makeKomaInteractive();
-  }else{
-    $('spin-btn-wrap').innerHTML=`<div style="font-size:14px;color:var(--cream-dim)">${t('aiSpinning',{name:sp.name})}</div>`;
-    setTimeout(()=>doSpin(),1200);
-  }
+  $('spin-btn-wrap').innerHTML=`<div class="hold-hint">${t('holdToSpin')}</div>`;
+  makeKomaInteractive();
 }
 
 async function doSpin(){
@@ -1041,21 +1035,17 @@ async function showNextButton(){
 // ============================================================
 function showDrinking(playerIdx,faceKey){
   return new Promise(resolve=>{
-    const player=state.players[playerIdx];const cup=CUP_DATA[faceKey];const isH=player.isHuman;
+    const player=state.players[playerIdx];const cup=CUP_DATA[faceKey];
     const ov=document.createElement('div');ov.className='drink-overlay';
-    ov.innerHTML=`<div class="drink-target-name">${player.name}</div><img class="drink-cup-img" src="${cup.img}" alt=""><div class="drink-cup-name" style="color:${cup.color}">${t(cup.nameKey)}</div><div class="drink-cup-ml">${cup.ml}ml</div><div class="drink-cup-desc">${t(cup.descKey)}</div><div class="drink-bar"><div class="drink-fill" id="drink-fill"></div></div><div class="drink-pct" id="drink-pct">0%</div><div class="drink-tap-hint" id="drink-hint">${isH?t('drinkTapHint'):t('drinkAutoMsg',{name:player.name})}</div>`;
+    ov.innerHTML=`<div class="drink-target-name">${player.name}</div><img class="drink-cup-img" src="${cup.img}" alt=""><div class="drink-cup-name" style="color:${cup.color}">${t(cup.nameKey)}</div><div class="drink-cup-ml">${cup.ml}ml</div><div class="drink-cup-desc">${t(cup.descKey)}</div><div class="drink-bar"><div class="drink-fill" id="drink-fill"></div></div><div class="drink-pct" id="drink-pct">0%</div><div class="drink-tap-hint" id="drink-hint">${t('drinkTapHint')}</div>`;
     document.body.appendChild(ov);
     let prog=0;const fill=ov.querySelector('#drink-fill');const pct=ov.querySelector('#drink-pct');const hint=ov.querySelector('#drink-hint');
     const sakeEls=ov.querySelectorAll('.sake-level');
     const sakeData=Array.from(sakeEls).map(el=>({el,maxH:parseFloat(el.getAttribute('height'))||50,origY:parseFloat(el.getAttribute('y'))||58}));
     const updateSake=()=>{sakeData.forEach(({el,maxH,origY})=>{const newH=maxH*(1-prog/100);el.setAttribute('height',Math.max(0,newH));el.setAttribute('y',origY+(maxH-newH));});};
     const finish=()=>{audio.playDrinkGulp();hint.className='drink-done-msg';hint.textContent=t('drinkDone');voice.speak(t('voiceDrinkDone'),{rate:1,pitch:1.05});setTimeout(()=>{ov.remove();resolve();},3500);};
-    if(isH){
-      const tap=(e)=>{e.preventDefault();if(prog>=100)return;prog=Math.min(100,prog+8);fill.style.width=prog+'%';pct.textContent=Math.round(prog)+'%';updateSake();audio.playClick();if(prog>=100){ov.removeEventListener('click',tap);ov.removeEventListener('touchstart',tap);ov.style.cursor='default';finish();}};
-      ov.addEventListener('click',tap);ov.addEventListener('touchstart',tap,{passive:false});
-    }else{
-      const iv=setInterval(()=>{prog=Math.min(100,prog+4);fill.style.width=prog+'%';pct.textContent=Math.round(prog)+'%';updateSake();if(prog>=100){clearInterval(iv);finish();}},80);
-    }
+    const tap=(e)=>{e.preventDefault();if(prog>=100)return;prog=Math.min(100,prog+8);fill.style.width=prog+'%';pct.textContent=Math.round(prog)+'%';updateSake();audio.playClick();if(prog>=100){ov.removeEventListener('click',tap);ov.removeEventListener('touchstart',tap);ov.style.cursor='default';finish();}};
+    ov.addEventListener('click',tap);ov.addEventListener('touchstart',tap,{passive:false});
   });
 }
 
@@ -1066,7 +1056,7 @@ function gameOver(){
   show('gameover-screen');audio.stopMusic();audio.playSake();audio.playWin();spawnConfetti(30);
   const sorted=[...state.players].sort((a,b)=>b.ml-a.ml);
   const ranks=['🥇','🥈','🥉'];
-  let h='';sorted.forEach((p,i)=>{h+=`<div class="lb-row${i===0?' champion':''}" style="animation-delay:${i*0.15}s"><span class="lb-rank">${ranks[i]||`${i+1}`}</span><span class="lb-name">${p.name} ${p.isHuman?'🧑':'🤖'}</span><span class="lb-ml">${p.ml}ml</span>${i===0?`<span class="lb-badge">${t('champion')}</span>`:''}</div>`;});
+  let h='';sorted.forEach((p,i)=>{const av=PLAYER_AVATARS[p.name]?`<img src="${PLAYER_AVATARS[p.name]}" style="width:28px;height:28px;object-fit:cover;border-radius:50%;vertical-align:middle;margin-right:6px;">`:'';h+=`<div class="lb-row${i===0?' champion':''}" style="animation-delay:${i*0.15}s"><span class="lb-rank">${ranks[i]||`${i+1}`}</span><span class="lb-name">${av}${p.name}</span><span class="lb-ml">${p.ml}ml</span>${i===0?`<span class="lb-badge">${t('champion')}</span>`:''}</div>`;});
   $('leaderboard').innerHTML=h;
   voice.speak(t('voiceGameover'),{rate:0.95,pitch:1});
 }
