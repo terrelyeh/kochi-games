@@ -819,10 +819,13 @@ function goHome(){
 }
 function spawnConfetti(count=20){for(let i=0;i<count;i++){const p=document.createElement('div');p.className='confetti-particle';p.style.left=randInt(10,90)+'vw';p.style.background=CONFETTI_COLORS[randInt(0,CONFETTI_COLORS.length-1)];p.style.setProperty('--dur',(2+Math.random()*2)+'s');p.style.animationDelay=(Math.random()*0.5)+'s';p.style.width=randInt(6,12)+'px';p.style.height=randInt(6,12)+'px';p.style.borderRadius=Math.random()>0.5?'50%':'2px';document.body.appendChild(p);setTimeout(()=>p.remove(),5000);}}
 
-// Voice helper: pick reveal line by cup size
+// Voice helper: pick reveal line by cup size (no consecutive repeat)
+let _lastReveal={};
 function getRevealVoice(name,cupName,size){
   const base=size==='big'?'voiceRevealBig':size==='mid'?'voiceRevealMid':'voiceRevealSmall';
-  const n=randInt(1,6);
+  let n=randInt(1,6);
+  if(_lastReveal[base]===n){n=n%6+1;}
+  _lastReveal[base]=n;
   return t(base+n,{name,cup:cupName});
 }
 
