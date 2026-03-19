@@ -130,8 +130,11 @@
   .player-row .idx{font-family:'Inter',sans-serif;font-size:16px;font-weight:700;color:var(--gold);width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:rgba(212,168,67,0.1);border:1px solid rgba(212,168,67,0.25);border-radius:8px;flex-shrink:0;}
   .player-row .name-input{flex:1;background:none;border:none;border-bottom:1px solid var(--surface-2);color:var(--white);font-size:15px;font-family:'Inter','Noto Sans JP',sans-serif;padding:4px 0;margin:0 10px;}
   .player-row .name-input:focus{border-color:var(--gold);outline:none;}
-  .player-row .type-toggle{font-size:30px;cursor:pointer;padding:4px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;border:none;background:rgba(255,255,255,0.05);border-radius:50%;transition:all 0.2s;flex-shrink:0;touch-action:manipulation;}
+  .player-row .type-toggle{font-size:30px;cursor:pointer;padding:4px;width:48px;height:48px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;border:none;background:rgba(255,255,255,0.05);border-radius:50%;transition:all 0.2s;flex-shrink:0;touch-action:manipulation;overflow:hidden;}
   .player-row .type-toggle:active{transform:scale(0.85);background:rgba(212,168,67,0.15);}
+  .player-row .type-toggle.has-photo{background:none;animation:setupBobble 2.5s ease-in-out infinite;}
+  .player-row .type-toggle.has-photo img{width:100%;height:100%;object-fit:contain;}
+  @keyframes setupBobble{0%,100%{transform:rotate(-2deg);}25%{transform:rotate(3deg) scale(1.03);}50%{transform:rotate(-3deg);}75%{transform:rotate(2deg) scale(0.97);}}
   .player-row.is-you{border-color:var(--gold);}
   .setup-toggle-hint{font-size:13px;color:var(--gold-light);margin-bottom:12px;background:rgba(212,168,67,0.08);padding:6px 14px;border-radius:8px;border:1px solid rgba(212,168,67,0.15);}
 
@@ -851,7 +854,7 @@ function renderSetup(){
   // Hint text
   $('setup-hint').textContent=t('setupToggleHint');
   // Player list
-  let lh='';for(let i=0;i<setupPlayers.length;i++){const p=setupPlayers[i];const av=PLAYER_AVATARS[p.name]?`<img src="${PLAYER_AVATARS[p.name]}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`:'🧑';lh+=`<div class="player-row${i===0?' is-you':''}"><span class="idx">${i+1}</span><input class="name-input" value="${p.name}" oninput="updatePlayerName(${i},this.value)" maxlength="8"><div class="type-toggle">${av}</div></div>`;}$('player-list').innerHTML=lh;
+  let lh='';for(let i=0;i<setupPlayers.length;i++){const p=setupPlayers[i];const hp=!!PLAYER_AVATARS[p.name];const av=hp?`<img src="${PLAYER_AVATARS[p.name]}" alt="${p.name}">`:'🧑';lh+=`<div class="player-row${i===0?' is-you':''}"><span class="idx">${i+1}</span><input class="name-input" value="${p.name}" oninput="updatePlayerName(${i},this.value)" maxlength="8"><div class="type-toggle${hp?' has-photo':''}">${av}</div></div>`;}$('player-list').innerHTML=lh;
 }
 function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,i)=>{setupPlayers[i].name=inp.value.trim()||('P'+(i+1));});state.players=setupPlayers.map(p=>({name:p.name,ml:0}));state.round=1;state.currentSpinner=0;state.spinning=false;audio.startMusic();show('table-screen');startRound();}
 
