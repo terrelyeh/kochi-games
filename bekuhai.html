@@ -100,11 +100,11 @@
   .cups-showcase{display:flex;gap:8px;justify-content:center;margin-top:16px;width:100%;perspective:600px;}
   .cup-card{flex:1;text-align:center;background:linear-gradient(180deg, rgba(58,45,36,0.8) 0%, rgba(42,31,26,0.8) 100%);border-radius:14px;padding:14px 6px 10px;border:1px solid rgba(212,168,67,0.1);transition:all 0.3s;transform:rotateX(5deg);transform-origin:center bottom;position:relative;}
   .cup-card::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg, transparent, rgba(212,168,67,0.2), transparent);}
-  .cup-card svg,.cup-card img{width:80px;height:80px;display:block;margin:0 auto 8px;filter:drop-shadow(0 8px 12px rgba(0,0,0,0.5));object-fit:contain;animation:cupSway 3s ease-in-out infinite;}
+  .cup-card svg,.cup-card img{width:80px;height:80px;display:block;margin:0 auto 8px;filter:drop-shadow(0 8px 12px rgba(0,0,0,0.5));object-fit:contain;animation:cupSway 2.5s ease-in-out infinite;}
   .cup-card:nth-child(1) svg,.cup-card:nth-child(1) img{animation-delay:0s;}
-  .cup-card:nth-child(2) svg,.cup-card:nth-child(2) img{animation-delay:0.8s;}
-  .cup-card:nth-child(3) svg,.cup-card:nth-child(3) img{animation-delay:1.6s;}
-  @keyframes cupSway{0%,100%{transform:rotate(-2deg);}50%{transform:rotate(2deg);}}
+  .cup-card:nth-child(2) svg,.cup-card:nth-child(2) img{animation-delay:0.6s;}
+  .cup-card:nth-child(3) svg,.cup-card:nth-child(3) img{animation-delay:1.2s;}
+  @keyframes cupSway{0%,100%{transform:rotate(-5deg) translateY(0px);}25%{transform:rotate(0deg) translateY(-4px);}50%{transform:rotate(5deg) translateY(0px);}75%{transform:rotate(0deg) translateY(4px);}}
   .cup-card .cup-label{font-size:15px;font-weight:700;color:var(--cream);margin-bottom:6px;}
   .cup-card .cup-vol{font-size:10px;color:var(--gold);font-weight:700;}
   .cup-card .cup-trait{font-size:9px;color:var(--cream-dim);margin-top:1px;}
