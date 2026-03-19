@@ -563,14 +563,20 @@ const I18N={
       voiceRevealBig2:'出たぁ！{name}に{cup}！鼻を持って飲めよ！百四十ミリ、覚悟しろ！',
       voiceRevealBig3:'{name}、ご愁傷様！{cup}だ！今夜は帰れないぞ、百四十ミリ一気飲み！',
       voiceRevealBig4:'{name}に{cup}、百四十ミリ！これでこそ維醺志士だ！飲め飲め！',
+      voiceRevealBig5:'{name}！{cup}百四十ミリ！肝臓が泣いてるぞ！でも志士に休みはない！',
+      voiceRevealBig6:'うわぁ、{name}に{cup}！百四十ミリ！明日の二日酔いは自己責任でどうぞ！',
       voiceRevealMid1:'おっと、{name}が当たった！{cup}、五十ミリリットル、頑張れよ！',
       voiceRevealMid2:'{name}、{cup}だ！穴を塞げよ、漏れたら自己責任だ！五十ミリ！',
       voiceRevealMid3:'あらら、{name}に{cup}か！まぁ五十ミリだし、まだマシだね！',
       voiceRevealMid4:'{name}、{cup}で五十ミリ！維醺志士への道、半分ってとこだな！',
+      voiceRevealMid5:'{name}に{cup}！穴から漏れる分は計算に入ってないからね！五十ミリ全部飲め！',
+      voiceRevealMid6:'{name}、{cup}五十ミリ！顔がもうひょっとこみたいだぞ！お似合いだ！',
       voiceRevealSmall1:'{name}、{cup}！二十ミリだけ、ラッキーだね！',
       voiceRevealSmall2:'{name}に{cup}か！たった二十ミリ、ずるいぞ！',
       voiceRevealSmall3:'{name}、{cup}！置けないから一気にどうぞ！二十ミリなんて一瞬だ！',
       voiceRevealSmall4:'{name}に{cup}で二十ミリ？維醺志士失格だな！もっと飲め！',
+      voiceRevealSmall5:'{name}、{cup}二十ミリ？それ乾杯の練習にもならないぞ！もう一回回せ！',
+      voiceRevealSmall6:'{name}に{cup}！二十ミリで済むなんて、神様えこひいきしすぎだろ！',
       voiceDrinkDone:'飲み干した！お見事！',
       voiceGameover:'酒豪決定！おめでとう！さすがだねぇ！',
     },
@@ -598,14 +604,20 @@ const I18N={
       voiceRevealBig2:'哈哈哈，{name}中獎了！{cup}！一百四十毫升，今晚你最慘！',
       voiceRevealBig3:'{name}，恭喜你抽到{cup}！鼻子擋路還要喝一百四十毫升，太衰了吧！',
       voiceRevealBig4:'{name}，{cup}一百四十毫升！這才是真正的維醺志士！乾了吧！',
+      voiceRevealBig5:'{name}！{cup}一百四十毫升！你的肝在哭了！但維醺志士不准哭！',
+      voiceRevealBig6:'哇，{name}抽到{cup}！一百四十毫升！明天的宿醉，今晚的代價，值得！',
       voiceRevealMid1:'噢，{name}被選中了，{cup}，五十毫升，加油哦！',
       voiceRevealMid2:'{name}，{cup}！記得堵住洞，不然酒會漏光！五十毫升！',
       voiceRevealMid3:'欸，{name}抽到{cup}了！五十毫升，不多不少，剛好微醺！',
       voiceRevealMid4:'{name}，{cup}五十毫升！想當維醺志士，先把這杯乾了再說！',
+      voiceRevealMid5:'{name}，{cup}！從洞裡漏掉的不算喔！五十毫升全部給我吞下去！',
+      voiceRevealMid6:'{name}抽到{cup}！你的表情已經跟火男一樣歪了！五十毫升，乾！',
       voiceRevealSmall1:'{name}，{cup}，才二十毫升而已，算你好運啦！',
       voiceRevealSmall2:'{name}抽到{cup}！才二十毫升，你是不是作弊啊！',
       voiceRevealSmall3:'{name}，{cup}！放不下所以一口乾掉吧！二十毫升，小意思啦！',
       voiceRevealSmall4:'{name}，{cup}才二十毫升？這樣也配叫維醺志士？再來一杯啦！',
+      voiceRevealSmall5:'{name}，{cup}二十毫升？這連乾杯的熱身都不夠！再轉一次啦！',
+      voiceRevealSmall6:'{name}抽到{cup}！才二十毫升，神明也太偏心了吧！不公平！',
       voiceDrinkDone:'喝完了，好厲害呀！',
       voiceGameover:'酒豪誕生！恭喜恭喜！太厲害了！',
     },
@@ -810,7 +822,7 @@ function spawnConfetti(count=20){for(let i=0;i<count;i++){const p=document.creat
 // Voice helper: pick reveal line by cup size
 function getRevealVoice(name,cupName,size){
   const base=size==='big'?'voiceRevealBig':size==='mid'?'voiceRevealMid':'voiceRevealSmall';
-  const n=randInt(1,4);
+  const n=randInt(1,6);
   return t(base+n,{name,cup:cupName});
 }
 
