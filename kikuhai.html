@@ -104,27 +104,15 @@
   .cup-inner{position:relative;width:100%;height:100%;transition:transform 0.6s ease;transform-style:preserve-3d;}
   .cup-slot.flipped .cup-inner{transform:rotateX(180deg);}
   .cup-slot.disabled{pointer-events:none;cursor:default;}
-  .cup-front,.cup-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:50%;display:flex;align-items:center;justify-content:center;}
-  /* Upside-down cup: real photo */
-  .cup-front{
-    background:url('Cup_down.png') center/contain no-repeat;
-    border-radius:0;border:none;
-    filter:drop-shadow(0 4px 8px rgba(0,0,0,0.4));
-  }
-  /* Flipped cup: empty, real photo */
-  .cup-back{
-    transform:rotateX(180deg);
-    background:url('Cup_up.png') center/contain no-repeat;
-    border-radius:0;border:none;
-    filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-  }
-  /* Chrysanthemum revealed: flower cup photo */
-  .cup-slot.chrysanthemum .cup-back{
-    background:url('Flower_cup.png') center/contain no-repeat;
-    border-radius:0;border:none;
-    filter:drop-shadow(0 0 16px rgba(212,168,67,0.6));
-    animation:chrysGlow 1.5s infinite;
-  }
+  .cup-front,.cup-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;}
+  .cup-front img,.cup-back img{width:100%;height:100%;object-fit:contain;}
+  /* Upside-down cup */
+  .cup-front{filter:drop-shadow(0 4px 8px rgba(0,0,0,0.4));}
+  /* Flipped cup: empty */
+  .cup-back{transform:rotateX(180deg);filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3));}
+  .cup-slot.flipped{z-index:5;}
+  /* Chrysanthemum revealed */
+  .cup-slot.chrysanthemum .cup-back{filter:drop-shadow(0 0 16px rgba(212,168,67,0.6));animation:chrysGlow 1.5s infinite;}
   .cup-slot.chrysanthemum .cup-back .chrys-emoji{display:none;}
 
   /* === Safe Overlay === */
@@ -822,7 +810,8 @@ function renderCups(){
     const slot=document.createElement('div');
     slot.className='cup-slot'+(cup.flipped?' flipped':'')+(cup.flipped&&cup.hasChrysanthemum?' chrysanthemum':'');
     if(cup.flipped)slot.classList.add('disabled');
-    slot.innerHTML=`<div class="cup-inner"><div class="cup-front"></div><div class="cup-back">${cup.flipped?(cup.hasChrysanthemum?'<span class="chrys-emoji">🌼</span>':''):''}${!cup.flipped&&!cup.hasChrysanthemum?'':''}${!cup.flipped&&cup.hasChrysanthemum?'':''}</div></div>`;
+    const backImg=cup.flipped&&cup.hasChrysanthemum?'Flower_cup.png':'Cup_up.png';
+    slot.innerHTML=`<div class="cup-inner"><div class="cup-front"><img src="Cup_down.png" alt=""></div><div class="cup-back"><img src="${backImg}" alt="">${cup.flipped&&cup.hasChrysanthemum?'<span class="chrys-emoji">🌼</span>':''}</div></div>`;
     if(!cup.flipped){
       slot.addEventListener('click',()=>flipCup(i));
       slot.addEventListener('touchstart',(e)=>{e.preventDefault();flipCup(i);},{passive:false});
