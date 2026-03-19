@@ -1,6 +1,6 @@
 # CLAUDE.md — 萬華世界の維醺志士
 
-> Last updated: 2026-03-19
+> Last updated: 2026-03-20
 
 ## Project Overview
 
@@ -11,6 +11,7 @@
 ## Tech Stack
 
 - 單一 HTML 檔案架構（inline CSS + JS，無 build 工具）
+- PWA（manifest.json + sw.js，可加入主畫面、離線使用）
 - Google Fonts：Noto Serif JP（標題/杯名）+ Noto Sans JP（UI）+ Inter（數字）
 - Web Speech API（SpeechSynthesis）— 雙語語音 ja-JP / zh-TW
 - Web Audio API — 合成 BGM（shamisen / matsuri）+ MP3 BGM（健身操）
@@ -26,14 +27,19 @@ kochi-games/
 ├── kikuhai.html        # 菊花杯（清酒版俄羅斯輪盤）— 56KB, 剛完成基礎版
 ├── hashiken.html       # 箸拳（猜拳對戰）— 54KB, 功能完成但 UI 未優化
 ├── bgm-kenshinso.mp3   # 健身操 BGM（3MB）
-├── cup-tengu.png       # 天狗杯圖片（去背）
-├── cup-hyottoko.png    # 火男杯圖片（去背）
-├── cup-okame.png       # 阿龜杯圖片（去背）
+├── manifest.json       # PWA manifest（app name: 乾杯！維醺志士）
+├── sw.js               # Service Worker（離線快取）
+├── icon-192.png        # PWA icon 192x192（天狗杯派對圖）
+├── icon-512.png        # PWA icon 512x512
+├── cup-tengu-clear.png # 天狗杯（乾淨去背版，目前使用）
+├── cup-hyottoko-clear.png # 火男杯（乾淨去背版）
+├── cup-okame-clear.png # 阿龜杯（乾淨去背版）
 ├── cup-tengu-splash.png # 天狗杯（GameOver 用）
 ├── koma-1.png          # 六角陀螺角度 1
 ├── koma-2.png          # 六角陀螺角度 2
 ├── koma-3.png          # 六角陀螺角度 3
-├── export*.svg         # 高品質 SVG（陀螺+杯子，400-600KB，未使用）
+├── cup-*.png (舊版)    # 舊的去背圖（有白邊，已不使用）
+├── export*.svg         # 高品質 SVG（400-600KB，未使用）
 ```
 
 ## 三個遊戲的使用模式
@@ -80,16 +86,18 @@ kochi-games/
 - **手機優先框架**：Safe area、橫屏遮罩、觸控優化、字體載入優化
 - **首頁**：可杯（萬華獨家）→ 菊花杯 → 箸拳（coming soon）
 - **自製確認彈窗**：取代原生 confirm()
+- **PWA 支援**：manifest + service worker + 自訂 icon（乾杯！維醺志士）
+- **杯子圖片換乾淨去背版**：cup-*-clear.png（使用者重新去背提供）
+- **菊花杯語音節奏修復**：翻杯後加「下面一位〜」按鈕，語音不再被截斷
+- **聲音提醒 toast**：進入設定頁時提示開啟手機聲音
 
 ### ⚠️ Pending / Known Issues
 
-- **菊花杯 UI 優化**：需要像可杯一樣做畫面逐頁微調
-- **菊花杯翻杯語音被截斷**：第一句沒講完就接第二句
-- **菊花杯 iPad RWD**：基礎版已加，但需要更精緻的調整
+- **菊花杯 UI 優化**：需要像可杯一樣做畫面逐頁微調（UX 細節）
+- **可杯真人頭像**：使用者將提供 6 張夥伴的 cute 版頭像替換 emoji
+- **iPad pixel perfection**：兩個遊戲都需要更精緻的 iPad 排版調整
 - **箸拳 UI 優化**：目前設為 coming soon，等菊花杯完成後再做
 - **遊戲中切換語言會 hang**：已移除遊戲中的語言切換按鈕作為 workaround
-- **使用者將提供**：6 張真人夥伴頭像（可愛動態風格）替換 emoji
-- **使用者將提供**：菊花杯的好看照片
 - **export*.svg 未使用**：高品質但太大（400-600KB），目前用 PNG
 
 ## Deployment
@@ -114,3 +122,6 @@ git add <files> && git commit -m "message" && git push
 - **手機語音 unlock**：必須在使用者首次 touchstart/click 時呼叫 unlockSpeech()
 - **SVG 檔案太大無法直接 Read**：需要用 offset/limit 分段讀
 - **改完檔案要記得 push**：之前多次改了本地但忘記 push，使用者在線上看不到更新
+- **PWA icon 不會自動更新**：改了 icon 後使用者需要刪除主畫面捷徑重新加入
+- **safe-overlay 的 pointer-events**：之前設了 pointer-events:none 導致按鈕無法點擊，已修復
+- **菊花杯翻杯間語音重疊**：需要 await speakAsync 等語音講完，加按鈕讓玩家控制節奏
