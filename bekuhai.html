@@ -792,6 +792,8 @@ const CUP_DATA={
 };
 const KOMA_FACES=['tengu','tengu','hyottoko','hyottoko','okame','okame'];
 const DEFAULT_NAMES=['政道','Fish','Winnie','蔡旻誠','小光頭'];
+const PLAYER_AVATARS={'小光頭':'Sin-head.png'};
+function getAvatar(name,isHuman){if(PLAYER_AVATARS[name])return`<img src="${PLAYER_AVATARS[name]}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;return isHuman?'🧑':'🤖';}
 const LYRICS_JA=['べろべろの〜','神様は','正直な','神様よ','萬華世界維醺志士の方へと','おもむきゃね','おもむきゃね'];
 const LYRICS_ZH=['醉醺醺的神明呀','正直的神明喲','朝著萬華世界','維醺志士的方向','轉過去吧'];
 function getLyrics(){return I18N.lang==='ja'?LYRICS_JA:LYRICS_ZH;}
@@ -843,7 +845,7 @@ function renderSetup(){
   // Hint text
   $('setup-hint').textContent=t('setupToggleHint');
   // Player list
-  let lh='';for(let i=0;i<setupPlayers.length;i++){const p=setupPlayers[i];lh+=`<div class="player-row${i===0?' is-you':''}"><span class="idx">${i+1}</span><input class="name-input" value="${p.name}" oninput="updatePlayerName(${i},this.value)" maxlength="8"><button class="type-toggle" onclick="togglePlayerType(${i})" ${i===0?'disabled style="opacity:0.5;cursor:default;"':''}>${p.isHuman?'🧑':'🤖'}</button></div>`;}$('player-list').innerHTML=lh;
+  let lh='';for(let i=0;i<setupPlayers.length;i++){const p=setupPlayers[i];const av=PLAYER_AVATARS[p.name]?`<img src="${PLAYER_AVATARS[p.name]}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`:(p.isHuman?'🧑':'🤖');lh+=`<div class="player-row${i===0?' is-you':''}"><span class="idx">${i+1}</span><input class="name-input" value="${p.name}" oninput="updatePlayerName(${i},this.value)" maxlength="8"><button class="type-toggle" onclick="togglePlayerType(${i})" ${i===0?'disabled style="opacity:0.5;cursor:default;"':''}>${av}</button></div>`;}$('player-list').innerHTML=lh;
 }
 function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,i)=>{setupPlayers[i].name=inp.value.trim()||('P'+(i+1));});state.players=setupPlayers.map(p=>({name:p.name,isHuman:p.isHuman,ml:0}));state.round=1;state.currentSpinner=0;state.spinning=false;audio.startMusic();show('table-screen');startRound();}
 
@@ -851,7 +853,7 @@ function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,
 // TABLE
 // ============================================================
 function getSeatPositions(count){const p=[];for(let i=0;i<count;i++){const a=(180+(360/count)*i)%360;const r=a*Math.PI/180;const radX=42;const radY=37;const x=Math.max(8,Math.min(92,50+radX*Math.sin(r)));const y=Math.max(12,Math.min(88,54-radY*Math.cos(r)));p.push({x,y,angle:a});}return p;}
-function renderTable(){const l=$('table-layout');l.querySelectorAll('.seat').forEach(s=>s.remove());l.querySelectorAll('.next-btn-float').forEach(b=>b.remove());const pos=getSeatPositions(state.players.length);state.players.forEach((p,i)=>{const s=document.createElement('div');s.className='seat';s.id='seat-'+i;s.style.left=pos[i].x+'%';s.style.top=pos[i].y+'%';s.innerHTML=`<div class="seat-cushion">${p.isHuman?'🧑':'🤖'}</div><div class="s-name">${p.name}</div><div class="s-ml">${p.ml}ml</div>`;l.appendChild(s);});
+function renderTable(){const l=$('table-layout');l.querySelectorAll('.seat').forEach(s=>s.remove());l.querySelectorAll('.next-btn-float').forEach(b=>b.remove());const pos=getSeatPositions(state.players.length);state.players.forEach((p,i)=>{const s=document.createElement('div');s.className='seat';s.id='seat-'+i;s.style.left=pos[i].x+'%';s.style.top=pos[i].y+'%';s.innerHTML=`<div class="seat-cushion">${getAvatar(p.name,p.isHuman)}</div><div class="s-name">${p.name}</div><div class="s-ml">${p.ml}ml</div>`;l.appendChild(s);});
   const kd=$('koma-3d');kd.innerHTML=`<span class="koma-pointer">▼</span><img src="koma-1.png" class="koma-img" alt=""><div class="koma-result-face" id="koma-result-face"></div>`;
 }
 function updateSeats(){state.players.forEach((p,i)=>{const s=$('seat-'+i);if(!s)return;s.querySelector('.s-ml').textContent=p.ml+'ml';s.classList.toggle('is-spinner',i===state.currentSpinner);s.classList.remove('is-target');});}
