@@ -889,7 +889,7 @@ async function showSafeOverlay(){
   audio.playSafeChime();
 
   const ov=document.createElement('div');ov.className='safe-overlay';
-  ov.innerHTML=`<div class="safe-text">${t('safeText')}</div><div class="safe-sub">${line}</div><div class="safe-next-btn" style="visibility:hidden">${I18N.lang==='ja'?'次の人 ▶':'下一位 ▶'}</div>`;
+  ov.innerHTML=`<div class="safe-text">${t('safeText')}</div><div class="safe-sub">${line}</div><div class="safe-next-btn" style="visibility:hidden">${I18N.lang==='ja'?'次の人〜 ▶':'下面一位〜 ▶'}</div>`;
   document.body.appendChild(ov);
 
   // Wait for voice to finish, then show "next" button
