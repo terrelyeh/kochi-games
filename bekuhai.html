@@ -832,7 +832,7 @@ function getRevealVoice(name,cupName,size){
 // ============================================================
 // SETUP
 // ============================================================
-function goSetup(){audio.init();audio.ensureResumed();audio.startMusic();setupCount=4;buildSetupPlayers();show('setup-screen');renderSetup();showSoundToast();}
+function goSetup(){audio.init();audio.ensureResumed();setupCount=4;buildSetupPlayers();show('setup-screen');renderSetup();showSoundToast();}
 function showSoundToast(){const t=document.createElement('div');t.className='sound-toast';t.textContent='🔊 '+( I18N.lang==='ja'?'音声をオンにしてお楽しみください！':'請開啟手機聲音，體驗最佳效果！');document.body.appendChild(t);setTimeout(()=>{t.style.transition='opacity 0.5s';t.style.opacity='0';setTimeout(()=>t.remove(),500);},1800);}
 function buildSetupPlayers(){setupPlayers=[];setupPlayers.push({name:t('you'),isHuman:true});for(let i=1;i<setupCount;i++)setupPlayers.push({name:DEFAULT_NAMES[i-1]||('P'+(i+1)),isHuman:false});}
 function setPlayerCount(n){audio.playClick();setupCount=n;while(setupPlayers.length<n){const i=setupPlayers.length-1;setupPlayers.push({name:DEFAULT_NAMES[i]||('P'+(setupPlayers.length+1)),isHuman:false});}while(setupPlayers.length>n)setupPlayers.pop();renderSetup();}
@@ -845,7 +845,7 @@ function renderSetup(){
   // Player list
   let lh='';for(let i=0;i<setupPlayers.length;i++){const p=setupPlayers[i];lh+=`<div class="player-row${i===0?' is-you':''}"><span class="idx">${i+1}</span><input class="name-input" value="${p.name}" oninput="updatePlayerName(${i},this.value)" maxlength="8"><button class="type-toggle" onclick="togglePlayerType(${i})" ${i===0?'disabled style="opacity:0.5;cursor:default;"':''}>${p.isHuman?'🧑':'🤖'}</button></div>`;}$('player-list').innerHTML=lh;
 }
-function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,i)=>{setupPlayers[i].name=inp.value.trim()||('P'+(i+1));});state.players=setupPlayers.map(p=>({name:p.name,isHuman:p.isHuman,ml:0}));state.round=1;state.currentSpinner=0;state.spinning=false;show('table-screen');startRound();}
+function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,i)=>{setupPlayers[i].name=inp.value.trim()||('P'+(i+1));});state.players=setupPlayers.map(p=>({name:p.name,isHuman:p.isHuman,ml:0}));state.round=1;state.currentSpinner=0;state.spinning=false;audio.startMusic();show('table-screen');startRound();}
 
 // ============================================================
 // TABLE
