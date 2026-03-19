@@ -133,6 +133,7 @@
   }
   .safe-overlay .safe-text{font-family:'Noto Serif JP',serif;font-size:36px;font-weight:900;color:var(--green);animation:bounceIn 0.5s ease;text-shadow:0 0 20px rgba(39,174,96,0.4);}
   .safe-overlay .safe-sub{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--cream-dim);animation:fadeIn 0.4s 0.3s ease both;}
+  .safe-next-btn{font-family:'Noto Serif JP',serif;font-size:20px;font-weight:700;color:var(--gold);background:rgba(212,168,67,0.15);border:2px solid var(--gold);border-radius:14px;padding:14px 40px;margin-top:24px;cursor:pointer;animation:pulse 1.5s infinite;touch-action:manipulation;user-select:none;-webkit-tap-highlight-color:transparent;}
 
   /* === Chrysanthemum Reveal Overlay === */
   .chrys-reveal-overlay{
@@ -212,6 +213,7 @@
     .ctrl-btn{width:52px;height:52px;font-size:24px;}
     .safe-overlay .safe-text{font-size:48px;}
     .safe-overlay .safe-sub{font-size:20px;}
+    .safe-next-btn{font-size:24px;padding:16px 48px;}
     .chrys-reveal-overlay .chrys-flower{font-size:120px;}
     .chrys-reveal-overlay .chrys-title{font-size:42px;}
     .chrys-reveal-overlay .chrys-penalty{font-size:28px;}
@@ -777,7 +779,8 @@ function startTurn(){
     return;
   }
 
-  // Tension voice — pick from category based on progress
+  // Tension voice — pick from category based on progress (delay so it doesn't feel rushed)
+  setTimeout(()=>{
   const s=I18N._strings[I18N.lang];
   const rem=state.cupCount-state.flippedCount;
   let pool;
@@ -787,6 +790,7 @@ function startTurn(){
   else pool=s.tensionEarly;
   const line=pool[randInt(0,pool.length-1)];
   voice.speak(line,{rate:0.95,pitch:rem<=3?1.1:1});
+  },800);
 }
 
 function renderCups(){
@@ -885,15 +889,29 @@ async function showSafeOverlay(){
   audio.playSafeChime();
 
   const ov=document.createElement('div');ov.className='safe-overlay';
-  ov.innerHTML=`<div class="safe-text">${t('safeText')}</div><div class="safe-sub">${line}</div>`;
+  ov.innerHTML=`<div class="safe-text">${t('safeText')}</div><div class="safe-sub">${line}</div><div class="safe-next-btn" style="visibility:hidden">${I18N.lang==='ja'?'次の人 ▶':'下一位 ▶'}</div>`;
   document.body.appendChild(ov);
 
-  voice.speak(line,{rate:1,pitch:1.05});
+  // Wait for voice to finish, then show "next" button
+  const voiceP=voice.speakAsync(line,{rate:1,pitch:1.05});
+  const minTimeP=wait(1500);
+  await Promise.all([voiceP,minTimeP]);
 
-  await wait(1800);
-  ov.style.transition='opacity 0.3s';ov.style.opacity='0';
-  await wait(300);
-  ov.remove();
+  const nextBtn=ov.querySelector('.safe-next-btn');
+  if(nextBtn)nextBtn.style.visibility='visible';
+
+  // Wait for player to tap "next"
+  await new Promise(resolve=>{
+    const dismiss=(e)=>{
+      e.preventDefault();
+      nextBtn.removeEventListener('click',dismiss);
+      nextBtn.removeEventListener('touchstart',dismiss);
+      ov.style.transition='opacity 0.3s';ov.style.opacity='0';
+      setTimeout(()=>{ov.remove();resolve();},300);
+    };
+    nextBtn.addEventListener('click',dismiss);
+    nextBtn.addEventListener('touchstart',dismiss,{passive:false});
+  });
 }
 
 async function showChrysanthemumReveal(){
