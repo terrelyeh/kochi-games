@@ -961,7 +961,8 @@ async function showSafeOverlay(){
   const minTimeP=wait(1500);
   await Promise.all([voiceP,minTimeP]);
 
-  // "下面一位～" voice prompt
+  // Short pause, then "下面一位～" voice prompt
+  await wait(500);
   const nextCall=I18N.lang==='ja'?'次の人〜':'下面一位〜';
   await voice.speakAsync(nextCall,{rate:0.85,pitch:1.1});
 
