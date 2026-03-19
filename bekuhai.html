@@ -907,17 +907,22 @@ function showRevealOverlay(targetPlayer,cup,faceKey){
 // ============================================================
 // KOMA INTERACTION — Press & Hold
 // ============================================================
-function makeKomaInteractive(){
-  const kd=$('koma-3d');kd.classList.add('interactive');let charging=false;
-  const onDown=(e)=>{e.preventDefault();e.stopPropagation();if(state.spinning)return;charging=true;kd.classList.remove('idle');kd.classList.add('charging');audio.playCharge();};
-  const onUp=(e)=>{e.preventDefault();e.stopPropagation();if(!charging||state.spinning)return;charging=false;kd.classList.remove('charging','interactive');removeKomaListeners();doSpin();};
-  const onCancel=()=>{if(!charging)return;charging=false;kd.classList.remove('charging');kd.classList.add('idle');};
-  kd._kl={onDown,onUp,onCancel};
+// Use a single persistent handler with a flag, no rebinding needed
+let komaReady=false;let komaCharging=false;
+function enableKoma(){komaReady=true;komaCharging=false;const kd=$('koma-3d');if(kd){kd.classList.add('interactive');kd.style.pointerEvents='auto';}}
+function disableKoma(){komaReady=false;komaCharging=false;const kd=$('koma-3d');if(kd){kd.classList.remove('interactive','charging');kd.style.pointerEvents='none';}}
+function initKomaOnce(){
+  const kd=$('koma-3d');if(!kd||kd._komaInit)return;kd._komaInit=true;
+  const onDown=(e)=>{e.preventDefault();if(!komaReady||state.spinning)return;komaCharging=true;kd.classList.remove('idle');kd.classList.add('charging');audio.playCharge();};
+  const onUp=(e)=>{e.preventDefault();if(!komaCharging||state.spinning)return;komaCharging=false;disableKoma();doSpin();};
+  const onCancel=()=>{if(!komaCharging)return;komaCharging=false;kd.classList.remove('charging');kd.classList.add('idle');};
   kd.addEventListener('mousedown',onDown);kd.addEventListener('touchstart',onDown,{passive:false});
   kd.addEventListener('mouseup',onUp);kd.addEventListener('touchend',onUp);
   kd.addEventListener('mouseleave',onCancel);kd.addEventListener('touchcancel',onCancel);
 }
-function removeKomaListeners(){const kd=$('koma-3d');if(!kd||!kd._kl)return;const{onDown,onUp,onCancel}=kd._kl;kd.removeEventListener('mousedown',onDown);kd.removeEventListener('touchstart',onDown);kd.removeEventListener('mouseup',onUp);kd.removeEventListener('touchend',onUp);kd.removeEventListener('mouseleave',onCancel);kd.removeEventListener('touchcancel',onCancel);kd._kl=null;}
+// Keep old names for compatibility
+function makeKomaInteractive(){initKomaOnce();enableKoma();}
+function removeKomaListeners(){disableKoma();}
 
 // ============================================================
 // GAME LOGIC
