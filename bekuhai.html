@@ -150,9 +150,9 @@
   .spinner-label{font-family:'Noto Serif JP',serif;font-size:14px;color:var(--gold-light);min-height:20px;}
   .table-surface{position:relative;width:100vw;height:calc(100dvh - 60px);flex-shrink:0;}
   .seat{position:absolute;text-align:center;transform:translate(-50%,-50%);z-index:5;}
-  .seat-cushion{width:72px;height:72px;border-radius:50%;background:radial-gradient(circle at 40% 35%, #8b2020 0%, #6b1515 50%, #4a0e0e 100%);box-shadow:0 4px 12px rgba(0,0,0,0.6),inset 0 1px 3px rgba(255,255,255,0.1);margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:36px;border:3px solid transparent;transition:all 0.3s;overflow:hidden;}
+  .seat-cushion{width:84px;height:84px;border-radius:50%;background:radial-gradient(circle at 40% 35%, #8b2020 0%, #6b1515 50%, #4a0e0e 100%);box-shadow:0 4px 12px rgba(0,0,0,0.6),inset 0 1px 3px rgba(255,255,255,0.1);margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:36px;border:3px solid transparent;transition:all 0.3s;overflow:hidden;}
   .seat-cushion.has-photo{background:none;box-shadow:0 4px 12px rgba(0,0,0,0.4);animation:bobble 3s ease-in-out infinite;}
-  .seat-cushion.has-photo img{width:90%;height:90%;object-fit:contain;border-radius:0;}
+  .seat-cushion.has-photo img{width:100%;height:100%;object-fit:contain;border-radius:0;}
   @keyframes bobble{0%,100%{transform:rotate(-3deg);}25%{transform:rotate(2deg) scale(1.02);}50%{transform:rotate(-2deg);}75%{transform:rotate(3deg) scale(0.98);}}
   .seat .s-name{font-family:'Noto Serif JP',serif;font-size:16px;font-weight:700;white-space:nowrap;color:var(--cream);text-shadow:0 1px 6px rgba(0,0,0,1);}
   .seat .s-ml{display:none;}
@@ -341,9 +341,37 @@
   .bgm-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--gold);color:var(--gold-light);padding:8px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:300;animation:toastIn 0.3s ease,toastOut 0.3s 1.5s ease forwards;}
   .sound-toast{position:fixed;top:calc(50% - 30px);left:50%;transform:translateX(-50%);background:rgba(42,31,26,0.95);border:1.5px solid var(--gold);color:var(--gold-light);padding:14px 28px;border-radius:14px;font-family:'Noto Sans JP',sans-serif;font-size:15px;font-weight:500;z-index:300;animation:toastIn 0.3s ease;white-space:nowrap;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
 
+  /* === Avatar Zoom === */
+  .avatar-zoom{
+    position:fixed;inset:0;background:rgba(26,18,16,0.88);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    z-index:200;animation:fadeIn 0.3s ease;cursor:pointer;
+    -webkit-tap-highlight-color:transparent;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  }
+  .avatar-zoom img{
+    width:220px;height:220px;object-fit:contain;
+    filter:drop-shadow(0 0 30px rgba(212,168,67,0.5));
+    animation:avatarDrunk 1.5s ease-in-out infinite;
+  }
+  @keyframes avatarDrunk{
+    0%{transform:rotate(0deg) scale(1);}
+    15%{transform:rotate(8deg) scale(1.04);}
+    30%{transform:rotate(-7deg) scale(1.06);}
+    45%{transform:rotate(5deg) scale(1.02);}
+    60%{transform:rotate(-5deg) scale(1.05);}
+    75%{transform:rotate(3deg) scale(1.01);}
+    90%{transform:rotate(-2deg) scale(1.03);}
+    100%{transform:rotate(0deg) scale(1);}
+  }
+  .avatar-zoom-name{
+    font-family:'Noto Serif JP',serif;font-size:28px;font-weight:900;
+    color:var(--gold-light);margin-top:16px;text-shadow:0 2px 10px rgba(0,0,0,0.5);
+    animation:fadeIn 0.4s 0.1s ease both;
+  }
+
   /* === RWD === */
   @media(max-width:375px){.ctrl-btn{width:44px;height:44px;font-size:20px;}}
-  @media(max-width:390px){.title{font-size:38px;letter-spacing:4px;}.subtitle{font-size:13px;margin-bottom:16px;}.tagline{font-size:12px;padding:8px 14px;}.rules-box{padding:14px;margin-bottom:14px;}.rules-box ul{font-size:12px;}.btn{font-size:16px;padding:12px 36px;}.cup-card svg{width:56px;height:56px;}.koma-3d{width:90px;height:108px;}.seat-cushion{width:44px;height:44px;font-size:15px;}.seat .s-name{font-size:10px;}.seat .s-ml{font-size:10px;}.gameover-title{font-size:24px;}.reveal-overlay .reveal-target{font-size:28px;}.reveal-overlay .reveal-cup-svg{width:140px;height:140px;}.reveal-overlay .reveal-cup-name{font-size:26px;}.spin-koma-wrap{width:140px;height:140px;}.next-btn-float{font-size:12px;padding:8px 14px;}}
+  @media(max-width:390px){.title{font-size:38px;letter-spacing:4px;}.subtitle{font-size:13px;margin-bottom:16px;}.tagline{font-size:12px;padding:8px 14px;}.rules-box{padding:14px;margin-bottom:14px;}.rules-box ul{font-size:12px;}.btn{font-size:16px;padding:12px 36px;}.cup-card svg{width:56px;height:56px;}.koma-3d{width:90px;height:108px;}.seat-cushion{width:56px;height:56px;font-size:15px;}.seat .s-name{font-size:10px;}.seat .s-ml{font-size:10px;}.gameover-title{font-size:24px;}.reveal-overlay .reveal-target{font-size:28px;}.reveal-overlay .reveal-cup-svg{width:140px;height:140px;}.reveal-overlay .reveal-cup-name{font-size:26px;}.spin-koma-wrap{width:140px;height:140px;}.next-btn-float{font-size:12px;padding:8px 14px;}}
   @media(max-height:700px){.screen{padding:16px 16px;}#table-screen{padding:0;}.title{font-size:36px;}.tagline{margin-bottom:12px;}.rules-box{padding:12px;margin-bottom:12px;}.koma-3d{width:90px;height:108px;}.spin-koma-wrap{width:150px;height:150px;}}
   @media(max-height:550px){.screen{min-height:auto;padding:12px 12px;justify-content:flex-start;}#table-screen{padding:0;justify-content:center;}.title{font-size:30px;margin-bottom:2px;}.title-romaji{display:none;}.subtitle-hokkien{font-size:12px;margin-bottom:8px;}.tagline{margin-bottom:8px;font-size:11px;}.rules-box{margin-bottom:8px;padding:8px;}.btn{padding:10px 28px;font-size:15px;}.koma-3d{width:72px;height:86px;}.seat-cushion{width:40px;height:40px;font-size:14px;}.table-info-bar{padding:4px 12px;}.spin-koma-wrap{width:120px;height:120px;}}
   /* iPad / tablet */
@@ -369,7 +397,7 @@
     .player-row .type-toggle{width:56px;height:56px;font-size:34px;}
     .setup-toggle-hint{font-size:15px;}
     .koma-3d{width:160px;height:192px;}
-    .seat-cushion{width:88px;height:88px;font-size:40px;}
+    .seat-cushion{width:104px;height:104px;font-size:40px;}
     .seat .s-name{font-size:20px;}
     .table-info-bar{padding:10px 24px;border-radius:20px;}
     .table-info-bar .round-info{font-size:16px;}
@@ -577,7 +605,7 @@ const I18N={
       cupTengu:'天狗杯',cupHyottoko:'ひょっとこ杯',cupOkame:'おかめ杯',
       cupTenguDesc:'鼻が邪魔で置けない大杯',cupHyottokoDesc:'口の穴を塞がないと漏れる中杯',cupOkameDesc:'丸底で置けない！一気飲み小杯',
       cupTenguTrait:'長鼻が邪魔',cupHyottokoTrait:'穴から漏れる',cupOkameTrait:'置けない！',
-      tapToContinue:'タップして続く',you:'A君',
+      tapToContinue:'タップして続く',you:'L君',
       voiceSpin:'べろべろの神様は、正直な神様よ、萬華世界維醺志士の方へと、おもむきゃね、おもむきゃね',
       voiceRevealBig1:'うわぁ、{name}！{cup}だ！百四十ミリリットル！これは大変だぁ！',
       voiceRevealBig2:'出たぁ！{name}に{cup}！鼻を持って飲めよ！百四十ミリ、覚悟しろ！',
@@ -618,7 +646,7 @@ const I18N={
       cupTengu:'天狗杯',cupHyottoko:'火男杯',cupOkame:'阿龜杯',
       cupTenguDesc:'長鼻擋路，杯子放不平',cupHyottokoDesc:'嘴巴有洞，不堵就漏酒',cupOkameDesc:'圓底放不下！必須一飲而盡',
       cupTenguTrait:'長鼻擋路',cupHyottokoTrait:'會漏酒！',cupOkameTrait:'放不下！',
-      tapToContinue:'點擊繼續',you:'A君',
+      tapToContinue:'點擊繼續',you:'L君',
       voiceSpin:'醉醺醺的神明呀，正直的神明，朝著萬華世界維醺志士的方向⋯⋯轉過去吧！',
       voiceRevealBig1:'天哪，{name}！抽到{cup}了！一百四十毫升呢，完蛋了啦！',
       voiceRevealBig2:'哈哈哈，{name}中獎了！{cup}！一百四十毫升，今晚你最慘！',
@@ -811,8 +839,8 @@ const CUP_DATA={
   okame:{svg:SVG_OKAME,img:'cup-okame-clear.png',ml:20,nameKey:'cupOkame',descKey:'cupOkameDesc',color:'var(--green)',size:'small'},
 };
 const KOMA_FACES=['tengu','tengu','hyottoko','hyottoko','okame','okame'];
-const DEFAULT_NAMES=['政道','Fish','Winnie','蔡旻辰','小光頭'];
-const PLAYER_AVATARS={'A君':'你-head.png','政道':'政道-head.png','Fish':'fish-head.png','Winnie':'winnie-head.png','蔡旻辰':'蔡旻辰-head.png','小光頭':'小光頭-head.png'};
+const DEFAULT_NAMES=['政道','Fish','Winnie','蔡旻辰','小光頭','L君'];
+const PLAYER_AVATARS={'L君':'你-head.png','政道':'政道-head.png','Fish':'fish-head.png','Winnie':'winnie-head.png','蔡旻辰':'蔡旻辰-head.png','小光頭':'小光頭-head.png'};
 function hasPhoto(name){return!!PLAYER_AVATARS[name];}
 function getAvatar(name){if(PLAYER_AVATARS[name])return`<img src="${PLAYER_AVATARS[name]}" alt="${name}">`;return'🧑';}
 const LYRICS_JA=['べろべろの〜','神様は','正直な','神様よ','萬華世界維醺志士の方へと','おもむきゃね','おもむきゃね'];
@@ -857,15 +885,15 @@ function getRevealVoice(name,cupName,size){
 // ============================================================
 function goSetup(){audio.init();audio.ensureResumed();setupCount=4;buildSetupPlayers();show('setup-screen');renderSetup();showSoundToast();}
 function showSoundToast(){const t=document.createElement('div');t.className='sound-toast';t.textContent='🔊 '+( I18N.lang==='ja'?'音声をオンにしてお楽しみください！':'請開啟手機聲音，體驗最佳效果！');document.body.appendChild(t);setTimeout(()=>{t.style.transition='opacity 0.5s';t.style.opacity='0';setTimeout(()=>t.remove(),500);},1800);}
-function buildSetupPlayers(){setupPlayers=[];setupPlayers.push({name:t('you')});for(let i=1;i<setupCount;i++)setupPlayers.push({name:DEFAULT_NAMES[i-1]||('P'+(i+1))});}
-function setPlayerCount(n){audio.playClick();setupCount=n;while(setupPlayers.length<n){const i=setupPlayers.length-1;setupPlayers.push({name:DEFAULT_NAMES[i]||('P'+(setupPlayers.length+1))});}while(setupPlayers.length>n)setupPlayers.pop();renderSetup();}
+function buildSetupPlayers(){setupPlayers=[];for(let i=0;i<setupCount;i++)setupPlayers.push({name:DEFAULT_NAMES[i]||('P'+(i+1))});}
+function setPlayerCount(n){audio.playClick();setupCount=n;while(setupPlayers.length<n){const idx=setupPlayers.length;setupPlayers.push({name:DEFAULT_NAMES[idx]||('P'+(idx+1))});}while(setupPlayers.length>n)setupPlayers.pop();renderSetup();}
 function updatePlayerName(i,n){setupPlayers[i].name=n;}
 function renderSetup(){
   let ch=`<span class="count-label">${t('setupCount')}</span>`;for(let n=4;n<=6;n++)ch+=`<button class="count-btn${n===setupCount?' selected':''}" onclick="setPlayerCount(${n})">${n}</button>`;$('count-row').innerHTML=ch;
   // Hint text
   $('setup-hint').textContent=t('setupToggleHint');
   // Player list
-  let lh='';for(let i=0;i<setupPlayers.length;i++){const p=setupPlayers[i];const hp=!!PLAYER_AVATARS[p.name];const av=hp?`<img src="${PLAYER_AVATARS[p.name]}" alt="${p.name}">`:'🧑';lh+=`<div class="player-row${i===0?' is-you':''}"><span class="idx">${i+1}</span><input class="name-input" value="${p.name}" oninput="updatePlayerName(${i},this.value)" maxlength="8"><div class="type-toggle${hp?' has-photo':''}">${av}</div></div>`;}$('player-list').innerHTML=lh;
+  let lh='';for(let i=0;i<setupPlayers.length;i++){const p=setupPlayers[i];const hp=!!PLAYER_AVATARS[p.name];const av=hp?`<img src="${PLAYER_AVATARS[p.name]}" alt="${p.name}">`:'🧑';lh+=`<div class="player-row"><span class="idx">${i+1}</span><input class="name-input" value="${p.name}" oninput="updatePlayerName(${i},this.value)" maxlength="8"><div class="type-toggle${hp?' has-photo':''}">${av}</div></div>`;}$('player-list').innerHTML=lh;
 }
 function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,i)=>{setupPlayers[i].name=inp.value.trim()||('P'+(i+1));});state.players=setupPlayers.map(p=>({name:p.name,ml:0}));state.round=1;state.currentSpinner=0;state.spinning=false;audio.startMusic();show('table-screen');startRound();}
 
@@ -873,11 +901,22 @@ function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,
 // TABLE
 // ============================================================
 function getSeatPositions(count){const p=[];for(let i=0;i<count;i++){const a=(180+(360/count)*i)%360;const r=a*Math.PI/180;const radX=40;const radY=36;const x=Math.max(12,Math.min(88,50+radX*Math.sin(r)));const y=Math.max(14,Math.min(86,54-radY*Math.cos(r)));p.push({x,y,angle:a});}return p;}
-function renderTable(){const l=$('table-layout');l.querySelectorAll('.seat').forEach(s=>s.remove());l.querySelectorAll('.next-btn-float').forEach(b=>b.remove());const pos=getSeatPositions(state.players.length);state.players.forEach((p,i)=>{const s=document.createElement('div');s.className='seat';s.id='seat-'+i;s.style.left=pos[i].x+'%';s.style.top=pos[i].y+'%';s.innerHTML=`<div class="seat-cushion${hasPhoto(p.name)?' has-photo':''}">${getAvatar(p.name)}</div><div class="s-name">${p.name}</div><div class="s-ml">${p.ml}ml</div>`;l.appendChild(s);});
+function renderTable(){const l=$('table-layout');l.querySelectorAll('.seat').forEach(s=>s.remove());l.querySelectorAll('.next-btn-float').forEach(b=>b.remove());const pos=getSeatPositions(state.players.length);state.players.forEach((p,i)=>{const s=document.createElement('div');s.className='seat';s.id='seat-'+i;s.style.left=pos[i].x+'%';s.style.top=pos[i].y+'%';s.innerHTML=`<div class="seat-cushion${hasPhoto(p.name)?' has-photo':''}">${getAvatar(p.name)}</div><div class="s-name">${p.name}</div><div class="s-ml">${p.ml}ml</div>`;s.onclick=()=>showAvatarZoom(p.name);l.appendChild(s);});
   const kd=$('koma-3d');kd.innerHTML=`<span class="koma-pointer">▼</span><img src="koma-1.png" class="koma-img" alt=""><div class="koma-result-face" id="koma-result-face"></div>`;
 }
 function updateSeats(){state.players.forEach((p,i)=>{const s=$('seat-'+i);if(!s)return;s.querySelector('.s-ml').textContent=p.ml+'ml';s.classList.toggle('is-spinner',i===state.currentSpinner);s.classList.remove('is-target');});}
 function highlightTarget(idx){state.players.forEach((_,i)=>{const s=$('seat-'+i);if(s){s.classList.toggle('is-target',i===idx);s.classList.remove('is-spinner');}});}
+
+// ============================================================
+// AVATAR ZOOM — tap seat to enlarge with drunk wobble
+// ============================================================
+function showAvatarZoom(name){
+  const src=PLAYER_AVATARS[name];if(!src||state.spinning)return;
+  const ov=document.createElement('div');ov.className='avatar-zoom';
+  ov.innerHTML=`<img src="${src}" alt="${name}"><div class="avatar-zoom-name">${name}</div>`;
+  ov.onclick=()=>{ov.style.transition='opacity 0.3s';ov.style.opacity='0';setTimeout(()=>ov.remove(),300);};
+  document.body.appendChild(ov);
+}
 
 // ============================================================
 // LYRICS
