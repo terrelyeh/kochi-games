@@ -398,7 +398,7 @@
     .confirm-msg{font-size:20px;}
     .confirm-btns button{font-size:18px;padding:12px 32px;}
   }
-  @media(orientation:landscape){
+  @media(orientation:landscape) and (max-width:1024px){
     body::before{content:'';position:fixed;inset:0;background:var(--bg);z-index:99999;}
     body::after{content:'📱';position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:100000;font-size:48px;animation:rotateTip 1.5s ease-in-out infinite;}
     @keyframes rotateTip{0%,100%{transform:translate(-50%,-50%) rotate(0deg);}50%{transform:translate(-50%,-50%) rotate(-90deg);}}
