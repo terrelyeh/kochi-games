@@ -160,6 +160,9 @@
   .seat.is-spinner .seat-cushion{border-color:var(--gold);box-shadow:0 0 20px rgba(212,168,67,0.6),0 4px 10px rgba(0,0,0,0.5);}
   .seat.is-spinner .seat-cushion.has-photo{animation:bobble 0.5s ease-in-out infinite;box-shadow:0 0 24px rgba(212,168,67,0.7),0 0 48px rgba(212,168,67,0.3);}
   @keyframes spinnerPulse{0%,100%{transform:translate(-50%,-50%) scale(1);}50%{transform:translate(-50%,-50%) scale(1.15);}}
+  /* 7-8 players: shrink seats to avoid crowding */
+  .many-seats .seat-cushion{width:68px;height:68px;}
+  .many-seats .seat .s-name{font-size:13px;}
   .seat.is-target .seat-cushion{border-color:var(--red-bright);animation:targetFlash 0.6s infinite;}
   .seat.is-target .seat-cushion.has-photo{animation:targetFlash 0.6s infinite;box-shadow:0 0 24px rgba(231,76,60,0.6);}
 
@@ -371,7 +374,7 @@
 
   /* === RWD === */
   @media(max-width:375px){.ctrl-btn{width:44px;height:44px;font-size:20px;}}
-  @media(max-width:390px){.title{font-size:38px;letter-spacing:4px;}.subtitle{font-size:13px;margin-bottom:16px;}.tagline{font-size:12px;padding:8px 14px;}.rules-box{padding:14px;margin-bottom:14px;}.rules-box ul{font-size:12px;}.btn{font-size:16px;padding:12px 36px;}.cup-card svg{width:56px;height:56px;}.koma-3d{width:90px;height:108px;}.seat-cushion{width:56px;height:56px;font-size:15px;}.seat .s-name{font-size:10px;}.seat .s-ml{font-size:10px;}.gameover-title{font-size:24px;}.reveal-overlay .reveal-target{font-size:28px;}.reveal-overlay .reveal-cup-svg{width:140px;height:140px;}.reveal-overlay .reveal-cup-name{font-size:26px;}.spin-koma-wrap{width:140px;height:140px;}.next-btn-float{font-size:12px;padding:8px 14px;}}
+  @media(max-width:390px){.title{font-size:38px;letter-spacing:4px;}.subtitle{font-size:13px;margin-bottom:16px;}.tagline{font-size:12px;padding:8px 14px;}.rules-box{padding:14px;margin-bottom:14px;}.rules-box ul{font-size:12px;}.btn{font-size:16px;padding:12px 36px;}.cup-card svg{width:56px;height:56px;}.koma-3d{width:90px;height:108px;}.seat-cushion{width:56px;height:56px;font-size:15px;}.many-seats .seat-cushion{width:48px;height:48px;}.seat .s-name{font-size:10px;}.seat .s-ml{font-size:10px;}.gameover-title{font-size:24px;}.reveal-overlay .reveal-target{font-size:28px;}.reveal-overlay .reveal-cup-svg{width:140px;height:140px;}.reveal-overlay .reveal-cup-name{font-size:26px;}.spin-koma-wrap{width:140px;height:140px;}.next-btn-float{font-size:12px;padding:8px 14px;}}
   @media(max-height:700px){.screen{padding:16px 16px;}#table-screen{padding:0;}.title{font-size:36px;}.tagline{margin-bottom:12px;}.rules-box{padding:12px;margin-bottom:12px;}.koma-3d{width:90px;height:108px;}.spin-koma-wrap{width:150px;height:150px;}}
   @media(max-height:550px){.screen{min-height:auto;padding:12px 12px;justify-content:flex-start;}#table-screen{padding:0;justify-content:center;}.title{font-size:30px;margin-bottom:2px;}.title-romaji{display:none;}.subtitle-hokkien{font-size:12px;margin-bottom:8px;}.tagline{margin-bottom:8px;font-size:11px;}.rules-box{margin-bottom:8px;padding:8px;}.btn{padding:10px 28px;font-size:15px;}.koma-3d{width:72px;height:86px;}.seat-cushion{width:40px;height:40px;font-size:14px;}.table-info-bar{padding:4px 12px;}.spin-koma-wrap{width:120px;height:120px;}}
   /* iPad / tablet */
@@ -839,8 +842,8 @@ const CUP_DATA={
   okame:{svg:SVG_OKAME,img:'cup-okame-clear.png',ml:20,nameKey:'cupOkame',descKey:'cupOkameDesc',color:'var(--green)',size:'small'},
 };
 const KOMA_FACES=['tengu','tengu','hyottoko','hyottoko','okame','okame'];
-const DEFAULT_NAMES=['政道','Fish','Winnie','蔡旻辰','小光頭','L君'];
-const PLAYER_AVATARS={'L君':'你-head.png','政道':'政道-head.png','Fish':'fish-head.png','Winnie':'winnie-head.png','蔡旻辰':'蔡旻辰-head.png','小光頭':'小光頭-head.png'};
+const DEFAULT_NAMES=['政道','Fish','Winnie','蔡旻辰','小光頭','琬蒨','YY','L君'];
+const PLAYER_AVATARS={'L君':'你-head.png','政道':'政道-head.png','Fish':'fish-head.png','Winnie':'winnie-head.png','蔡旻辰':'蔡旻辰-head.png','小光頭':'小光頭-head.png','琬蒨':'琬蒨-head.png','YY':'yy-head.png'};
 function hasPhoto(name){return!!PLAYER_AVATARS[name];}
 function getAvatar(name){if(PLAYER_AVATARS[name])return`<img src="${PLAYER_AVATARS[name]}" alt="${name}">`;return'🧑';}
 const LYRICS_JA=['べろべろの〜','神様は','正直な','神様よ','萬華世界維醺志士の方へと','おもむきゃね','おもむきゃね'];
@@ -883,13 +886,13 @@ function getRevealVoice(name,cupName,size){
 // ============================================================
 // SETUP
 // ============================================================
-function goSetup(){audio.init();audio.ensureResumed();setupCount=5;buildSetupPlayers();show('setup-screen');renderSetup();showSoundToast();}
+function goSetup(){audio.init();audio.ensureResumed();setupCount=6;buildSetupPlayers();show('setup-screen');renderSetup();showSoundToast();}
 function showSoundToast(){const t=document.createElement('div');t.className='sound-toast';t.textContent='🔊 '+( I18N.lang==='ja'?'音声をオンにしてお楽しみください！':'請開啟手機聲音，體驗最佳效果！');document.body.appendChild(t);setTimeout(()=>{t.style.transition='opacity 0.5s';t.style.opacity='0';setTimeout(()=>t.remove(),500);},1800);}
 function buildSetupPlayers(){setupPlayers=[];for(let i=0;i<setupCount;i++)setupPlayers.push({name:DEFAULT_NAMES[i]||('P'+(i+1))});}
 function setPlayerCount(n){audio.playClick();setupCount=n;while(setupPlayers.length<n){const idx=setupPlayers.length;setupPlayers.push({name:DEFAULT_NAMES[idx]||('P'+(idx+1))});}while(setupPlayers.length>n)setupPlayers.pop();renderSetup();}
 function updatePlayerName(i,n){setupPlayers[i].name=n;}
 function renderSetup(){
-  let ch=`<span class="count-label">${t('setupCount')}</span>`;for(let n=4;n<=6;n++)ch+=`<button class="count-btn${n===setupCount?' selected':''}" onclick="setPlayerCount(${n})">${n}</button>`;$('count-row').innerHTML=ch;
+  let ch=`<span class="count-label">${t('setupCount')}</span>`;for(let n=4;n<=8;n++)ch+=`<button class="count-btn${n===setupCount?' selected':''}" onclick="setPlayerCount(${n})">${n}</button>`;$('count-row').innerHTML=ch;
   // Hint text
   $('setup-hint').textContent=t('setupToggleHint');
   // Player list
@@ -901,7 +904,7 @@ function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,
 // TABLE
 // ============================================================
 function getSeatPositions(count){const p=[];for(let i=0;i<count;i++){const a=(180+(360/count)*i)%360;const r=a*Math.PI/180;const radX=40;const radY=36;const x=Math.max(12,Math.min(88,50+radX*Math.sin(r)));const y=Math.max(14,Math.min(86,54-radY*Math.cos(r)));p.push({x,y,angle:a});}return p;}
-function renderTable(){const l=$('table-layout');l.querySelectorAll('.seat').forEach(s=>s.remove());l.querySelectorAll('.next-btn-float').forEach(b=>b.remove());const pos=getSeatPositions(state.players.length);state.players.forEach((p,i)=>{const s=document.createElement('div');s.className='seat';s.id='seat-'+i;s.style.left=pos[i].x+'%';s.style.top=pos[i].y+'%';s.innerHTML=`<div class="seat-cushion${hasPhoto(p.name)?' has-photo':''}">${getAvatar(p.name)}</div><div class="s-name">${p.name}</div><div class="s-ml">${p.ml}ml</div>`;s.onclick=()=>showAvatarZoom(p.name);l.appendChild(s);});
+function renderTable(){const l=$('table-layout');l.querySelectorAll('.seat').forEach(s=>s.remove());l.querySelectorAll('.next-btn-float').forEach(b=>b.remove());const n=state.players.length;const pos=getSeatPositions(n);l.classList.toggle('many-seats',n>=7);state.players.forEach((p,i)=>{const s=document.createElement('div');s.className='seat';s.id='seat-'+i;s.style.left=pos[i].x+'%';s.style.top=pos[i].y+'%';s.innerHTML=`<div class="seat-cushion${hasPhoto(p.name)?' has-photo':''}">${getAvatar(p.name)}</div><div class="s-name">${p.name}</div><div class="s-ml">${p.ml}ml</div>`;s.onclick=()=>showAvatarZoom(p.name);l.appendChild(s);});
   const kd=$('koma-3d');kd.innerHTML=`<span class="koma-pointer">▼</span><img src="koma-1.png" class="koma-img" alt=""><div class="koma-result-face" id="koma-result-face"></div>`;
 }
 function updateSeats(){state.players.forEach((p,i)=>{const s=$('seat-'+i);if(!s)return;s.querySelector('.s-ml').textContent=p.ml+'ml';s.classList.toggle('is-spinner',i===state.currentSpinner);s.classList.remove('is-target');});}
