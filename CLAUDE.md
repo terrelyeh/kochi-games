@@ -14,7 +14,8 @@
 - PWA（manifest.json + sw.js，可加入主畫面、離線使用）
 - Google Fonts：Noto Serif JP（標題/杯名）+ Noto Sans JP（UI）+ Inter（數字）
 - Web Speech API（SpeechSynthesis）— 雙語語音 ja-JP / zh-TW
-- Web Audio API — 合成 BGM（shamisen / matsuri）+ MP3 BGM（健身操）
+- Web Audio API — SFX 音效合成（click / spin / flip / drink / win）
+- HTML Audio — MP3 BGM（健身操 + 月夜思鄉 + 夏日廟會 + 祭典夜晚）
 - CSS Custom Properties 居酒屋深色主題
 - GitHub repo → Vercel 自動部署
 
@@ -26,7 +27,10 @@ kochi-games/
 ├── bekuhai.html        # 可杯（獨樂酒杯遊戲）— 82KB, 已完成大量 UI 優化
 ├── kikuhai.html        # 菊花杯（清酒版俄羅斯輪盤）— 56KB, 剛完成基礎版
 ├── hashiken.html       # 箸拳（猜拳對戰）— 54KB, 功能完成但 UI 未優化
-├── bgm-kenshinso.mp3   # 健身操 BGM（3MB）
+├── bgm-kenshinso.mp3   # 健身操 BGM（3MB）— 可杯專用
+├── 月夜思鄉.mp3        # 月夜思鄉 BGM（3.4MB）— 兩遊戲共用
+├── 夏日廟會.mp3        # 夏日廟會 BGM（3.1MB）— 兩遊戲共用
+├── 祭典夜晚.mp3        # 祭典夜晚 BGM（3.0MB）— 兩遊戲共用
 ├── manifest.json       # PWA manifest（app name: 乾杯！維醺志士）
 ├── sw.js               # Service Worker（離線快取）
 ├── icon-192.png        # PWA icon 192x192（天狗杯派對圖）
@@ -44,6 +48,9 @@ kochi-games/
 ├── winnie-head.png     # Winnie Q版頭像
 ├── 蔡旻辰-head.png     # 蔡旻辰 Q版頭像
 ├── 小光頭-head.png     # 小光頭 Q版頭像
+├── 琬蒨-head.png       # 琬蒨 Q版頭像
+├── yy-head.png         # YY Q版頭像
+├── kaya-head.png       # Kaya Q版頭像
 ├── cup-*.png (舊版)    # 舊的去背圖（有白邊，已不使用）
 ├── export*.svg         # 高品質 SVG（400-600KB，未使用）
 ```
@@ -64,10 +71,12 @@ kochi-games/
 - VoiceManager 支援 jaVoice + zhVoice
 
 ### 音頻規則
-- BGM 壓低（musicGain 0.25-0.6），SFX 較大（0.5）
+- **所有 BGM 皆為 MP3**（已移除所有合成 BGM oscillator 代碼）
+- BGM 統一 volume=0.08，語音播放時 duck 到 0.01
+- SFX 走 Web Audio API（sfxGain 0.5）
 - Voice volume = 1.0（要切過環境噪音）
-- 語音播放時 BGM 自動 duck（降低音量）
 - MP3 BGM 靜音用 pause/play，不用 volume=0
+- `_bgmCache` 物件快取 Audio 元素，避免重複建立
 - 所有音頻需要使用者首次互動才能啟動（瀏覽器限制）
 
 ### 設計規範
@@ -80,7 +89,7 @@ kochi-games/
 - 木紋背景桌面風格（bekuhai table-screen）
 
 ### 可杯預設玩家名
-1=政道, 2=Fish, 3=Winnie, 4=蔡旻辰, 5=小光頭, 6=琬蒨, 7=YY, 8=L君（預設 5 人，支援 4～8 人）
+1=政道, 2=Fish, 3=Winnie, 4=蔡旻辰, 5=小光頭, 6=琬蒨, 7=YY, 8=Kaya（預設 5 人，支援 4～8 人）
 
 ## Current Status
 
@@ -88,7 +97,7 @@ kochi-games/
 
 - **可杯 UI 大改版**：木紋圓桌俯瞰、真實杯子/陀螺 PNG、座墊式座位、全螢幕 Overlay 優化
 - **可杯語音系統**：每種杯型 8 句隨機語音（含維醺志士梗＋人多起鬨台詞）、中日雙語
-- **可杯 Q版真人頭像**：6 張夥伴 cute 版頭像（政道/Fish/Winnie/蔡旻辰/小光頭/L君），取代 emoji
+- **可杯 Q版真人頭像**：8 張夥伴 cute 版頭像（政道/Fish/Winnie/蔡旻辰/小光頭/琬蒨/YY/Kaya），取代 emoji
 - **頭像放大互動**：點擊任何玩家頭像全螢幕放大 + 搖頭晃腦醉態動畫（遊戲桌面 + 座席安排都支援）
 - **下一回合按鈕定位修復**：golden label 出現在對應玩家頭像附近（不再固定螢幕底部），帶脈搏動畫
 - **玩家重新排序**：預設順序改為 政道→Fish→Winnie→蔡旻辰→小光頭→L君，預設 5 人
@@ -102,6 +111,7 @@ kochi-games/
 - **杯子圖片換乾淨去背版**：cup-*-clear.png（使用者重新去背提供）
 - **菊花杯語音節奏修復**：翻杯後加「下面一位〜」按鈕，語音不再被截斷
 - **聲音提醒 toast**：進入設定頁時提示開啟手機聲音
+- **全 MP3 BGM 系統**：移除所有合成 BGM（shamisen/matsuri/miyako），改用 4 首 MP3（可杯：健身操+月夜思鄉+夏日廟會+祭典夜晚，菊花杯：月夜思鄉+夏日廟會+祭典夜晚）
 
 ### ⚠️ Pending / Known Issues
 
@@ -129,7 +139,7 @@ git add <files> && git commit -m "message" && git push
 - **Edit tool "not unique" 錯誤**：bekuhai.html 有 ja/zh 兩段 I18N，改字串時要提供足夠上下文區分
 - **Edit tool "file not read" 錯誤**：長檔案在多次編輯後需要重新 read 才能繼續 edit
 - **遊戲中切換語言會 hang**：根本原因未修，目前用隱藏語言按鈕 workaround
-- **MP3 BGM 與合成 BGM 音量差異大**：MP3 走 Audio 元素（volume 0.08），合成走 AudioContext（gain 0.6）
+- **BGM 音量統一 0.08**：所有 BGM 皆為 MP3，duck 時降至 0.01，不再有合成 BGM 音量差異
 - **手機語音 unlock**：必須在使用者首次 touchstart/click 時呼叫 unlockSpeech()
 - **SVG 檔案太大無法直接 Read**：需要用 offset/limit 分段讀
 - **改完檔案要記得 push**：之前多次改了本地但忘記 push，使用者在線上看不到更新

@@ -323,7 +323,7 @@ const I18N={
       backHomeBtn:'トップへ',
       confirmHome:'トップに戻りますか？',
       lastCupAuto:'最後の一杯…めくるまでもない、菊花はここだ！',
-      bgmShamisen:'🎶 宴会',bgmMatsuri:'🥁 祭り',
+      bgmMoonlight:'🌙 月夜思郷',bgmSummer:'🏮 夏祭り',bgmFestival:'🎆 祭りの夜',
       // Tension voices (0-indexed by flippedCount)
       tensionEarly:[
         '一番手、どうぞ！',
@@ -430,7 +430,7 @@ const I18N={
       backHomeBtn:'回首頁',
       confirmHome:'確定要返回首頁嗎？',
       lastCupAuto:'最後一杯⋯不用翻了，菊花一定在這！',
-      bgmShamisen:'🎶 宴會',bgmMatsuri:'🥁 祭典',
+      bgmMoonlight:'🌙 月夜思鄉',bgmSummer:'🏮 夏日廟會',bgmFestival:'🎆 祭典夜晚',
       // Tension voices — early (cups 1-4)
       tensionEarly:[
         '這一位勇者，請翻杯！',
@@ -531,58 +531,21 @@ function toggleLang(){
 // ============================================================
 // AUDIO
 // ============================================================
-const BGM_ORDER=['shamisen','matsuri'];
-const BGM_ICONS={shamisen:'🎶',matsuri:'🥁'};
-const BGM_KEYS={shamisen:'bgmShamisen',matsuri:'bgmMatsuri'};
+const BGM_ORDER=['moonlight','summer','festival'];
+const BGM_ICONS={moonlight:'🌙',summer:'🏮',festival:'🎆'};
+const BGM_KEYS={moonlight:'bgmMoonlight',summer:'bgmSummer',festival:'bgmFestival'};
+const BGM_FILES={moonlight:'月夜思鄉.mp3',summer:'夏日廟會.mp3',festival:'祭典夜晚.mp3'};
 
 class AudioManager{
-  constructor(){this.ctx=null;this.masterGain=null;this.musicGain=null;this.sfxGain=null;this.muted=false;this.musicPlaying=false;this._musicInterval=null;this._musicNodes=[];this.bgmStyle='matsuri';}
+  constructor(){this.ctx=null;this.masterGain=null;this.musicGain=null;this.sfxGain=null;this.muted=false;this.musicPlaying=false;this.bgmStyle='moonlight';this._bgmAudio=null;this._bgmCache={};}
   init(){if(this.ctx)return;this.ctx=new(window.AudioContext||window.webkitAudioContext)();this.masterGain=this.ctx.createGain();this.masterGain.connect(this.ctx.destination);this.musicGain=this.ctx.createGain();this.musicGain.gain.value=1.0;this.musicGain.connect(this.masterGain);this.sfxGain=this.ctx.createGain();this.sfxGain.gain.value=0.5;this.sfxGain.connect(this.masterGain);}
   ensureResumed(){if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();}
-  toggleMute(){this.muted=!this.muted;if(this.masterGain)this.masterGain.gain.value=this.muted?0:1;document.getElementById('mute-toggle').textContent=this.muted?'🔇':'🔊';if(this.muted)speechSynthesis.cancel();}
+  toggleMute(){this.muted=!this.muted;if(this.masterGain)this.masterGain.gain.value=this.muted?0:1;if(this._bgmAudio){if(this.muted){this._bgmAudio.pause();}else{this._bgmAudio.volume=0.08;if(this.musicPlaying)this._bgmAudio.play().catch(()=>{});}}document.getElementById('mute-toggle').textContent=this.muted?'🔇':'🔊';if(this.muted)speechSynthesis.cancel();}
 
-  // --- BGM: Shamisen ---
-  startMusicShamisen(){const c=this.ctx;const ph=[293.66,329.63,392,440,493.88,440,392,329.63,293.66,392,493.88,440,329.63,392,440,293.66];const dur=0.4;let i=0;const p=()=>{if(!this.musicPlaying)return;const f=ph[i%ph.length];const o=c.createOscillator();o.type='sawtooth';o.frequency.value=f;const fl=c.createBiquadFilter();fl.type='bandpass';fl.frequency.value=f*2.5;fl.Q.value=3;const e=c.createGain();const n=c.currentTime;e.gain.setValueAtTime(0.14,n);e.gain.exponentialRampToValueAtTime(0.001,n+dur*0.85);o.connect(fl);fl.connect(e);e.connect(this.musicGain);o.start(n);o.stop(n+dur);if(i%4===0){const t=c.createOscillator();t.type='triangle';t.frequency.setValueAtTime(100,n);t.frequency.exponentialRampToValueAtTime(40,n+0.2);const tg=c.createGain();tg.gain.setValueAtTime(0.18,n);tg.gain.exponentialRampToValueAtTime(0.001,n+0.25);t.connect(tg);tg.connect(this.musicGain);t.start(n);t.stop(n+0.25);}i++;};p();this._musicInterval=setInterval(p,dur*1000);}
-
-  // --- BGM: Matsuri ---
-  startMusicMatsuri(){
-    const c=this.ctx;const beatDur=0.22;let beat=0;
-    const melody=[392,440,523.25,587.33,659.25,587.33,523.25,440,392,523.25,659.25,587.33,440,523.25,587.33,392];
-    const p=()=>{
-      if(!this.musicPlaying)return;const n=c.currentTime;const bm=beat%8;
-      if(bm%2===0){
-        const accent=bm===0||bm===6;
-        const o=c.createOscillator();o.type='triangle';
-        o.frequency.setValueAtTime(accent?100:75,n);o.frequency.exponentialRampToValueAtTime(38,n+0.12);
-        const g=c.createGain();g.gain.setValueAtTime(accent?0.28:0.16,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.18);
-        o.connect(g);g.connect(this.musicGain);o.start(n);o.stop(n+0.18);
-        const bs=c.sampleRate*0.015,b=c.createBuffer(1,bs,c.sampleRate),d=b.getChannelData(0);
-        for(let j=0;j<bs;j++)d[j]=(Math.random()*2-1)*Math.pow(1-j/bs,3);
-        const ns=c.createBufferSource();ns.buffer=b;const ng=c.createGain();
-        ng.gain.setValueAtTime(accent?0.14:0.06,n);ng.gain.exponentialRampToValueAtTime(0.001,n+0.06);
-        ns.connect(ng);ng.connect(this.musicGain);ns.start(n);
-      }
-      if(beat%4===0){
-        const freq=melody[(beat/4)%melody.length];
-        const o=c.createOscillator();o.type='sine';o.frequency.value=freq;
-        const lfo=c.createOscillator();lfo.type='sine';lfo.frequency.value=5;
-        const lfoG=c.createGain();lfoG.gain.value=3;
-        lfo.connect(lfoG);lfoG.connect(o.frequency);lfo.start(n);lfo.stop(n+beatDur*3.5);
-        const g=c.createGain();g.gain.setValueAtTime(0.05,n);g.gain.linearRampToValueAtTime(0.07,n+beatDur);
-        g.gain.linearRampToValueAtTime(0.03,n+beatDur*3);g.gain.exponentialRampToValueAtTime(0.001,n+beatDur*3.5);
-        o.connect(g);g.connect(this.musicGain);o.start(n);o.stop(n+beatDur*4);
-      }
-      if(beat%16===0){
-        const o=c.createOscillator();o.type='sine';o.frequency.value=1480;
-        const g=c.createGain();g.gain.setValueAtTime(0.05,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.6);
-        o.connect(g);g.connect(this.musicGain);o.start(n);o.stop(n+0.6);
-      }
-      beat++;
-    };p();this._musicInterval=setInterval(p,beatDur*1000);
-  }
-
-  startMusic(){if(this.musicPlaying)return;this.init();this.musicPlaying=true;if(this.bgmStyle==='matsuri')this.startMusicMatsuri();else this.startMusicShamisen();}
-  stopMusic(){this.musicPlaying=false;if(this._musicInterval){clearInterval(this._musicInterval);this._musicInterval=null;}this._musicNodes.forEach(({osc,gain})=>{try{gain.gain.linearRampToValueAtTime(0,this.ctx.currentTime+0.5);osc.stop(this.ctx.currentTime+0.6);}catch(e){}});this._musicNodes=[];}
+  // --- All BGM via MP3 ---
+  _playMP3(key){if(this._bgmAudio){this._bgmAudio.pause();this._bgmAudio.currentTime=0;}if(!this._bgmCache[key]){this._bgmCache[key]=new Audio(BGM_FILES[key]);this._bgmCache[key].loop=true;}this._bgmAudio=this._bgmCache[key];this._bgmAudio.volume=this.muted?0:0.08;this._bgmAudio.play().catch(()=>{});}
+  startMusic(){if(this.musicPlaying)return;this.init();this.musicPlaying=true;this._playMP3(this.bgmStyle);}
+  stopMusic(){this.musicPlaying=false;if(this._bgmAudio){this._bgmAudio.pause();this._bgmAudio.currentTime=0;}}
 
   playClick(){this.init();const c=this.ctx,n=c.currentTime;const o=c.createOscillator();o.type='sine';o.frequency.value=1200;const g=c.createGain();g.gain.setValueAtTime(0.15,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.08);o.connect(g);g.connect(this.sfxGain);o.start(n);o.stop(n+0.08);}
 
@@ -663,8 +626,8 @@ class VoiceManager{
       v.find(x=>x.lang&&x.lang.startsWith('zh'))||null;
     this.ready=true;
   }
-  _duckBGM(){if(audio.musicGain)audio.musicGain.gain.value=0.05;}
-  _unduckBGM(){if(audio.musicGain)audio.musicGain.gain.value=1.0;}
+  _duckBGM(){if(audio._bgmAudio)audio._bgmAudio.volume=0.01;}
+  _unduckBGM(){if(audio.muted)return;if(audio._bgmAudio)audio._bgmAudio.volume=0.08;}
   speak(text,opts={}){
     if(audio.muted)return;if(!this.ready)this.init();
     this._duckBGM();

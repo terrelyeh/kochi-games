@@ -102,7 +102,7 @@
 | voiceGameover | 酒豪決定！おめでとう！さすがだねぇ！ | 酒豪誕生！恭喜恭喜！太厲害了！ |
 
 ### 預設玩家名稱
-1. 政道　2. Fish　3. Winnie　4. 蔡旻辰　5. 小光頭　6. 琬蒨　7. YY　8. L君（預設 5 人）
+1. 政道　2. Fish　3. Winnie　4. 蔡旻辰　5. 小光頭　6. 琬蒨　7. YY　8. Kaya（預設 5 人）
 
 ### Q版真人頭像 & 互動
 
@@ -257,12 +257,15 @@ kochi-games/
 ├── hashiken.html           # 箸拳（~1320 行）
 ├── manifest.json           # PWA manifest
 ├── sw.js                   # Service Worker
-├── bgm-kenshinso.mp3       # 健身操 BGM（3MB）
+├── bgm-kenshinso.mp3       # 健身操 BGM（3MB）— 可杯專用
+├── 月夜思鄉.mp3            # 月夜思鄉 BGM（3.4MB）
+├── 夏日廟會.mp3            # 夏日廟會 BGM（3.1MB）
+├── 祭典夜晚.mp3            # 祭典夜晚 BGM（3.0MB）
 ├── icon-192.png / 512.png  # PWA icon
 ├── cup-*-clear.png         # 杯子去背圖（3 種）
 ├── cup-tengu-splash.png    # 天狗杯 GameOver 版
 ├── koma-1/2/3.png          # 六角陀螺（3 角度）
-└── *-head.png              # Q版真人頭像（8 張：你/政道/fish/winnie/蔡旻辰/小光頭/琬蒨/yy）
+└── *-head.png              # Q版真人頭像（8 張：政道/fish/winnie/蔡旻辰/小光頭/琬蒨/yy/kaya）
 ```
 
 ### 共用技術棧
@@ -271,8 +274,8 @@ kochi-games/
 |------|------|
 | **Google Fonts** | Noto Serif JP（標題/杯名）+ Noto Sans JP（UI）+ Inter（數字） |
 | **Web Speech API** | SpeechSynthesis 雙語語音（ja-JP / zh-TW） |
-| **Web Audio API** | 合成 BGM（shamisen / matsuri）+ 所有 SFX |
-| **HTML Audio** | MP3 BGM（健身操） |
+| **Web Audio API** | 所有 SFX 音效合成 |
+| **HTML Audio** | MP3 BGM（健身操 / 月夜思鄉 / 夏日廟會 / 祭典夜晚） |
 | **CSS Custom Properties** | 居酒屋深色主題色彩系統 |
 | **PWA** | manifest.json + Service Worker 離線快取 |
 
@@ -315,17 +318,18 @@ t('roundInfo', { n: 3 })  // → "第 3 回合 / 共 8 回合"
 
 ```
 AudioManager
-├── BGM（3 種合成 + 1 種 MP3）
-│   ├── shamisen — 三味線撥弦
-│   ├── matsuri — 太鼓 + 笛子 + 鉦
-│   └── enkai — 健身操 MP3
-├── SFX
+├── BGM（全部 MP3，統一 volume=0.08）
+│   ├── enkai — 🏋️ 健身操（可杯專用）
+│   ├── moonlight — 🌙 月夜思鄉
+│   ├── summer — 🏮 夏日廟會
+│   └── festival — 🎆 祭典夜晚
+├── SFX（Web Audio API 合成）
 │   ├── playClick() — UI 點擊
 │   ├── playSpinStart() / playSpinStop() — 獨樂旋轉
 │   ├── playFlipCup() — 翻杯陶瓷聲
 │   ├── playDrinkGulp() — 喝酒咕嚕聲
 │   └── playWin() / playSake() — 慶祝
-└── 自動 Duck（語音播放時 BGM 降低音量）
+└── 自動 Duck（語音播放時 BGM 降至 0.01）
 
 VoiceManager
 ├── jaVoice — Kyoko (ja-JP)
@@ -374,7 +378,7 @@ https://kochi-games.vercel.app/
 | 問題 | 狀態 | Workaround |
 |------|------|-----------|
 | 遊戲中切換語言會 hang | ⚠️ | 遊戲中隱藏語言切換按鈕 |
-| MP3 與合成 BGM 音量差異 | ✅ 已處理 | MP3: volume 0.08 / 合成: gain 0.6 |
+| BGM 全部改為 MP3 | ✅ 已處理 | 統一 volume 0.08，duck 時 0.01 |
 | PWA icon 不會自動更新 | 設計如此 | 刪除主畫面捷徑重新加入 |
 | 手機靜音偵測 | 無法偵測 | 進入遊戲時顯示「開啟聲音」toast |
 

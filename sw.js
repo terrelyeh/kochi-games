@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ishin-v36';
+const CACHE_NAME = 'ishin-v37';
 const ASSETS = [
   '/',
   '/index.html',
@@ -25,6 +25,9 @@ const ASSETS = [
   '/琬蒨-head.png',
   '/yy-head.png',
   '/kaya-head.png',
+  '/月夜思鄉.mp3',
+  '/夏日廟會.mp3',
+  '/祭典夜晚.mp3',
   '/manifest.json'
 ];
 
