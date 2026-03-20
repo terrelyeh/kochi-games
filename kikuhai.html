@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1210">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="6de48909-2353-4e99-87fa-854079eba9f8"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&family=Noto+Serif+JP:wght@700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -737,8 +738,11 @@ function renderSetup(){
   $('cup-count-desc').textContent=t('cupDesc'+state.cupCount);
 }
 
+let _gameStartTime=0;
 function startGame(){
   state.round=1;state.currentPlayer=1;state.busy=false;
+  _gameStartTime=Date.now();
+  if(typeof umami!=='undefined')umami.track('kikuhai-start',{cups:state.cupCount,lang:I18N.lang});
   initCups();
   show('game-screen');
   startTurn();
@@ -1041,6 +1045,7 @@ function showDrinking(penalty){
 function showRoundEnd(penalty){
   show('roundend-screen');
   $('roundend-summary').innerHTML=t('roundSummary',{p:state.currentPlayer,n:penalty})+'<div class="roundend-penalty">🍶 x '+penalty+'</div>';
+  if(typeof umami!=='undefined')umami.track('kikuhai-complete',{cups:state.cupCount,penalty:penalty,flipped:state.flippedCount,duration:Math.round((Date.now()-_gameStartTime)/1000),lang:I18N.lang});
   audio.playSake();
   spawnConfetti(15);
 }

@@ -9,6 +9,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1210">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="6de48909-2353-4e99-87fa-854079eba9f8"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&family=Noto+Serif+JP:wght@700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -864,7 +865,8 @@ function renderSetup(){
   // Player list
   let lh='';for(let i=0;i<setupPlayers.length;i++){const p=setupPlayers[i];const hp=!!PLAYER_AVATARS[p.name];const av=hp?`<img src="${PLAYER_AVATARS[p.name]}" alt="${p.name}">`:'🧑';lh+=`<div class="player-row"><span class="idx">${i+1}</span><input class="name-input" value="${p.name}" oninput="updatePlayerName(${i},this.value)" maxlength="8"><div class="type-toggle${hp?' has-photo':''}" onclick="showAvatarZoom(setupPlayers[${i}].name)">${av}</div></div>`;}$('player-list').innerHTML=lh;
 }
-function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,i)=>{setupPlayers[i].name=inp.value.trim()||('P'+(i+1));});state.players=setupPlayers.map(p=>({name:p.name,ml:0}));state.round=1;state.currentSpinner=0;state.spinning=false;audio.startMusic();show('table-screen');startRound();}
+let _gameStartTime=0;
+function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,i)=>{setupPlayers[i].name=inp.value.trim()||('P'+(i+1));});state.players=setupPlayers.map(p=>({name:p.name,ml:0}));state.round=1;state.currentSpinner=0;state.spinning=false;_gameStartTime=Date.now();if(typeof umami!=='undefined')umami.track('bekuhai-start',{players:state.players.length,lang:I18N.lang});audio.startMusic();show('table-screen');startRound();}
 
 // ============================================================
 // TABLE
@@ -1091,6 +1093,7 @@ function showDrinking(playerIdx,faceKey){
 // ============================================================
 function gameOver(){
   show('gameover-screen');audio.stopMusic();audio.playSake();audio.playWin();spawnConfetti(30);
+  if(typeof umami!=='undefined')umami.track('bekuhai-complete',{players:state.players.length,rounds:state.round,duration:Math.round((Date.now()-_gameStartTime)/1000),lang:I18N.lang});
   const sorted=[...state.players].sort((a,b)=>b.ml-a.ml);
   const ranks=['🥇','🥈','🥉'];
   let h='';sorted.forEach((p,i)=>{const av=PLAYER_AVATARS[p.name]?`<img src="${PLAYER_AVATARS[p.name]}" style="width:28px;height:28px;object-fit:cover;border-radius:50%;vertical-align:middle;margin-right:6px;">`:'';h+=`<div class="lb-row${i===0?' champion':''}" style="animation-delay:${i*0.15}s"><span class="lb-rank">${ranks[i]||`${i+1}`}</span><span class="lb-name">${av}${p.name}</span><span class="lb-ml">${p.ml}ml</span>${i===0?`<span class="lb-badge">${t('champion')}</span>`:''}</div>`;});
