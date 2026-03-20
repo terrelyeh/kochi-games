@@ -1049,7 +1049,7 @@ async function showNextButton(){
   const btn=document.createElement('button');btn.className='next-btn-float';
   btn.innerHTML=`${t('nextRound')}<span class="next-name">${nextP.name}</span>`;
   btn.style.left=Math.max(22,Math.min(78,seatPos.x))+'%';
-  btn.style.top=(seatPos.y>55 ? seatPos.y-12 : seatPos.y+13)+'%';
+  btn.style.top=(seatPos.y>55 ? seatPos.y-9 : seatPos.y+10)+'%';
   btn.onclick=()=>{console.log('[KOMA] NEXT BUTTON CLICKED');audio.playClick();btn.remove();state.spinning=false;startRound();};
   $('table-layout').appendChild(btn);
   console.log('[KOMA] next button CREATED for',nextP.name,'at seat',seatPos.x,seatPos.y);
