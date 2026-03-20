@@ -893,7 +893,7 @@ function renderSetup(){
   // Hint text
   $('setup-hint').textContent=t('setupToggleHint');
   // Player list
-  let lh='';for(let i=0;i<setupPlayers.length;i++){const p=setupPlayers[i];const hp=!!PLAYER_AVATARS[p.name];const av=hp?`<img src="${PLAYER_AVATARS[p.name]}" alt="${p.name}">`:'🧑';lh+=`<div class="player-row"><span class="idx">${i+1}</span><input class="name-input" value="${p.name}" oninput="updatePlayerName(${i},this.value)" maxlength="8"><div class="type-toggle${hp?' has-photo':''}">${av}</div></div>`;}$('player-list').innerHTML=lh;
+  let lh='';for(let i=0;i<setupPlayers.length;i++){const p=setupPlayers[i];const hp=!!PLAYER_AVATARS[p.name];const av=hp?`<img src="${PLAYER_AVATARS[p.name]}" alt="${p.name}">`:'🧑';lh+=`<div class="player-row"><span class="idx">${i+1}</span><input class="name-input" value="${p.name}" oninput="updatePlayerName(${i},this.value)" maxlength="8"><div class="type-toggle${hp?' has-photo':''}" onclick="showAvatarZoom(setupPlayers[${i}].name)">${av}</div></div>`;}$('player-list').innerHTML=lh;
 }
 function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,i)=>{setupPlayers[i].name=inp.value.trim()||('P'+(i+1));});state.players=setupPlayers.map(p=>({name:p.name,ml:0}));state.round=1;state.currentSpinner=0;state.spinning=false;audio.startMusic();show('table-screen');startRound();}
 
