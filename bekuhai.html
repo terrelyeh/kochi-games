@@ -118,6 +118,10 @@
   .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--bg);box-shadow:0 4px 16px rgba(212,168,67,0.4);}
   .btn-sm{font-size:14px;padding:10px 24px;border-radius:8px;}
 
+  /* === Ripple effect === */
+  @keyframes rippleEffect{0%{transform:translate(-50%,-50%) scale(0);opacity:0.4;}100%{transform:translate(-50%,-50%) scale(4);opacity:0;}}
+  .ripple-circle{position:absolute;border-radius:50%;width:60px;height:60px;background:rgba(245,230,200,0.25);pointer-events:none;animation:rippleEffect 0.5s ease-out forwards;z-index:0;}
+
   /* === Setup === */
   #setup-screen{gap:16px;}
   .setup-title{font-family:'Noto Serif JP',serif;font-size:24px;font-weight:900;color:var(--gold);margin-bottom:8px;}
@@ -599,7 +603,7 @@ const I18N={
       startBtn:'入座！',setupTitle:'座席安排',setupCount:'人数',setupStart:'開始喝酒！',
       setupToggleHint:'👆 名前タップで編集できます',
       roundInfo:'第 {n} 回合 ／ 全 {max} 回合',spinBtn:'回せ！',spinnerTurn:'{name} の番',aiSpinning:'{name} が回している…',
-      holdToSpin:'独楽をタップ！',
+      holdToSpin:'独楽をスワイプ！',
       revealWho:'独楽が指したのは…',
       drinkTapHint:'タップして飲み干せ！',drinkAutoMsg:'{name} が飲んでいる…',drinkDone:'飲み干した！🍶',
       nextRound:'次へ',gameoverTitle:'維醺志士・酒豪決定！',champion:'酒豪！',
@@ -646,7 +650,7 @@ const I18N={
       startBtn:'入座！',setupTitle:'座席安排',setupCount:'人數',setupStart:'開始喝酒！',
       setupToggleHint:'👆 點名字可修改',
       roundInfo:'第 {n} 回合 ／ 共 {max} 回合',spinBtn:'轉！',spinnerTurn:'輪到 {name}',aiSpinning:'{name} 正在轉…',
-      holdToSpin:'點獨樂旋轉！',
+      holdToSpin:'滑動獨樂旋轉！',
       revealWho:'獨樂指向了…',
       drinkTapHint:'連續點擊喝光！',drinkAutoMsg:'{name} 正在喝…',drinkDone:'喝完了！🍶',
       nextRound:'繼續',gameoverTitle:'維醺志士・酒豪決定！',champion:'酒豪！',
@@ -925,25 +929,85 @@ function showRevealOverlay(targetPlayer,cup,faceKey){
 }
 
 // ============================================================
-// KOMA INTERACTION — Press & Hold
+// KOMA INTERACTION — Swipe to Spin
 // ============================================================
-// SIMPLE TAP — no touchstart/touchend complexity, just onclick
 let komaReady=false;
+let _komaTouchData=null;
 function makeKomaInteractive(){
   komaReady=true;
   const kd=$('koma-3d');if(!kd)return;
   kd.classList.add('interactive');
+
+  // Desktop fallback: click
   kd.onclick=function(){
-    console.log('[KOMA] TAP!',{komaReady,spinning:state.spinning});
     if(!komaReady||state.spinning)return;
-    console.log('[KOMA] doSpin called');
     removeKomaListeners();doSpin();
   };
-  console.log('[KOMA] makeKomaInteractive — ready');
+
+  // Mobile: swipe gesture
+  kd.addEventListener('touchstart',_komaTS,{passive:false});
+  kd.addEventListener('touchmove',_komaTM,{passive:false});
+  kd.addEventListener('touchend',_komaTE);
+  kd.addEventListener('touchcancel',_komaTC);
+  console.log('[KOMA] makeKomaInteractive — ready (swipe)');
+}
+function _komaTS(e){
+  if(!komaReady||state.spinning)return;
+  e.preventDefault();
+  const t=e.touches[0];
+  _komaTouchData={startX:t.clientX,startY:t.clientY,startTime:Date.now()};
+  const kd=$('koma-3d');
+  kd.classList.add('charging');
+}
+function _komaTM(e){
+  if(!_komaTouchData)return;
+  e.preventDefault();
+  // Visual tilt in swipe direction
+  const t=e.touches[0];
+  const dx=t.clientX-_komaTouchData.startX;
+  const dy=t.clientY-_komaTouchData.startY;
+  const kd=$('koma-3d');
+  kd.style.transform=`perspective(400px) rotateX(${8-dy*0.15}deg) rotateY(${dx*0.15}deg)`;
+}
+function _komaTE(e){
+  if(!_komaTouchData)return;
+  const t=e.changedTouches[0];
+  const dx=t.clientX-_komaTouchData.startX;
+  const dy=t.clientY-_komaTouchData.startY;
+  const dt=Date.now()-_komaTouchData.startTime;
+  const dist=Math.sqrt(dx*dx+dy*dy);
+  const velocity=dist/Math.max(dt,1);
+  const kd=$('koma-3d');
+  kd.style.transform='';kd.classList.remove('charging');
+  _komaTouchData=null;
+
+  // Velocity threshold: 0.2 px/ms = gentle swipe, or distance > 30px
+  if(velocity>0.2||dist>30){
+    if(!komaReady||state.spinning)return;
+    removeKomaListeners();doSpin();
+  }else{
+    // Too slow / too short — just a tap, still trigger spin
+    if(!komaReady||state.spinning)return;
+    removeKomaListeners();doSpin();
+  }
+}
+function _komaTC(){
+  const kd=$('koma-3d');
+  if(kd){kd.style.transform='';kd.classList.remove('charging');}
+  _komaTouchData=null;
 }
 function removeKomaListeners(){
   komaReady=false;
-  const kd=$('koma-3d');if(kd){kd.classList.remove('interactive','charging');kd.onclick=null;}
+  const kd=$('koma-3d');
+  if(kd){
+    kd.classList.remove('interactive','charging');
+    kd.onclick=null;kd.style.transform='';
+    kd.removeEventListener('touchstart',_komaTS);
+    kd.removeEventListener('touchmove',_komaTM);
+    kd.removeEventListener('touchend',_komaTE);
+    kd.removeEventListener('touchcancel',_komaTC);
+  }
+  _komaTouchData=null;
   console.log('[KOMA] removeKomaListeners — disabled');
 }
 
@@ -1103,6 +1167,32 @@ function gameOver(){
 }
 
 function resetAll(){state.players=[];state.round=1;state.currentSpinner=0;state.spinning=false;audio.stopMusic();show('welcome-screen');}
+
+// ============================================================
+// RIPPLE EFFECT — tactile feedback on buttons
+// ============================================================
+function addRipple(el,e){
+  if(!el||el.classList.contains('disabled'))return;
+  const rect=el.getBoundingClientRect();
+  const x=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+  const y=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
+  const r=document.createElement('span');
+  r.className='ripple-circle';r.style.left=x+'px';r.style.top=y+'px';
+  const pos=getComputedStyle(el).position;
+  if(pos==='static')el.style.position='relative';
+  const ov=getComputedStyle(el).overflow;
+  if(ov!=='hidden')el.style.overflow='hidden';
+  el.appendChild(r);
+  r.addEventListener('animationend',()=>r.remove());
+}
+document.addEventListener('touchstart',function(e){
+  const btn=e.target.closest('.btn,.ctrl-btn,.count-btn,.next-btn-float,.type-toggle');
+  if(btn)addRipple(btn,e);
+},{passive:true});
+document.addEventListener('mousedown',function(e){
+  const btn=e.target.closest('.btn,.ctrl-btn,.count-btn,.next-btn-float,.type-toggle');
+  if(btn)addRipple(btn,e);
+});
 
 // ============================================================
 // INIT

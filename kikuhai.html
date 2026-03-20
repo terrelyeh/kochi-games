@@ -56,16 +56,19 @@
       repeating-linear-gradient(90deg, rgba(107,68,35,0.03) 0px, rgba(107,68,35,0.03) 1px, transparent 1px, transparent 8px),
       linear-gradient(180deg, #1e1510 0%, #120d09 100%);
   }
+  .welcome-flower{font-size:80px;filter:drop-shadow(0 4px 24px rgba(212,168,67,0.5));animation:sakeWave 2.5s ease-in-out infinite;margin-bottom:8px;display:none;}
   .title{font-family:'Noto Serif JP',serif;font-size:52px;font-weight:900;color:var(--gold);text-shadow:0 2px 16px rgba(212,168,67,0.4),0 0 60px rgba(212,168,67,0.1);letter-spacing:10px;margin-bottom:0;}
   .title-romaji{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--cream-dim);letter-spacing:6px;text-transform:uppercase;margin-bottom:6px;}
-  .tagline{font-size:14px;color:var(--gold-light);background:linear-gradient(135deg, rgba(42,31,26,0.9), rgba(58,45,36,0.9));padding:10px 24px;border-radius:20px;border:1px solid rgba(212,168,67,0.4);margin-bottom:18px;font-weight:500;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
-  .rules-box{background:linear-gradient(180deg, rgba(46,35,25,0.95) 0%, rgba(37,28,20,0.95) 100%);border:1px solid rgba(212,168,67,0.15);border-radius:16px;padding:18px;margin-bottom:18px;text-align:left;width:100%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.03);position:relative;overflow:hidden;}
+  .tagline{font-size:14px;color:var(--gold-light);background:linear-gradient(135deg, rgba(42,31,26,0.9), rgba(58,45,36,0.9));padding:10px 24px;border-radius:20px;border:1px solid rgba(212,168,67,0.4);margin-bottom:24px;font-weight:500;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+  .rules-box{background:linear-gradient(180deg, rgba(46,35,25,0.95) 0%, rgba(37,28,20,0.95) 100%);border:1px solid rgba(212,168,67,0.15);border-radius:16px;padding:22px 24px;margin-bottom:24px;text-align:left;width:100%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.03);position:relative;overflow:hidden;}
   .rules-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg, transparent, rgba(212,168,67,0.3), transparent);}
-  .rules-box h3{font-family:'Noto Serif JP',serif;color:var(--gold);margin-bottom:10px;font-size:15px;}
-  .rules-box ul{list-style:none;font-size:14px;line-height:1.8;color:var(--cream);}
+  .rules-box h3{font-family:'Noto Serif JP',serif;color:var(--gold);margin-bottom:12px;font-size:16px;}
+  .rules-box ul{list-style:none;font-size:15px;line-height:2;color:var(--cream);}
   .rules-box ul li::before{content:'▸ ';color:var(--red-bright);}
-  .chrysanthemum-showcase{display:flex;justify-content:center;margin-top:14px;}
-  .chrysanthemum-icon{font-size:56px;filter:drop-shadow(0 4px 16px rgba(212,168,67,0.5));animation:sakeWave 2s ease-in-out infinite;}
+  .rules-box .rules-highlight{margin-top:14px;padding:14px 16px;background:rgba(212,168,67,0.08);border:1px solid rgba(212,168,67,0.2);border-radius:12px;display:flex;align-items:center;gap:14px;}
+  .highlight-flower{font-size:56px;flex-shrink:0;filter:drop-shadow(0 2px 12px rgba(212,168,67,0.4));animation:sakeWave 2.5s ease-in-out infinite;}
+  .highlight-text{font-family:'Noto Serif JP',serif;font-size:14px;color:var(--cream);line-height:1.7;text-align:left;padding-left:4px;}
+  .highlight-text strong{color:var(--gold-light);font-size:15px;}
 
   /* === Buttons === */
   .btn{font-family:'Noto Sans JP',sans-serif;font-size:18px;font-weight:700;padding:16px 48px;border:none;border-radius:14px;cursor:pointer;transition:all 0.2s;letter-spacing:2px;min-height:56px;touch-action:manipulation;}
@@ -95,16 +98,18 @@
   .game-info-bar{position:absolute;top:calc(16px + var(--safe-top));left:50%;transform:translateX(-50%);background:rgba(26,18,16,0.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:16px;padding:6px 18px;z-index:15;text-align:center;border:1px solid rgba(212,168,67,0.15);white-space:nowrap;max-width:80vw;transition:opacity 0.3s ease;}
   .game-info-bar .round-info{font-family:'Noto Serif JP',serif;font-size:13px;color:var(--cream-dim);letter-spacing:1px;}
   .game-info-bar .player-info{font-family:'Noto Serif JP',serif;font-size:16px;color:var(--gold-light);font-weight:700;margin-top:2px;}
-  .tension-text{position:absolute;top:calc(80px + var(--safe-top));left:50%;transform:translateX(-50%);font-family:'Noto Serif JP',serif;font-size:17px;color:var(--cream);text-align:center;z-index:15;width:90vw;max-width:420px;line-height:1.6;opacity:0;transition:opacity 0.4s ease;pointer-events:none;text-shadow:0 2px 8px rgba(0,0,0,0.6);white-space:nowrap;}
+  .tension-text{position:absolute;top:calc(80px + var(--safe-top));left:50%;transform:translateX(-50%);font-family:'Noto Serif JP',serif;font-size:17px;color:var(--cream);text-align:center;z-index:15;width:85vw;max-width:360px;line-height:1.6;opacity:0;transition:opacity 0.4s ease;pointer-events:none;text-shadow:0 2px 8px rgba(0,0,0,0.6);text-wrap:balance;}
   .game-hint{position:absolute;bottom:calc(24px + var(--safe-bottom));left:50%;transform:translateX(-50%);font-family:'Noto Serif JP',serif;font-size:14px;color:var(--cream);background:rgba(26,18,16,0.6);padding:8px 20px;border-radius:16px;border:1px solid rgba(212,168,67,0.15);white-space:nowrap;z-index:15;animation:pulse 1.5s infinite;}
   .cup-tray{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:grid;gap:12px;z-index:10;perspective:800px;}
   .cup-tray.cols-3{grid-template-columns:repeat(3,1fr);}
 
   /* === Cup 3D flip === */
-  .cup-slot{width:96px;height:96px;perspective:600px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+  .cup-slot{width:96px;height:96px;perspective:600px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:none;user-select:none;}
   .cup-inner{position:relative;width:100%;height:100%;transition:transform 0.6s ease;transform-style:preserve-3d;}
   .cup-slot.flipped .cup-inner{transform:rotateX(180deg);}
   .cup-slot.disabled{pointer-events:none;cursor:default;}
+  .cup-slot.cup-active{transform:scale(1.08);filter:drop-shadow(0 6px 20px rgba(212,168,67,0.4));z-index:20;}
+  .cup-slot.cup-active .cup-inner{transition:none;}
   .cup-front,.cup-back{position:absolute;width:100%;height:100%;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;}
   .cup-front img,.cup-back img{width:100%;height:100%;object-fit:contain;}
   /* Upside-down cup */
@@ -125,8 +130,14 @@
     animation:fadeIn 0.3s ease;
   }
   .safe-overlay .safe-text{font-family:'Noto Serif JP',serif;font-size:36px;font-weight:900;color:var(--green);animation:bounceIn 0.5s ease;text-shadow:0 0 20px rgba(39,174,96,0.4);}
-  .safe-overlay .safe-sub{font-family:'Noto Serif JP',serif;font-size:20px;color:var(--cream);animation:fadeIn 0.4s 0.3s ease both;}
-  .safe-next-btn{font-family:'Noto Serif JP',serif;font-size:20px;font-weight:700;color:var(--gold);background:rgba(212,168,67,0.15);border:2px solid var(--gold);border-radius:14px;padding:14px 40px;margin-top:48px;cursor:pointer;animation:pulse 1.5s infinite;touch-action:manipulation;user-select:none;-webkit-tap-highlight-color:transparent;}
+  .safe-overlay .safe-sub{font-family:'Noto Serif JP',serif;font-size:20px;color:var(--cream);animation:fadeIn 0.4s 0.3s ease both;max-width:min(85vw,360px);text-align:center;line-height:1.6;text-wrap:balance;}
+  .safe-next-btn{font-family:'Noto Serif JP',serif;font-size:20px;font-weight:700;color:var(--gold);background:rgba(212,168,67,0.15);border:2px solid var(--gold);border-radius:14px;padding:14px 40px;margin-top:48px;cursor:pointer;animation:pulse 1.5s infinite;touch-action:manipulation;user-select:none;-webkit-tap-highlight-color:transparent;position:relative;overflow:hidden;}
+  .safe-next-btn:active{transform:scale(0.95);background:rgba(212,168,67,0.25);}
+
+  /* === Ripple effect === */
+  @keyframes rippleEffect{0%{transform:translate(-50%,-50%) scale(0);opacity:0.4;}100%{transform:translate(-50%,-50%) scale(4);opacity:0;}}
+  .ripple-host{position:relative;overflow:hidden;}
+  .ripple-circle{position:absolute;border-radius:50%;width:60px;height:60px;background:rgba(245,230,200,0.25);pointer-events:none;animation:rippleEffect 0.5s ease-out forwards;z-index:0;}
 
   /* === Chrysanthemum Reveal Overlay === */
   .chrys-reveal-overlay{
@@ -181,9 +192,9 @@
 
   /* === RWD === */
   @media(max-width:375px){.ctrl-btn{width:44px;height:44px;font-size:20px;}}
-  @media(max-width:390px){.title{font-size:38px;letter-spacing:4px;}.tagline{font-size:12px;padding:8px 14px;}.rules-box{padding:14px;margin-bottom:14px;}.rules-box ul{font-size:12px;}.btn{font-size:16px;padding:12px 36px;}.cup-slot{width:72px;height:72px;}.chrys-reveal-overlay .chrys-flower{font-size:72px;}.chrys-reveal-overlay .chrys-title{font-size:26px;}}
-  @media(max-height:700px){.screen{padding:16px 16px;}#game-screen{padding:0;}.title{font-size:36px;}.tagline{margin-bottom:12px;}.rules-box{padding:12px;margin-bottom:12px;}}
-  @media(max-height:550px){.screen{min-height:auto;padding:12px 12px;justify-content:flex-start;}#game-screen{padding:0;justify-content:center;}.title{font-size:30px;margin-bottom:2px;}.title-romaji{display:none;}.tagline{margin-bottom:8px;font-size:11px;}.rules-box{margin-bottom:8px;padding:8px;}.btn{padding:10px 28px;font-size:15px;}.cup-slot{width:64px;height:64px;}}
+  @media(max-width:390px){.title{font-size:38px;letter-spacing:4px;}.tagline{font-size:12px;padding:8px 14px;}.rules-box{padding:14px;margin-bottom:14px;}.rules-box ul{font-size:12px;}.highlight-flower{font-size:36px;}.highlight-text{font-size:12px;}.btn{font-size:16px;padding:12px 36px;}.cup-slot{width:72px;height:72px;}.chrys-reveal-overlay .chrys-flower{font-size:72px;}.chrys-reveal-overlay .chrys-title{font-size:26px;}}
+  @media(max-height:700px){.screen{padding:16px 16px;}#game-screen{padding:0;}.title{font-size:36px;}.tagline{margin-bottom:12px;}.rules-box{padding:14px 18px;margin-bottom:12px;}.rules-box ul{font-size:14px;line-height:1.8;}.highlight-flower{font-size:40px;}}
+  @media(max-height:550px){.screen{min-height:auto;padding:12px 12px;justify-content:flex-start;}#game-screen{padding:0;justify-content:center;}.title{font-size:30px;margin-bottom:2px;}.title-romaji{display:none;}.tagline{margin-bottom:8px;font-size:11px;}.rules-box{margin-bottom:8px;padding:8px 12px;}.rules-box ul{font-size:12px;line-height:1.7;}.rules-box .rules-highlight{padding:8px 10px;margin-top:8px;}.highlight-flower{font-size:32px;}.highlight-text{font-size:12px;}.btn{padding:10px 28px;font-size:15px;}.cup-slot{width:64px;height:64px;}}
   /* iPad / tablet */
   @media(min-width:600px){
     .screen{padding:calc(40px + var(--safe-top)) 40px calc(40px + var(--safe-bottom));}
@@ -192,6 +203,7 @@
     .tagline{font-size:18px;padding:14px 32px;}
     .rules-box{max-width:560px;padding:28px;}.rules-box ul{font-size:18px;}
     .rules-box h3{font-size:18px;}
+    .highlight-flower{font-size:56px;}.highlight-text{font-size:16px;}
     .chrys-deco{font-size:80px;}
     .btn{font-size:22px;padding:18px 56px;min-height:64px;border-radius:16px;}
     .setup-title{font-size:32px;}
@@ -245,8 +257,9 @@
     <div class="rules-box">
       <h3 data-i18n="rulesTitle"></h3>
       <ul id="rules-list"></ul>
-      <div class="chrysanthemum-showcase">
-        <div class="chrysanthemum-icon">🌼</div>
+      <div class="rules-highlight" id="rules-highlight">
+        <div class="highlight-flower">🌼</div>
+        <div class="highlight-text" id="highlight-text"></div>
       </div>
     </div>
     <button class="btn btn-primary" onclick="goSetup()" data-i18n="startBtn"></button>
@@ -294,11 +307,13 @@ const I18N={
       tagline:'清酒版ロシアンルーレット！',
       rulesTitle:'📜 ルール',
       rules:[
-        '伏せた杯の中に一つだけ<strong>菊花</strong>が隠れている',
-        '順番に杯をめくる——空なら<strong>セーフ</strong>',
-        '菊花が出たら<strong>「当たり！」</strong>',
-        '罰：めくられた杯の数だけ清酒を飲む！',
+        '伏せた杯の中に<strong>一つだけ菊花</strong>が隠れている',
+        '順番に杯を<strong>指でめくれ</strong>——空なら安全！',
+        '菊花が出たら<strong>「当たり！」</strong>罰酒確定',
+        'めくった杯が多いほど<strong>罰酒も増える</strong>！',
+        '最後の一杯は<strong>自動オープン</strong>——逃げられない',
       ],
+      rulesHighlight:'翻した杯の数 ＝ <strong>罰酒の杯数</strong><br>後になるほど罰が重い…！',
       startBtn:'入座！',
       setupTitle:'ゲーム設定',
       cupCountLabel:'杯の数',
@@ -401,11 +416,13 @@ const I18N={
       tagline:'清酒版俄羅斯輪盤！',
       rulesTitle:'📜 遊戲規則',
       rules:[
-        '倒扣的杯子中藏著一朵<strong>菊花</strong>',
-        '眾人輪流翻杯，翻到空杯<strong>安全過關</strong>',
-        '翻到菊花者<strong>「中獎！」</strong>',
-        '懲罰：喝下已翻開杯數的清酒！',
+        '倒扣的杯子中藏著<strong>一朵菊花</strong>',
+        '輪流用<strong>手指滑開</strong>杯子——空杯安全過關！',
+        '翻到菊花者<strong>「中獎！」</strong>罰酒確定',
+        '翻越多杯，<strong>罰酒越重</strong>！',
+        '最後一杯<strong>自動開牌</strong>——沒人逃得掉',
       ],
+      rulesHighlight:'已翻杯數 ＝ <strong>罰酒杯數</strong><br>越晚中獎，喝越多…！',
       startBtn:'入座！',
       setupTitle:'遊戲設定',
       cupCountLabel:'杯數',
@@ -517,6 +534,8 @@ const I18N={
     document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=this.t(el.getAttribute('data-i18n'));});
     const rl=document.getElementById('rules-list');
     if(rl)rl.innerHTML=this._strings[this._lang].rules.map(r=>`<li>${r}</li>`).join('');
+    const rh=document.getElementById('highlight-text');
+    if(rh)rh.innerHTML=this._strings[this._lang].rulesHighlight||'';
     document.getElementById('lang-toggle').textContent=this._lang==='ja'?'🇹🇼':'🇯🇵';
   },
 };
@@ -825,17 +844,61 @@ function renderCups(){
     const slot=document.createElement('div');
     slot.className='cup-slot'+(cup.flipped?' flipped':'')+(cup.flipped&&cup.hasChrysanthemum?' chrysanthemum':'');
     if(cup.flipped)slot.classList.add('disabled');
-    const backImg=cup.flipped&&cup.hasChrysanthemum?'cup-flower.png':'Cup-top.png';
+    // Always set correct back face — backface-visibility hides it until rotated past 90°
+    const backImg=cup.hasChrysanthemum?'cup-flower.png':'Cup-top.png';
     slot.innerHTML=`<div class="cup-inner"><div class="cup-front"><img src="Cup_down.png" alt=""></div><div class="cup-back"><img src="${backImg}" alt="">${cup.flipped&&cup.hasChrysanthemum?'<span class="chrys-emoji">🌼</span>':''}</div></div>`;
     if(!cup.flipped){
-      slot.addEventListener('click',()=>flipCup(i));
-      slot.addEventListener('touchstart',(e)=>{e.preventDefault();flipCup(i);},{passive:false});
+      // Desktop: click to flip
+      slot.addEventListener('click',(e)=>{if(!e._fromGesture)flipCup(i);});
+      // Mobile: swipe-up gesture to flip
+      let tData=null;
+      slot.addEventListener('touchstart',(e)=>{
+        if(state.busy)return;e.preventDefault();
+        const inner=slot.querySelector('.cup-inner');
+        inner.style.transition='none';
+        tData={startY:e.touches[0].clientY,angle:0,inner};
+        slot.classList.add('cup-active');
+      },{passive:false});
+      slot.addEventListener('touchmove',(e)=>{
+        if(!tData)return;e.preventDefault();
+        const dy=tData.startY-e.touches[0].clientY;
+        tData.angle=Math.max(0,Math.min(180,dy*2.5));
+        tData.inner.style.transform=`rotateX(${tData.angle}deg)`;
+      },{passive:false});
+      slot.addEventListener('touchend',(e)=>{
+        if(!tData)return;
+        const{angle,inner}=tData;
+        slot.classList.remove('cup-active');
+        if(angle>=60){
+          // Complete the flip from current angle
+          const dur=Math.max(0.15,0.4*(180-angle)/180);
+          inner.style.transition=`transform ${dur}s ease-out`;
+          inner.style.transform='rotateX(180deg)';
+          tData=null;
+          flipCup(i,dur);
+        }else{
+          // Spring back
+          inner.style.transition='transform 0.3s ease';
+          inner.style.transform='rotateX(0deg)';
+          tData=null;
+          setTimeout(()=>{inner.style.transition='';inner.style.transform='';},300);
+        }
+      });
+      slot.addEventListener('touchcancel',()=>{
+        if(!tData)return;
+        const{inner}=tData;
+        slot.classList.remove('cup-active');
+        inner.style.transition='transform 0.3s ease';
+        inner.style.transform='rotateX(0deg)';
+        tData=null;
+        setTimeout(()=>{inner.style.transition='';inner.style.transform='';},300);
+      });
     }
     tray.appendChild(slot);
   });
 }
 
-async function flipCup(idx){
+async function flipCup(idx, gestureAnimDur){
   if(state.busy)return;
   if(state.cups[idx].flipped)return;
   state.busy=true;
@@ -849,12 +912,11 @@ async function flipCup(idx){
   updateInfoBar();
   $('tension-text').style.opacity='0';
 
-  // Update the specific cup visually
   const tray=$('cup-tray');
   const slot=tray.children[idx];
   const cup=state.cups[idx];
 
-  // Update back face content before flip
+  // Back face already set at render time; ensure content is correct
   const back=slot.querySelector('.cup-back');
   if(cup.hasChrysanthemum){
     back.innerHTML='<img src="cup-flower.png" alt="">';
@@ -864,18 +926,18 @@ async function flipCup(idx){
 
   slot.classList.add('flipped','disabled');
   slot.onclick=null;
-
-  // Remove click from all unflipped during animation
   disableAllCups();
 
-  await wait(800); // wait for flip animation + brief pause
+  // Gesture flip: shorter wait (animation already partially done)
+  // Click flip: full 800ms CSS transition
+  const waitTime=gestureAnimDur?(gestureAnimDur*1000+200):800;
+  await wait(waitTime);
 
   if(cup.hasChrysanthemum){
     slot.classList.add('chrysanthemum');
     await showChrysanthemumReveal();
   }else{
     await showSafeOverlay();
-    // Advance player
     state.busy=false;
     startTurn();
   }
@@ -1066,6 +1128,34 @@ function backToWelcome(){
   state.busy=false;
   show('welcome-screen');
 }
+
+// ============================================================
+// RIPPLE EFFECT — tactile feedback on buttons
+// ============================================================
+function addRipple(el,e){
+  if(!el||el.classList.contains('disabled'))return;
+  const rect=el.getBoundingClientRect();
+  const x=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+  const y=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
+  const r=document.createElement('span');
+  r.className='ripple-circle';r.style.left=x+'px';r.style.top=y+'px';
+  // Ensure parent can contain the ripple
+  const pos=getComputedStyle(el).position;
+  if(pos==='static')el.style.position='relative';
+  const ov=getComputedStyle(el).overflow;
+  if(ov!=='hidden')el.style.overflow='hidden';
+  el.appendChild(r);
+  r.addEventListener('animationend',()=>r.remove());
+}
+// Event delegation — catch all button taps
+document.addEventListener('touchstart',function(e){
+  const btn=e.target.closest('.btn,.ctrl-btn,.option-btn,.safe-next-btn');
+  if(btn)addRipple(btn,e);
+},{passive:true});
+document.addEventListener('mousedown',function(e){
+  const btn=e.target.closest('.btn,.ctrl-btn,.option-btn,.safe-next-btn');
+  if(btn)addRipple(btn,e);
+});
 
 // ============================================================
 // INIT
