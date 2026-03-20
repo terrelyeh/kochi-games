@@ -1047,7 +1047,9 @@ async function showNextButton(){
   const btn=document.createElement('button');btn.className='next-btn-float '+(isTop?'below':'above');
   btn.innerHTML=`${t('nextRound')}<span class="next-name">${nextP.name}</span>`;
   btn.onclick=()=>{console.log('[KOMA] NEXT BUTTON CLICKED');audio.playClick();btn.remove();state.spinning=false;startRound();};
+  btn.addEventListener('touchend',()=>{console.log('[KOMA] NEXT BUTTON TOUCHEND — forcing click');btn.click();},{once:true});
   seat.appendChild(btn);
+  console.log('[KOMA] next button CREATED for',nextP.name,'in seat-'+nextIdx);
 }
 
 // ============================================================
