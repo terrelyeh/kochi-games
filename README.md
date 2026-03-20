@@ -90,7 +90,13 @@
 | voiceGameover | 酒豪決定！おめでとう！さすがだねぇ！ | 酒豪誕生！恭喜恭喜！太厲害了！ |
 
 ### 預設玩家名稱
-1. 你　2. 政道　3. Fish　4. Winnie　5. 蔡旻誠　6. 小光頭
+1. 政道　2. Fish　3. Winnie　4. 蔡旻辰　5. 小光頭　6. L君（預設 5 人）
+
+### Q版真人頭像 & 互動
+
+每位預設玩家都有 cute 版 Q 版大頭照（PNG 去背），在遊戲桌面和座席安排畫面中顯示。
+
+**點擊放大功能**：點擊任何玩家頭像 → 全螢幕放大顯示 + 搖頭晃腦醉態動畫（`avatarDrunk` keyframes），再次點擊關閉。在昏暗居酒屋環境中，讓玩家可以看清彼此的搞笑頭像。
 
 ---
 
@@ -234,7 +240,7 @@
 ```
 kochi-games/
 ├── index.html              # 首頁（遊戲選單）
-├── bekuhai.html            # 可杯（~1050 行）
+├── bekuhai.html            # 可杯（~1100 行）
 ├── kikuhai.html            # 菊花杯（~1050 行）
 ├── hashiken.html           # 箸拳（~1320 行）
 ├── manifest.json           # PWA manifest
@@ -243,7 +249,8 @@ kochi-games/
 ├── icon-192.png / 512.png  # PWA icon
 ├── cup-*-clear.png         # 杯子去背圖（3 種）
 ├── cup-tengu-splash.png    # 天狗杯 GameOver 版
-└── koma-1/2/3.png          # 六角陀螺（3 角度）
+├── koma-1/2/3.png          # 六角陀螺（3 角度）
+└── *-head.png              # Q版真人頭像（6 張：你/政道/fish/winnie/蔡旻辰/小光頭）
 ```
 
 ### 共用技術棧
@@ -363,10 +370,9 @@ https://kochi-games.vercel.app/
 
 ## 待完成
 
+- [ ] **箸拳 UI 大改版**（下一步重點）
 - [ ] 菊花杯 UI 逐頁優化（像可杯一樣精緻）
-- [ ] 可杯：6 張夥伴 cute 版真人頭像
 - [ ] iPad pixel perfection（兩個遊戲）
-- [ ] 箸拳 UI 大改版
 - [ ] 菊花杯：找到好看的豬口杯照片
 
 ---

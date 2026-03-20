@@ -38,6 +38,12 @@ kochi-games/
 ├── koma-1.png          # 六角陀螺角度 1
 ├── koma-2.png          # 六角陀螺角度 2
 ├── koma-3.png          # 六角陀螺角度 3
+├── 你-head.png         # L君 Q版頭像
+├── 政道-head.png       # 政道 Q版頭像
+├── fish-head.png       # Fish Q版頭像
+├── winnie-head.png     # Winnie Q版頭像
+├── 蔡旻辰-head.png     # 蔡旻辰 Q版頭像
+├── 小光頭-head.png     # 小光頭 Q版頭像
 ├── cup-*.png (舊版)    # 舊的去背圖（有白邊，已不使用）
 ├── export*.svg         # 高品質 SVG（400-600KB，未使用）
 ```
@@ -74,7 +80,7 @@ kochi-games/
 - 木紋背景桌面風格（bekuhai table-screen）
 
 ### 可杯預設玩家名
-1=你, 2=政道, 3=Fish, 4=Winnie, 5=蔡旻誠, 6=小光頭
+1=政道, 2=Fish, 3=Winnie, 4=蔡旻辰, 5=小光頭, 6=L君（預設 5 人）
 
 ## Current Status
 
@@ -82,6 +88,11 @@ kochi-games/
 
 - **可杯 UI 大改版**：木紋圓桌俯瞰、真實杯子/陀螺 PNG、座墊式座位、全螢幕 Overlay 優化
 - **可杯語音系統**：每種杯型 4 句隨機語音（含維醺志士梗）、中日雙語
+- **可杯 Q版真人頭像**：6 張夥伴 cute 版頭像（政道/Fish/Winnie/蔡旻辰/小光頭/L君），取代 emoji
+- **頭像放大互動**：點擊任何玩家頭像全螢幕放大 + 搖頭晃腦醉態動畫（遊戲桌面 + 座席安排都支援）
+- **下一回合按鈕定位修復**：golden label 出現在對應玩家頭像附近（不再固定螢幕底部），帶脈搏動畫
+- **玩家重新排序**：預設順序改為 政道→Fish→Winnie→蔡旻辰→小光頭→L君，預設 5 人
+- **座墊放大**：Q版頭像從 72→84px，更醒目
 - **菊花杯基礎版**：6/9/12/15 杯模式、翻杯動畫、緊張感語音、iPad RWD
 - **手機優先框架**：Safe area、橫屏遮罩、觸控優化、字體載入優化
 - **首頁**：可杯（萬華獨家）→ 菊花杯 → 箸拳（coming soon）
@@ -93,10 +104,9 @@ kochi-games/
 
 ### ⚠️ Pending / Known Issues
 
+- **箸拳 UI 優化**：下一步重點，目前設為 coming soon
 - **菊花杯 UI 優化**：需要像可杯一樣做畫面逐頁微調（UX 細節）
-- **可杯真人頭像**：使用者將提供 6 張夥伴的 cute 版頭像替換 emoji
 - **iPad pixel perfection**：兩個遊戲都需要更精緻的 iPad 排版調整
-- **箸拳 UI 優化**：目前設為 coming soon，等菊花杯完成後再做
 - **遊戲中切換語言會 hang**：已移除遊戲中的語言切換按鈕作為 workaround
 - **export*.svg 未使用**：高品質但太大（400-600KB），目前用 PNG
 
@@ -125,3 +135,5 @@ git add <files> && git commit -m "message" && git push
 - **PWA icon 不會自動更新**：改了 icon 後使用者需要刪除主畫面捷徑重新加入
 - **safe-overlay 的 pointer-events**：之前設了 pointer-events:none 導致按鈕無法點擊，已修復
 - **菊花杯翻杯間語音重疊**：需要 await speakAsync 等語音講完，加按鈕讓玩家控制節奏
+- **next-round 按鈕 z-index**：不要把按鈕放在 `.seat` 元素內（stacking context 會被 koma-area z:10 和 spin-btn-wrap z:20 擋住），應 append 到 `table-layout` 並用 z-index:50
+- **座位定位用 getSeatPositions()**：按鈕位置用 `seatPos.y > 55 ? y-9 : y+10` 決定在頭像上方或下方
