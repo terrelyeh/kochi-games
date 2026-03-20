@@ -907,26 +907,37 @@ function showRevealOverlay(targetPlayer,cup,faceKey){
 // ============================================================
 // KOMA INTERACTION — Press & Hold
 // ============================================================
-// Fresh event listeners each round — stored refs for clean removal
-let komaReady=false;let komaCharging=false;let _komaH=null;
-function makeKomaInteractive(){
-  removeKomaListeners();
-  komaReady=true;komaCharging=false;
-  const kd=$('koma-3d');if(!kd)return;
-  kd.classList.add('interactive');kd.style.pointerEvents='auto';
-  const onDown=(e)=>{e.preventDefault();if(!komaReady||state.spinning)return;komaCharging=true;kd.classList.remove('idle');kd.classList.add('charging');audio.playCharge();};
-  const onUp=(e)=>{e.preventDefault();if(!komaCharging||state.spinning)return;komaCharging=false;removeKomaListeners();doSpin();};
-  const onCancel=()=>{if(!komaCharging)return;komaCharging=false;kd.classList.remove('charging');kd.classList.add('idle');};
-  _komaH={kd,onDown,onUp,onCancel};
-  kd.addEventListener('touchstart',onDown,{passive:false});kd.addEventListener('mousedown',onDown);
-  kd.addEventListener('touchend',onUp);kd.addEventListener('mouseup',onUp);
-  kd.addEventListener('touchcancel',onCancel);kd.addEventListener('mouseleave',onCancel);
-}
-function removeKomaListeners(){
-  komaReady=false;komaCharging=false;
-  if(_komaH){const{kd,onDown,onUp,onCancel}=_komaH;kd.removeEventListener('touchstart',onDown);kd.removeEventListener('mousedown',onDown);kd.removeEventListener('touchend',onUp);kd.removeEventListener('mouseup',onUp);kd.removeEventListener('touchcancel',onCancel);kd.removeEventListener('mouseleave',onCancel);_komaH=null;}
-  const kd=$('koma-3d');if(kd){kd.classList.remove('interactive','charging');kd.style.pointerEvents='none';}
-}
+// Event delegation on document — listeners bound ONCE, never rebind
+let komaReady=false;let komaCharging=false;
+(function(){
+  function isKoma(e){return e.target&&e.target.closest&&!!e.target.closest('#koma-3d');}
+  document.addEventListener('touchstart',function(e){
+    if(!isKoma(e)||!komaReady||state.spinning)return;
+    e.preventDefault();komaCharging=true;
+    const kd=$('koma-3d');if(kd){kd.classList.remove('idle');kd.classList.add('charging');}
+    audio.playCharge();
+  },{passive:false});
+  document.addEventListener('touchend',function(e){
+    if(!komaCharging)return;e.preventDefault();komaCharging=false;
+    removeKomaListeners();doSpin();
+  });
+  document.addEventListener('touchcancel',function(){
+    if(!komaCharging)return;komaCharging=false;
+    const kd=$('koma-3d');if(kd){kd.classList.remove('charging');kd.classList.add('idle');}
+  });
+  document.addEventListener('mousedown',function(e){
+    if(!isKoma(e)||!komaReady||state.spinning)return;
+    komaCharging=true;
+    const kd=$('koma-3d');if(kd){kd.classList.remove('idle');kd.classList.add('charging');}
+    audio.playCharge();
+  });
+  document.addEventListener('mouseup',function(){
+    if(!komaCharging)return;komaCharging=false;
+    removeKomaListeners();doSpin();
+  });
+})();
+function makeKomaInteractive(){komaReady=true;komaCharging=false;const kd=$('koma-3d');if(kd){kd.classList.add('interactive');kd.style.pointerEvents='auto';}}
+function removeKomaListeners(){komaReady=false;komaCharging=false;const kd=$('koma-3d');if(kd){kd.classList.remove('interactive','charging');kd.style.pointerEvents='none';}}
 
 // ============================================================
 // GAME LOGIC

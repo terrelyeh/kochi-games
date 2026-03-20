@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ishin-v18';
+const CACHE_NAME = 'ishin-v19';
 const ASSETS = [
   '/',
   '/index.html',
