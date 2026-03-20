@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>維醺志士 — 數據追蹤方案說明</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700;900&family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --bg:#0f0d0b;--surface:#1e1814;--surface-2:#2e251e;--surface-3:#3a2d24;
+    --gold:#d4a843;--gold-light:#f0d68a;--gold-dim:rgba(212,168,67,0.15);
+    --cream:#f5e6c8;--cream-dim:#c4b496;--white:#faf3e6;
+    --red:#e74c3c;--green:#2ecc71;--blue:#5dade2;--purple:#bb8fce;
+  }
+  body{
+    font-family:'Noto Sans JP','Inter',sans-serif;background:var(--bg);color:var(--cream);
+    line-height:1.7;-webkit-font-smoothing:antialiased;
+  }
+
+  /* === LAYOUT === */
+  .page{max-width:760px;margin:0 auto;padding:40px 24px 80px;}
+
+  /* === HEADER === */
+  .header{text-align:center;margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid var(--surface-2);}
+  .header-icon{font-size:48px;margin-bottom:8px;}
+  .header-title{font-family:'Noto Serif JP',serif;font-size:28px;font-weight:900;color:var(--gold-light);letter-spacing:4px;margin-bottom:4px;}
+  .header-sub{font-size:15px;color:var(--cream-dim);letter-spacing:2px;}
+  .header-date{font-size:12px;color:var(--cream-dim);opacity:0.5;margin-top:12px;}
+
+  /* === SECTIONS === */
+  .section{margin-bottom:48px;}
+  .section-label{
+    font-size:11px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;
+    margin-bottom:8px;font-weight:700;
+  }
+  .section-title{
+    font-family:'Noto Serif JP',serif;font-size:22px;font-weight:900;
+    color:var(--white);margin-bottom:16px;line-height:1.4;
+  }
+  .section-desc{font-size:15px;color:var(--cream-dim);margin-bottom:20px;line-height:1.8;}
+  .section-desc strong{color:var(--cream);}
+
+  /* === HIGHLIGHT BOX === */
+  .highlight-box{
+    background:var(--surface);border:1px solid var(--surface-2);border-radius:16px;
+    padding:24px;margin-bottom:24px;
+  }
+  .highlight-box.gold{border-color:rgba(212,168,67,0.3);background:rgba(212,168,67,0.05);}
+
+  /* === UMAMI INTRO === */
+  .umami-logo{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:18px;font-weight:700;color:var(--white);
+    background:var(--surface-2);padding:6px 16px;border-radius:8px;margin-bottom:16px;
+  }
+  .umami-features{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+  .umami-feat{
+    display:flex;align-items:flex-start;gap:10px;
+    background:var(--surface);border-radius:12px;padding:14px;
+    border:1px solid var(--surface-2);
+  }
+  .umami-feat .feat-icon{font-size:20px;flex-shrink:0;margin-top:2px;}
+  .umami-feat .feat-text{font-size:13px;color:var(--cream-dim);line-height:1.5;}
+  .umami-feat .feat-text strong{color:var(--cream);display:block;font-size:14px;margin-bottom:2px;}
+
+  /* === EVENT CARDS === */
+  .event-group{margin-bottom:28px;}
+  .event-group-title{
+    font-family:'Noto Serif JP',serif;font-size:18px;font-weight:700;
+    color:var(--gold-light);margin-bottom:12px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .event-card{
+    background:var(--surface);border:1px solid var(--surface-2);border-radius:14px;
+    padding:20px;margin-bottom:12px;transition:border-color 0.2s;
+  }
+  .event-card:hover{border-color:var(--surface-3);}
+  .event-name{
+    font-family:'Inter',monospace;font-size:14px;font-weight:700;
+    color:var(--gold);background:var(--gold-dim);
+    display:inline-block;padding:3px 10px;border-radius:6px;margin-bottom:10px;
+  }
+  .event-trigger{font-size:13px;color:var(--cream-dim);margin-bottom:10px;}
+  .event-trigger strong{color:var(--cream);}
+  .event-fields{display:flex;flex-wrap:wrap;gap:6px;}
+  .field-tag{
+    font-size:12px;padding:4px 10px;border-radius:20px;
+    background:var(--surface-2);color:var(--cream-dim);
+    border:1px solid var(--surface-3);
+  }
+  .field-tag .field-key{color:var(--cream);font-weight:600;}
+
+  /* === AUTO TRACKING TABLE === */
+  .auto-table{width:100%;border-collapse:collapse;margin-top:12px;}
+  .auto-table th{
+    text-align:left;font-size:12px;color:var(--gold);letter-spacing:1px;
+    text-transform:uppercase;padding:8px 12px;
+    border-bottom:1px solid var(--surface-2);font-weight:600;
+  }
+  .auto-table td{
+    font-size:14px;color:var(--cream-dim);padding:10px 12px;
+    border-bottom:1px solid rgba(255,255,255,0.03);vertical-align:top;
+  }
+  .auto-table td:first-child{color:var(--cream);font-weight:500;white-space:nowrap;}
+  .auto-table tr:last-child td{border-bottom:none;}
+  .auto-table .tag{
+    font-size:11px;padding:2px 8px;border-radius:10px;
+    background:rgba(46,204,113,0.12);color:var(--green);
+    border:1px solid rgba(46,204,113,0.25);margin-left:6px;
+  }
+
+  /* === INSIGHT CARDS === */
+  .insight-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+  .insight-card{
+    background:var(--surface);border:1px solid var(--surface-2);border-radius:14px;
+    padding:16px;text-align:center;
+  }
+  .insight-card .insight-icon{font-size:28px;margin-bottom:6px;}
+  .insight-card .insight-label{font-size:13px;color:var(--cream-dim);margin-bottom:4px;}
+  .insight-card .insight-how{font-size:12px;color:var(--cream-dim);opacity:0.6;line-height:1.4;}
+  .insight-card .insight-value{font-family:'Noto Serif JP',serif;font-size:16px;font-weight:700;color:var(--gold-light);margin-bottom:4px;}
+
+  /* === FREE PLAN === */
+  .plan-box{
+    background:linear-gradient(135deg,rgba(212,168,67,0.08),rgba(212,168,67,0.02));
+    border:1px solid rgba(212,168,67,0.25);border-radius:16px;
+    padding:24px;text-align:center;
+  }
+  .plan-name{font-family:'Noto Serif JP',serif;font-size:20px;font-weight:900;color:var(--gold-light);margin-bottom:4px;}
+  .plan-price{font-size:36px;font-weight:900;color:var(--white);margin:8px 0;font-family:'Inter',sans-serif;}
+  .plan-price span{font-size:14px;color:var(--cream-dim);font-weight:400;}
+  .plan-limits{list-style:none;text-align:left;margin-top:16px;}
+  .plan-limits li{
+    font-size:14px;color:var(--cream-dim);padding:8px 0;
+    border-bottom:1px solid rgba(255,255,255,0.04);
+    display:flex;align-items:center;gap:8px;
+  }
+  .plan-limits li:last-child{border-bottom:none;}
+  .plan-limits .check{color:var(--green);font-size:16px;flex-shrink:0;}
+  .plan-limits .limit-val{color:var(--cream);font-weight:600;}
+  .plan-note{font-size:12px;color:var(--cream-dim);opacity:0.6;margin-top:16px;line-height:1.6;}
+
+  /* === FLOW DIAGRAM === */
+  .flow{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:20px 0;}
+  .flow-step{
+    background:var(--surface);border:1px solid var(--surface-2);border-radius:10px;
+    padding:10px 16px;font-size:13px;color:var(--cream);text-align:center;
+  }
+  .flow-step .step-icon{font-size:20px;display:block;margin-bottom:4px;}
+  .flow-arrow{color:var(--cream-dim);font-size:18px;opacity:0.4;}
+
+  /* === FOOTER === */
+  .footer{
+    text-align:center;margin-top:48px;padding-top:24px;
+    border-top:1px solid var(--surface-2);
+    font-size:12px;color:var(--cream-dim);opacity:0.4;
+  }
+
+  /* === RWD === */
+  @media(max-width:600px){
+    .page{padding:28px 16px 60px;}
+    .header-title{font-size:22px;letter-spacing:2px;}
+    .section-title{font-size:19px;}
+    .umami-features{grid-template-columns:1fr;}
+    .insight-grid{grid-template-columns:1fr 1fr;}
+    .flow{gap:6px;}
+    .flow-step{padding:8px 12px;font-size:12px;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-icon">📊</div>
+    <h1 class="header-title">維醺志士 數據追蹤方案</h1>
+    <div class="header-sub">透過 Umami 分析遊戲成效</div>
+    <div class="header-date">2026 年 3 月</div>
+  </header>
+
+  <!-- SECTION 1: WHAT IS UMAMI -->
+  <section class="section">
+    <div class="section-label">About</div>
+    <div class="section-title">什麼是 Umami？</div>
+    <div class="section-desc">
+      <strong>Umami</strong> 是一個開源的網站分析平台，定位為「注重隱私的 Google Analytics 替代品」。
+      它不使用 Cookie、不跨站追蹤使用者，追蹤碼小於 2KB，不影響網站載入速度。
+      我們使用 <strong>Umami Cloud</strong>（官方託管版），只需在 HTML 中加入一行 <code>&lt;script&gt;</code> 即可開始收集數據。
+    </div>
+
+    <div class="umami-features">
+      <div class="umami-feat">
+        <div class="feat-icon">🔒</div>
+        <div class="feat-text"><strong>隱私友善</strong>不用 Cookie，天生符合 GDPR / CCPA</div>
+      </div>
+      <div class="umami-feat">
+        <div class="feat-icon">⚡</div>
+        <div class="feat-text"><strong>極致輕量</strong>追蹤碼 < 2KB，不拖慢遊戲速度</div>
+      </div>
+      <div class="umami-feat">
+        <div class="feat-icon">🛠️</div>
+        <div class="feat-text"><strong>自訂事件</strong>可追蹤遊戲特定行為（開局、結束、BGM 等）</div>
+      </div>
+      <div class="umami-feat">
+        <div class="feat-icon">📱</div>
+        <div class="feat-text"><strong>即時面板</strong>Dashboard 即時更新，手機也能看</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: DATA FLOW -->
+  <section class="section">
+    <div class="section-label">How It Works</div>
+    <div class="section-title">數據怎麼來？</div>
+    <div class="section-desc">玩家在居酒屋打開遊戲時，Umami 會自動記錄基本流量資訊。在遊戲的關鍵節點（開始、結束、切換 BGM），我們額外埋設了自訂事件，記錄遊玩細節。</div>
+
+    <div class="flow">
+      <div class="flow-step"><span class="step-icon">📱</span>玩家開啟遊戲</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><span class="step-icon">📡</span>Umami 自動追蹤</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><span class="step-icon">🎮</span>遊戲觸發事件</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><span class="step-icon">📊</span>Dashboard 即時顯示</div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: AUTO TRACKING -->
+  <section class="section">
+    <div class="section-label">Automatic</div>
+    <div class="section-title">自動追蹤的指標</div>
+    <div class="section-desc">以下指標由 Umami <strong>自動收集</strong>，不需要額外寫程式。開啟遊戲頁面即開始記錄。</div>
+
+    <div class="highlight-box">
+      <table class="auto-table">
+        <thead>
+          <tr><th>指標</th><th>說明</th><th>對我們的意義</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Pageviews</td>
+            <td>每個頁面被開了幾次</td>
+            <td>首頁 / 可杯 / 菊花杯 各被開了幾次</td>
+          </tr>
+          <tr>
+            <td>Unique Visitors</td>
+            <td>多少台不同裝置使用</td>
+            <td>最接近「多少桌客人玩過」</td>
+          </tr>
+          <tr>
+            <td>Visit Duration</td>
+            <td>平均停留時間</td>
+            <td>大家花多少時間在玩</td>
+          </tr>
+          <tr>
+            <td>Pages</td>
+            <td>各頁面流量排行</td>
+            <td>哪個遊戲最受歡迎</td>
+          </tr>
+          <tr>
+            <td>Devices</td>
+            <td>手機 / 平板 / 電腦</td>
+            <td>iPhone vs iPad 比例</td>
+          </tr>
+          <tr>
+            <td>Browsers</td>
+            <td>Safari / Chrome / 其他</td>
+            <td>要優先支援哪個瀏覽器</td>
+          </tr>
+          <tr>
+            <td>OS</td>
+            <td>iOS / Android</td>
+            <td>客群使用什麼系統</td>
+          </tr>
+          <tr>
+            <td>Languages</td>
+            <td>瀏覽器語系</td>
+            <td>日本客人 vs 台灣客人比例</td>
+          </tr>
+          <tr>
+            <td>Countries</td>
+            <td>來源地區</td>
+            <td>使用者地理分布</td>
+          </tr>
+          <tr>
+            <td>Hours</td>
+            <td>按小時流量分布</td>
+            <td>哪個時段最多人玩（營業高峰）</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 4: CUSTOM EVENTS -->
+  <section class="section">
+    <div class="section-label">Custom Events</div>
+    <div class="section-title">自訂事件追蹤</div>
+    <div class="section-desc">
+      在遊戲的<strong>關鍵節點</strong>，我們埋設了自訂事件，記錄遊玩行為的細節。
+      這些事件會出現在 Umami Dashboard 的 <strong>Events</strong> 區塊，可以點進去看各欄位的分布統計。
+    </div>
+
+    <!-- BEKUHAI EVENTS -->
+    <div class="event-group">
+      <div class="event-group-title">🎲 可杯（Bekuhai）</div>
+
+      <div class="event-card">
+        <div class="event-name">bekuhai-start</div>
+        <div class="event-trigger">觸發時機：每次按下<strong>「入座！」</strong>開始遊戲時</div>
+        <div class="event-fields">
+          <span class="field-tag"><span class="field-key">players</span> 幾人遊玩</span>
+          <span class="field-tag"><span class="field-key">lang</span> 語言 (zh/ja)</span>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-name">bekuhai-complete</div>
+        <div class="event-trigger">觸發時機：8 回合結束，進入<strong>酒豪排行榜</strong>畫面時</div>
+        <div class="event-fields">
+          <span class="field-tag"><span class="field-key">players</span> 幾人遊玩</span>
+          <span class="field-tag"><span class="field-key">rounds</span> 玩了幾回合</span>
+          <span class="field-tag"><span class="field-key">duration</span> 遊戲時長（秒）</span>
+          <span class="field-tag"><span class="field-key">lang</span> 語言 (zh/ja)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- KIKUHAI EVENTS -->
+    <div class="event-group">
+      <div class="event-group-title">🌸 菊花杯（Kikuhai）</div>
+
+      <div class="event-card">
+        <div class="event-name">kikuhai-start</div>
+        <div class="event-trigger">觸發時機：選好杯數模式後，按下<strong>「開始！」</strong>時</div>
+        <div class="event-fields">
+          <span class="field-tag"><span class="field-key">cups</span> 杯數模式 (6/9/12/15)</span>
+          <span class="field-tag"><span class="field-key">lang</span> 語言 (zh/ja)</span>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-name">kikuhai-complete</div>
+        <div class="event-trigger">觸發時機：翻到菊花，進入<strong>一輪結束</strong>畫面時</div>
+        <div class="event-fields">
+          <span class="field-tag"><span class="field-key">cups</span> 杯數模式</span>
+          <span class="field-tag"><span class="field-key">penalty</span> 罰酒杯數</span>
+          <span class="field-tag"><span class="field-key">flipped</span> 翻了幾杯才中</span>
+          <span class="field-tag"><span class="field-key">duration</span> 遊戲時長（秒）</span>
+          <span class="field-tag"><span class="field-key">lang</span> 語言 (zh/ja)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BGM EVENT -->
+    <div class="event-group">
+      <div class="event-group-title">🎵 BGM 偏好</div>
+
+      <div class="event-card">
+        <div class="event-name">bgm-switch</div>
+        <div class="event-trigger">觸發時機：玩家點擊 <strong>BGM 切換按鈕</strong>時</div>
+        <div class="event-fields">
+          <span class="field-tag"><span class="field-key">game</span> 在哪個遊戲 (bekuhai/kikuhai)</span>
+          <span class="field-tag"><span class="field-key">to</span> 切到哪首 (enkai/moonlight/summer/festival)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: WHAT CAN WE LEARN -->
+  <section class="section">
+    <div class="section-label">Insights</div>
+    <div class="section-title">我們能回答哪些問題？</div>
+
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="insight-icon">👥</div>
+        <div class="insight-value">多少桌玩過？</div>
+        <div class="insight-label">Unique Visitors</div>
+        <div class="insight-how">一台裝置 ≈ 一桌客人</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">🎮</div>
+        <div class="insight-value">總共玩了幾場？</div>
+        <div class="insight-label">start 事件次數</div>
+        <div class="insight-how">bekuhai-start + kikuhai-start</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">🏆</div>
+        <div class="insight-value">哪個遊戲更受歡迎？</div>
+        <div class="insight-label">Pages 排行</div>
+        <div class="insight-how">比較可杯 vs 菊花杯的流量</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">👨‍👩‍👧‍👦</div>
+        <div class="insight-value">最常見的人數？</div>
+        <div class="insight-label">players 分布</div>
+        <div class="insight-how">4/5/6/7/8 人哪個最多</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">⏱️</div>
+        <div class="insight-value">一場平均玩多久？</div>
+        <div class="insight-label">duration 欄位</div>
+        <div class="insight-how">從開始到結束的秒數</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">✅</div>
+        <div class="insight-value">完成率高嗎？</div>
+        <div class="insight-label">complete ÷ start</div>
+        <div class="insight-how">太低 = 中途退出率高</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">🎵</div>
+        <div class="insight-value">最受歡迎的 BGM？</div>
+        <div class="insight-label">bgm-switch 的 to 分布</div>
+        <div class="insight-how">健身操 / 月夜 / 夏日 / 祭典</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-icon">🕐</div>
+        <div class="insight-value">幾點最多人玩？</div>
+        <div class="insight-label">Hours 分布圖</div>
+        <div class="insight-how">對應營業高峰時段</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6: FREE PLAN -->
+  <section class="section">
+    <div class="section-label">Plan</div>
+    <div class="section-title">免費版本與限制</div>
+    <div class="section-desc">我們目前使用 Umami Cloud 的<strong>免費方案</strong>，對居酒屋的使用量來說綽綽有餘。</div>
+
+    <div class="plan-box">
+      <div class="plan-name">Umami Cloud — Hobby</div>
+      <div class="plan-price">$0 <span>/ 月</span></div>
+
+      <ul class="plan-limits">
+        <li><span class="check">✓</span> <span class="limit-val">100K 事件 / 月</span> — 每次開頁面或觸發事件都算 1 次，居酒屋場景完全夠用</li>
+        <li><span class="check">✓</span> <span class="limit-val">無限制網站數量</span> — 可以追蹤多個網站</li>
+        <li><span class="check">✓</span> <span class="limit-val">無限制團隊成員</span> — 團隊都可以看 Dashboard</li>
+        <li><span class="check">✓</span> <span class="limit-val">資料保留 1 年</span> — 歷史數據保存一年</li>
+        <li><span class="check">✓</span> <span class="limit-val">自訂事件</span> — 追蹤遊戲專屬行為</li>
+        <li><span class="check">✓</span> <span class="limit-val">即時 Dashboard</span> — 數據秒級更新</li>
+      </ul>
+
+      <div class="plan-note">
+        💡 以我們的使用情境估算：假設每天 20 桌客人、每桌玩 3 場遊戲，<br>
+        每月約 20 × 3 × 30 × 5（事件）= 9,000 次，遠低於 100K 上限。<br>
+        如果超過免費額度，可升級付費方案（按用量計費，$0.00002/事件）。
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 7: DASHBOARD ACCESS -->
+  <section class="section">
+    <div class="section-label">Access</div>
+    <div class="section-title">如何查看數據？</div>
+
+    <div class="highlight-box gold">
+      <div class="section-desc" style="margin-bottom:12px;">
+        登入 <strong><a href="https://cloud.umami.is" target="_blank" style="color:var(--gold-light);text-decoration:underline;">cloud.umami.is</a></strong>
+        即可看到即時 Dashboard。手機、平板、電腦都能查看。
+      </div>
+      <div class="section-desc" style="margin-bottom:0;font-size:13px;">
+        🔗 也可以開啟「分享連結」功能，產生一個公開網址，不需要登入也能查看數據。<br>
+        適合分享給團隊成員快速瀏覽。
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    © 萬華世界 — 維醺志士數據追蹤方案 · Powered by Umami
+  </footer>
+
+</div>
+</body>
+</html>
