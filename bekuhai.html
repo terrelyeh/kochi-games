@@ -558,7 +558,7 @@ const I18N={
       startBtn:'入座！',setupTitle:'座席安排',setupCount:'人数',setupStart:'開始喝酒！',
       setupToggleHint:'👆 名前タップで編集できます',
       roundInfo:'第 {n} 回合 ／ 全 {max} 回合',spinBtn:'回せ！',spinnerTurn:'{name} の番',aiSpinning:'{name} が回している…',
-      holdToSpin:'独楽を押して放せ！',
+      holdToSpin:'独楽をタップ！',
       revealWho:'独楽が指したのは…',
       drinkTapHint:'タップして飲み干せ！',drinkAutoMsg:'{name} が飲んでいる…',drinkDone:'飲み干した！🍶',
       nextRound:'次へ',gameoverTitle:'維醺志士・酒豪決定！',champion:'酒豪！',
@@ -599,7 +599,7 @@ const I18N={
       startBtn:'入座！',setupTitle:'座席安排',setupCount:'人數',setupStart:'開始喝酒！',
       setupToggleHint:'👆 點名字可修改',
       roundInfo:'第 {n} 回合 ／ 共 {max} 回合',spinBtn:'轉！',spinnerTurn:'輪到 {name}',aiSpinning:'{name} 正在轉…',
-      holdToSpin:'按住獨樂，放開旋轉！',
+      holdToSpin:'點獨樂旋轉！',
       revealWho:'獨樂指向了…',
       drinkTapHint:'連續點擊喝光！',drinkAutoMsg:'{name} 正在喝…',drinkDone:'喝完了！🍶',
       nextRound:'繼續',gameoverTitle:'維醺志士・酒豪決定！',champion:'酒豪！',
@@ -907,46 +907,25 @@ function showRevealOverlay(targetPlayer,cup,faceKey){
 // ============================================================
 // KOMA INTERACTION — Press & Hold
 // ============================================================
-// Event delegation on document — listeners bound ONCE, never rebind
-let komaReady=false;let komaCharging=false;
-(function(){
-  function isKoma(e){return e.target&&e.target.closest&&!!e.target.closest('#koma-3d');}
-  document.addEventListener('touchstart',function(e){
-    console.log('[KOMA] touchstart',{isKoma:isKoma(e),komaReady,spinning:state.spinning,target:e.target.tagName+'.'+e.target.className});
-    if(!isKoma(e)||!komaReady||state.spinning)return;
-    e.preventDefault();komaCharging=true;
-    const kd=$('koma-3d');if(kd){kd.classList.remove('idle');kd.classList.add('charging');}
-    audio.playCharge();
-    console.log('[KOMA] charging started');
-  },{passive:false});
-  document.addEventListener('touchend',function(e){
-    console.log('[KOMA] touchend',{komaCharging});
-    if(!komaCharging)return;e.preventDefault();komaCharging=false;
-    removeKomaListeners();doSpin();
+// SIMPLE TAP — no touchstart/touchend complexity, just onclick
+let komaReady=false;
+function makeKomaInteractive(){
+  komaReady=true;
+  const kd=$('koma-3d');if(!kd)return;
+  kd.classList.add('interactive');
+  kd.onclick=function(){
+    console.log('[KOMA] TAP!',{komaReady,spinning:state.spinning});
+    if(!komaReady||state.spinning)return;
     console.log('[KOMA] doSpin called');
-  });
-  document.addEventListener('touchcancel',function(){
-    console.log('[KOMA] touchcancel',{komaCharging});
-    if(!komaCharging)return;komaCharging=false;
-    const kd=$('koma-3d');if(kd){kd.classList.remove('charging');kd.classList.add('idle');}
-  });
-  document.addEventListener('mousedown',function(e){
-    console.log('[KOMA] mousedown',{isKoma:isKoma(e),komaReady,spinning:state.spinning,target:e.target.tagName+'.'+e.target.className});
-    if(!isKoma(e)||!komaReady||state.spinning)return;
-    komaCharging=true;
-    const kd=$('koma-3d');if(kd){kd.classList.remove('idle');kd.classList.add('charging');}
-    audio.playCharge();
-    console.log('[KOMA] charging started');
-  });
-  document.addEventListener('mouseup',function(){
-    console.log('[KOMA] mouseup',{komaCharging});
-    if(!komaCharging)return;komaCharging=false;
     removeKomaListeners();doSpin();
-    console.log('[KOMA] doSpin called');
-  });
-})();
-function makeKomaInteractive(){komaReady=true;komaCharging=false;const kd=$('koma-3d');if(kd){kd.classList.add('interactive');kd.style.pointerEvents='auto';}console.log('[KOMA] makeKomaInteractive — ready');}
-function removeKomaListeners(){komaReady=false;komaCharging=false;const kd=$('koma-3d');if(kd){kd.classList.remove('interactive','charging');kd.style.pointerEvents='none';}console.log('[KOMA] removeKomaListeners — disabled');}
+  };
+  console.log('[KOMA] makeKomaInteractive — ready');
+}
+function removeKomaListeners(){
+  komaReady=false;
+  const kd=$('koma-3d');if(kd){kd.classList.remove('interactive','charging');kd.onclick=null;}
+  console.log('[KOMA] removeKomaListeners — disabled');
+}
 
 // ============================================================
 // GAME LOGIC
