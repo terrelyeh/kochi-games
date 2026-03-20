@@ -16,6 +16,7 @@
 - Web Speech API（SpeechSynthesis）— 雙語語音 ja-JP / zh-TW
 - Web Audio API — SFX 音效合成（click / spin / flip / drink / win）
 - HTML Audio — MP3 BGM（健身操 + 月夜思鄉 + 夏日廟會 + 祭典夜晚）
+- Umami Cloud 數據分析（自訂事件追蹤遊玩行為）
 - CSS Custom Properties 居酒屋深色主題
 - GitHub repo → Vercel 自動部署
 
@@ -51,6 +52,7 @@ kochi-games/
 ├── 琬蒨-head.png       # 琬蒨 Q版頭像
 ├── yy-head.png         # YY Q版頭像
 ├── kaya-head.png       # Kaya Q版頭像
+├── analytics-intro.html # 數據追蹤方案說明頁（團隊分享用，noindex）
 ├── cup-*.png (舊版)    # 舊的去背圖（有白邊，已不使用）
 ├── export*.svg         # 高品質 SVG（400-600KB，未使用）
 ```
@@ -91,6 +93,19 @@ kochi-games/
 ### 可杯預設玩家名
 1=政道, 2=Fish, 3=Winnie, 4=蔡旻辰, 5=小光頭, 6=琬蒨, 7=YY, 8=Kaya（預設 5 人，支援 4～8 人）
 
+### 數據分析（Umami Cloud）
+- **Website ID**: `6de48909-2353-4e99-87fa-854079eba9f8`
+- 三個 HTML 頁面（index/bekuhai/kikuhai）皆有 Umami script tag
+- 自訂事件定義：
+  - `bekuhai-start` → {players, lang}
+  - `bekuhai-complete` → {players, rounds, duration, lang}
+  - `kikuhai-start` → {cups, lang}
+  - `kikuhai-complete` → {cups, penalty, flipped, duration, lang}
+  - `bgm-switch` → {game, to}
+- Dashboard: [cloud.umami.is](https://cloud.umami.is)
+- 說明頁面: `analytics-intro.html`（noindex，團隊分享用）
+- ⚠️ **新增遊戲或事件時，記得更新 Umami 事件埋設 + analytics-intro.html**
+
 ## Current Status
 
 ### ✅ Completed
@@ -111,7 +126,8 @@ kochi-games/
 - **杯子圖片換乾淨去背版**：cup-*-clear.png（使用者重新去背提供）
 - **菊花杯語音節奏修復**：翻杯後加「下面一位〜」按鈕，語音不再被截斷
 - **聲音提醒 toast**：進入設定頁時提示開啟手機聲音
-- **全 MP3 BGM 系統**：移除所有合成 BGM（shamisen/matsuri/miyako），改用 4 首 MP3（可杯：健身操+月夜思鄉+夏日廟會+祭典夜晚，菊花杯：月夜思鄉+夏日廟會+祭典夜晚）
+- **全 MP3 BGM 系統**：移除所有合成 BGM，改用 MP3（可杯 4 首，菊花杯 3 首）
+- **Umami 數據分析**：自訂事件追蹤遊玩行為（開局/結束/BGM 切換），團隊說明頁 analytics-intro.html
 
 ### ⚠️ Pending / Known Issues
 
@@ -120,6 +136,7 @@ kochi-games/
 - **iPad pixel perfection**：兩個遊戲都需要更精緻的 iPad 排版調整
 - **遊戲中切換語言會 hang**：已移除遊戲中的語言切換按鈕作為 workaround
 - **export*.svg 未使用**：高品質但太大（400-600KB），目前用 PNG
+- **Supabase 事件記錄**：未來可考慮接 Supabase 做更細緻的遊戲數據記錄（方案 B）
 
 ## Deployment
 

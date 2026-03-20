@@ -278,6 +278,7 @@ kochi-games/
 | **HTML Audio** | MP3 BGM（健身操 / 月夜思鄉 / 夏日廟會 / 祭典夜晚） |
 | **CSS Custom Properties** | 居酒屋深色主題色彩系統 |
 | **PWA** | manifest.json + Service Worker 離線快取 |
+| **Umami Cloud** | 數據分析 — 頁面流量 + 自訂遊戲事件追蹤 |
 
 ### 色彩系統
 
@@ -358,6 +359,29 @@ VoiceManager
 
 ---
 
+## 📊 數據分析（Umami）
+
+使用 [Umami Cloud](https://umami.is)（開源、隱私友善的 Google Analytics 替代品）追蹤遊戲使用狀況。
+
+### 自動追蹤
+頁面瀏覽量、獨立訪客、裝置類型、瀏覽器、語系、時段分布等。
+
+### 自訂事件
+
+| 事件 | 觸發時機 | 記錄的數據 |
+|------|---------|-----------|
+| `bekuhai-start` | 可杯遊戲開始 | 人數、語言 |
+| `bekuhai-complete` | 可杯 GameOver | 人數、回合數、遊戲時長(秒)、語言 |
+| `kikuhai-start` | 菊花杯遊戲開始 | 杯數模式、語言 |
+| `kikuhai-complete` | 菊花杯翻到菊花 | 杯數模式、罰酒杯數、翻了幾杯、時長(秒)、語言 |
+| `bgm-switch` | 切換 BGM | 遊戲名、切到哪首 |
+
+### 查看數據
+- **Dashboard**: [cloud.umami.is](https://cloud.umami.is)
+- **團隊說明頁**: [analytics-intro.html](https://kochi-games.vercel.app/analytics-intro.html)（noindex）
+
+---
+
 ## 部署
 
 ```bash
@@ -390,6 +414,7 @@ https://kochi-games.vercel.app/
 - [ ] 菊花杯 UI 逐頁優化（像可杯一樣精緻）
 - [ ] iPad pixel perfection（兩個遊戲）
 - [ ] 菊花杯：找到好看的豬口杯照片
+- [ ] 考慮接 Supabase 做更細緻的遊戲數據記錄
 
 ---
 
