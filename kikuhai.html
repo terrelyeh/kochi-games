@@ -610,6 +610,7 @@ function toggleBgm(){
   const toast=document.createElement('div');toast.className='bgm-toast';toast.textContent=t(BGM_KEYS[audio.bgmStyle]);
   document.body.appendChild(toast);setTimeout(()=>toast.remove(),2000);
   if(audio.musicPlaying){audio.stopMusic();audio.startMusic();}
+  if(typeof umami!=='undefined')umami.track('bgm-switch',{game:'kikuhai',to:audio.bgmStyle});
 }
 
 // ============================================================
