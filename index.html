@@ -277,6 +277,20 @@ function toggleLang() {
 
 applyLang();
 
+// Mini SFX for home page card clicks
+let _sfxCtx;
+function playHomeClick(){
+  if(!_sfxCtx)_sfxCtx=new(window.AudioContext||window.webkitAudioContext)();
+  if(_sfxCtx.state==='suspended')_sfxCtx.resume();
+  const n=_sfxCtx.currentTime;
+  const o=_sfxCtx.createOscillator();o.type='sine';o.frequency.value=1200;
+  const g=_sfxCtx.createGain();g.gain.setValueAtTime(0.15,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.08);
+  o.connect(g);g.connect(_sfxCtx.destination);o.start(n);o.stop(n+0.08);
+}
+document.querySelectorAll('.game-card:not(.coming-soon)').forEach(card=>{
+  card.addEventListener('click',()=>playHomeClick());
+});
+
 // Register Service Worker for PWA
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
 </script>

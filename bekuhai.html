@@ -858,7 +858,7 @@ function getRevealVoice(name,cupName,size){
 // ============================================================
 // SETUP
 // ============================================================
-function goSetup(){audio.init();audio.ensureResumed();setupCount=5;buildSetupPlayers();show('setup-screen');renderSetup();showSoundToast();}
+function goSetup(){audio.init();audio.ensureResumed();audio.playClick();setupCount=5;buildSetupPlayers();show('setup-screen');renderSetup();showSoundToast();}
 function showSoundToast(){const t=document.createElement('div');t.className='sound-toast';t.textContent='🔊 '+( I18N.lang==='ja'?'音声をオンにしてお楽しみください！':'請開啟手機聲音，體驗最佳效果！');document.body.appendChild(t);setTimeout(()=>{t.style.transition='opacity 0.5s';t.style.opacity='0';setTimeout(()=>t.remove(),500);},1800);}
 function buildSetupPlayers(){setupPlayers=[];for(let i=0;i<setupCount;i++)setupPlayers.push({name:DEFAULT_NAMES[i]||('P'+(i+1))});}
 function setPlayerCount(n){audio.playClick();setupCount=n;while(setupPlayers.length<n){const idx=setupPlayers.length;setupPlayers.push({name:DEFAULT_NAMES[idx]||('P'+(idx+1))});}while(setupPlayers.length>n)setupPlayers.pop();renderSetup();}
@@ -871,7 +871,7 @@ function renderSetup(){
   let lh='';for(let i=0;i<setupPlayers.length;i++){const p=setupPlayers[i];const hp=!!PLAYER_AVATARS[p.name];const av=hp?`<img src="${PLAYER_AVATARS[p.name]}" alt="${p.name}">`:'🧑';lh+=`<div class="player-row"><span class="idx">${i+1}</span><input class="name-input" value="${p.name}" oninput="updatePlayerName(${i},this.value)" maxlength="8"><div class="type-toggle${hp?' has-photo':''}" onclick="showAvatarZoom(setupPlayers[${i}].name)">${av}</div></div>`;}$('player-list').innerHTML=lh;
 }
 let _gameStartTime=0;
-function startFromSetup(){document.querySelectorAll('.name-input').forEach((inp,i)=>{setupPlayers[i].name=inp.value.trim()||('P'+(i+1));});state.players=setupPlayers.map(p=>({name:p.name,ml:0}));state.round=1;state.currentSpinner=0;state.spinning=false;_gameStartTime=Date.now();if(typeof umami!=='undefined')umami.track('bekuhai-start',{players:state.players.length,lang:I18N.lang});audio.startMusic();show('table-screen');startRound();}
+function startFromSetup(){audio.playClick();document.querySelectorAll('.name-input').forEach((inp,i)=>{setupPlayers[i].name=inp.value.trim()||('P'+(i+1));});state.players=setupPlayers.map(p=>({name:p.name,ml:0}));state.round=1;state.currentSpinner=0;state.spinning=false;_gameStartTime=Date.now();if(typeof umami!=='undefined')umami.track('bekuhai-start',{players:state.players.length,lang:I18N.lang});audio.startMusic();show('table-screen');startRound();}
 
 // ============================================================
 // TABLE

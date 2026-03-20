@@ -741,7 +741,7 @@ function goHome(){
 // SETUP
 // ============================================================
 function goSetup(){
-  audio.init();audio.ensureResumed();audio.startMusic();
+  audio.init();audio.ensureResumed();audio.playClick();audio.startMusic();
   state.cupCount=9;state.playerCount=4;
   show('setup-screen');renderSetup();showSoundToast();
 }
@@ -760,6 +760,7 @@ function renderSetup(){
 
 let _gameStartTime=0;
 function startGame(){
+  audio.playClick();
   state.round=1;state.currentPlayer=1;state.busy=false;
   _gameStartTime=Date.now();
   if(typeof umami!=='undefined')umami.track('kikuhai-start',{cups:state.cupCount,lang:I18N.lang});
