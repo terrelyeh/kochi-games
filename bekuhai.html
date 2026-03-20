@@ -952,6 +952,8 @@ function removeKomaListeners(){komaReady=false;komaCharging=false;const kd=$('ko
 // GAME LOGIC
 // ============================================================
 function startRound(){
+  try{
+  console.log('[KOMA] ===== startRound BEGIN round:'+state.round+' =====');
   state.spinning=false;
   $('table-info-bar').style.opacity='1';
   $('round-info').textContent=t('roundInfo',{n:state.round,max:state.maxRounds});
@@ -963,6 +965,8 @@ function startRound(){
   removeKomaListeners();
   $('spin-btn-wrap').innerHTML=`<div class="hold-hint">${t('holdToSpin')}</div>`;
   makeKomaInteractive();
+  console.log('[KOMA] ===== startRound END komaReady:'+komaReady+' pointer:'+kd.style.pointerEvents+' =====');
+  }catch(err){console.error('[KOMA] startRound ERROR:',err);}
 }
 
 async function doSpin(){
@@ -1063,7 +1067,7 @@ async function showNextButton(){
   const isTop=p.y<50;
   const btn=document.createElement('button');btn.className='next-btn-float '+(isTop?'below':'above');
   btn.innerHTML=`${t('nextRound')}<span class="next-name">${nextP.name}</span>`;
-  btn.onclick=()=>{audio.playClick();btn.remove();state.spinning=false;startRound();};
+  btn.onclick=()=>{console.log('[KOMA] NEXT BUTTON CLICKED');audio.playClick();btn.remove();state.spinning=false;startRound();};
   seat.appendChild(btn);
 }
 
