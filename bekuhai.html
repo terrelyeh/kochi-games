@@ -883,7 +883,7 @@ function getRevealVoice(name,cupName,size){
 // ============================================================
 // SETUP
 // ============================================================
-function goSetup(){audio.init();audio.ensureResumed();setupCount=4;buildSetupPlayers();show('setup-screen');renderSetup();showSoundToast();}
+function goSetup(){audio.init();audio.ensureResumed();setupCount=5;buildSetupPlayers();show('setup-screen');renderSetup();showSoundToast();}
 function showSoundToast(){const t=document.createElement('div');t.className='sound-toast';t.textContent='🔊 '+( I18N.lang==='ja'?'音声をオンにしてお楽しみください！':'請開啟手機聲音，體驗最佳效果！');document.body.appendChild(t);setTimeout(()=>{t.style.transition='opacity 0.5s';t.style.opacity='0';setTimeout(()=>t.remove(),500);},1800);}
 function buildSetupPlayers(){setupPlayers=[];for(let i=0;i<setupCount;i++)setupPlayers.push({name:DEFAULT_NAMES[i]||('P'+(i+1))});}
 function setPlayerCount(n){audio.playClick();setupCount=n;while(setupPlayers.length<n){const idx=setupPlayers.length;setupPlayers.push({name:DEFAULT_NAMES[idx]||('P'+(idx+1))});}while(setupPlayers.length>n)setupPlayers.pop();renderSetup();}
