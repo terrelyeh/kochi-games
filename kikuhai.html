@@ -556,14 +556,16 @@ const BGM_ICONS={moonlight:'🌙',summer:'🏮',festival:'🎆'};
 const BGM_KEYS={moonlight:'bgmMoonlight',summer:'bgmSummer',festival:'bgmFestival'};
 const BGM_FILES={moonlight:'月夜思鄉.mp3',summer:'夏日廟會.mp3',festival:'祭典夜晚.mp3'};
 
+const VOL_PRESETS=[{bgm:0,sfx:0,voice:0,icon:'🔇',duck:0},{bgm:0.12,sfx:0.5,voice:1.0,icon:'🔉',duck:0.02},{bgm:0.25,sfx:0.7,voice:1.0,icon:'🔊',duck:0.04}];
 class AudioManager{
-  constructor(){this.ctx=null;this.masterGain=null;this.musicGain=null;this.sfxGain=null;this.muted=false;this.musicPlaying=false;this.bgmStyle='moonlight';this._bgmAudio=null;this._bgmCache={};}
-  init(){if(this.ctx)return;this.ctx=new(window.AudioContext||window.webkitAudioContext)();this.masterGain=this.ctx.createGain();this.masterGain.connect(this.ctx.destination);this.musicGain=this.ctx.createGain();this.musicGain.gain.value=1.0;this.musicGain.connect(this.masterGain);this.sfxGain=this.ctx.createGain();this.sfxGain.gain.value=0.5;this.sfxGain.connect(this.masterGain);}
+  constructor(){this.ctx=null;this.masterGain=null;this.musicGain=null;this.sfxGain=null;this.volLevel=parseInt(localStorage.getItem('kochi-vol'))||1;this.musicPlaying=false;this.bgmStyle='moonlight';this._bgmAudio=null;this._bgmCache={};}
+  get muted(){return this.volLevel===0;}
+  init(){if(this.ctx)return;this.ctx=new(window.AudioContext||window.webkitAudioContext)();this.masterGain=this.ctx.createGain();this.masterGain.connect(this.ctx.destination);this.musicGain=this.ctx.createGain();this.musicGain.gain.value=1.0;this.musicGain.connect(this.masterGain);this.sfxGain=this.ctx.createGain();this.sfxGain.gain.value=VOL_PRESETS[this.volLevel].sfx;this.sfxGain.connect(this.masterGain);}
   ensureResumed(){if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();}
-  toggleMute(){this.muted=!this.muted;if(this.masterGain)this.masterGain.gain.value=this.muted?0:1;if(this._bgmAudio){if(this.muted){this._bgmAudio.pause();}else{this._bgmAudio.volume=0.08;if(this.musicPlaying)this._bgmAudio.play().catch(()=>{});}}document.getElementById('mute-toggle').textContent=this.muted?'🔇':'🔊';if(this.muted)speechSynthesis.cancel();}
+  cycleVolume(){this.volLevel=(this.volLevel+1)%3;localStorage.setItem('kochi-vol',this.volLevel);const p=VOL_PRESETS[this.volLevel];if(this.sfxGain)this.sfxGain.gain.value=p.sfx;if(this.masterGain)this.masterGain.gain.value=this.volLevel===0?0:1;if(this._bgmAudio){if(this.volLevel===0){this._bgmAudio.pause();}else{this._bgmAudio.volume=p.bgm;if(this.musicPlaying)this._bgmAudio.play().catch(()=>{});}}document.getElementById('mute-toggle').textContent=p.icon;if(this.volLevel===0)speechSynthesis.cancel();}
 
   // --- All BGM via MP3 ---
-  _playMP3(key){if(this._bgmAudio){this._bgmAudio.pause();this._bgmAudio.currentTime=0;}if(!this._bgmCache[key]){this._bgmCache[key]=new Audio(BGM_FILES[key]);this._bgmCache[key].loop=true;}this._bgmAudio=this._bgmCache[key];this._bgmAudio.volume=this.muted?0:0.08;this._bgmAudio.play().catch(()=>{});}
+  _playMP3(key){if(this._bgmAudio){this._bgmAudio.pause();this._bgmAudio.currentTime=0;}if(!this._bgmCache[key]){this._bgmCache[key]=new Audio(BGM_FILES[key]);this._bgmCache[key].loop=true;}this._bgmAudio=this._bgmCache[key];this._bgmAudio.volume=this.muted?0:VOL_PRESETS[this.volLevel].bgm;this._bgmAudio.play().catch(()=>{});}
   startMusic(){if(this.musicPlaying)return;this.init();this.musicPlaying=true;this._playMP3(this.bgmStyle);}
   stopMusic(){this.musicPlaying=false;if(this._bgmAudio){this._bgmAudio.pause();this._bgmAudio.currentTime=0;}}
 
@@ -621,7 +623,7 @@ class AudioManager{
   playWin(){this.init();const c=this.ctx,n=c.currentTime;[293.66,392,440,587.33].forEach((f,i)=>{const o=c.createOscillator();o.type='sine';const g=c.createGain();const t=n+i*0.12;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.15,t+0.04);g.gain.exponentialRampToValueAtTime(0.001,t+0.4);o.frequency.value=f;o.connect(g);g.connect(this.sfxGain);o.start(t);o.stop(t+0.4);});}
 }
 const audio=new AudioManager();
-function toggleMute(){audio.toggleMute();}
+function toggleMute(){audio.cycleVolume();}
 function toggleBgm(){
   const cur=BGM_ORDER.indexOf(audio.bgmStyle);
   audio.bgmStyle=BGM_ORDER[(cur+1)%BGM_ORDER.length];
@@ -647,8 +649,8 @@ class VoiceManager{
       v.find(x=>x.lang&&x.lang.startsWith('zh'))||null;
     this.ready=true;
   }
-  _duckBGM(){if(audio._bgmAudio)audio._bgmAudio.volume=0.01;}
-  _unduckBGM(){if(audio.muted)return;if(audio._bgmAudio)audio._bgmAudio.volume=0.08;}
+  _duckBGM(){if(audio._bgmAudio&&!audio.muted)audio._bgmAudio.volume=VOL_PRESETS[audio.volLevel].duck;}
+  _unduckBGM(){if(audio.muted)return;if(audio._bgmAudio)audio._bgmAudio.volume=VOL_PRESETS[audio.volLevel].bgm;}
   speak(text,opts={}){
     if(audio.muted)return;if(!this.ready)this.init();
     this._duckBGM();
@@ -1163,7 +1165,7 @@ document.addEventListener('mousedown',function(e){
 // ============================================================
 document.addEventListener('DOMContentLoaded',()=>{
   I18N.updateDOM();
-  $('mute-toggle').textContent='🔊';
+  $('mute-toggle').textContent=VOL_PRESETS[audio.volLevel].icon;
   $('bgm-toggle').textContent=BGM_ICONS[audio.bgmStyle];
   if(typeof speechSynthesis!=='undefined'&&speechSynthesis.getVoices().length>0)voice.init();
 });
