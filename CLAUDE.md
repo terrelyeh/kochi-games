@@ -1,6 +1,6 @@
 # CLAUDE.md — 萬華世界の維醺志士
 
-> Last updated: 2026-03-20
+> Last updated: 2026-03-21
 
 ## Project Overview
 
@@ -27,7 +27,7 @@ kochi-games/
 ├── index.html          # 首頁（遊戲選單）
 ├── bekuhai.html        # 可杯（獨樂酒杯遊戲）— 82KB, 已完成大量 UI 優化
 ├── kikuhai.html        # 菊花杯（清酒版俄羅斯輪盤）— 56KB, 剛完成基礎版
-├── hashiken.html       # 箸拳（猜拳對戰）— 54KB, 功能完成但 UI 未優化
+├── hashiken.html       # 箸拳（1v1 AI 對戰）— 已完成大改版（教學+AI角色+MP3 BGM）
 ├── bgm-kenshinso.mp3   # 健身操 BGM（3MB）— 可杯專用
 ├── 月夜思鄉.mp3        # 月夜思鄉 BGM（3.4MB）— 兩遊戲共用
 ├── 夏日廟會.mp3        # 夏日廟會 BGM（3.1MB）— 兩遊戲共用
@@ -63,7 +63,7 @@ kochi-games/
 |------|------|------------|------|
 | **可杯** bekuhai | 4～8 人 | 手機平放桌上，大家圍著看 | ✅ UI 大幅優化完成 |
 | **菊花杯** kikuhai | 不限（不輸入名字）| 手機放桌上，推到不同人面前翻杯 | ⚠️ 基礎版完成，需要 UI 優化 |
-| **箸拳** hashiken | 1 人 vs AI | 一人手持手機對戰電腦 | ⚠️ 功能完成，UI 未優化，index 設為 coming soon |
+| **箸拳** hashiken | 1 人 vs AI | 一人手持手機對戰 AI（大將） | ✅ 大改版完成（教學、AI 角色、語音台詞） |
 
 ## Conventions
 
@@ -74,12 +74,14 @@ kochi-games/
 
 ### 音頻規則
 - **所有 BGM 皆為 MP3**（已移除所有合成 BGM oscillator 代碼）
-- BGM 統一 volume=0.08，語音播放時 duck 到 0.01
+- **三段音量控制**：🔇 靜音 → 🔉 普通 → 🔊 大聲，`localStorage 'kochi-vol'` 跨遊戲共用
+- `VOL_PRESETS` 陣列定義各段的 bgm/sfx/voice/duck 音量
 - SFX 走 Web Audio API（sfxGain 0.5）
 - Voice volume = 1.0（要切過環境噪音）
 - MP3 BGM 靜音用 pause/play，不用 volume=0
 - `_bgmCache` 物件快取 Audio 元素，避免重複建立
 - 所有音頻需要使用者首次互動才能啟動（瀏覽器限制）
+- CTA 按鈕點擊時播放 click SFX（所有遊戲 + 首頁卡片）
 
 ### 設計規範
 - Safe area: `env(safe-area-inset-*)` 處理瀏海/Dynamic Island
@@ -95,12 +97,14 @@ kochi-games/
 
 ### 數據分析（Umami Cloud）
 - **Website ID**: `6de48909-2353-4e99-87fa-854079eba9f8`
-- 三個 HTML 頁面（index/bekuhai/kikuhai）皆有 Umami script tag
+- 四個 HTML 頁面（index/bekuhai/kikuhai/hashiken）皆有 Umami script tag
 - 自訂事件定義：
   - `bekuhai-start` → {players, lang}
   - `bekuhai-complete` → {players, rounds, duration, lang}
   - `kikuhai-start` → {cups, lang}
   - `kikuhai-complete` → {cups, penalty, flipped, duration, lang}
+  - `hashiken-start` → {lang, tutorialSkipped}
+  - `hashiken-complete` → {winner, playerScore, aiScore, rounds, duration, lang}
   - `bgm-switch` → {game, to}
 - Dashboard: [cloud.umami.is](https://cloud.umami.is)
 - 說明頁面: `analytics-intro.html`（noindex，團隊分享用）
@@ -120,7 +124,7 @@ kochi-games/
 - **支援 4～8 人**：人數上限從 6 擴展到 8，新增琬蒨/YY 頭像，7-8 人座墊自動縮小避免擠
 - **菊花杯基礎版**：6/9/12/15 杯模式、翻杯動畫、緊張感語音、iPad RWD
 - **手機優先框架**：Safe area、橫屏遮罩、觸控優化、字體載入優化
-- **首頁**：可杯（萬華獨家）→ 菊花杯 → 箸拳（coming soon）
+- **首頁**：可杯（萬華獨家）→ 菊花杯（萬華獨家）→ 箸拳（NEW）
 - **自製確認彈窗**：取代原生 confirm()
 - **PWA 支援**：manifest + service worker + 自訂 icon（乾杯！維醺志士）
 - **杯子圖片換乾淨去背版**：cup-*-clear.png（使用者重新去背提供）
@@ -128,12 +132,15 @@ kochi-games/
 - **聲音提醒 toast**：進入設定頁時提示開啟手機聲音
 - **全 MP3 BGM 系統**：移除所有合成 BGM，改用 MP3（可杯 4 首，菊花杯 3 首）
 - **Umami 數據分析**：自訂事件追蹤遊玩行為（開局/結束/BGM 切換），團隊說明頁 analytics-intro.html
+- **三段音量控制**：🔇🔉🔊 三段循環，取代 binary mute toggle，跨遊戲共用 localStorage
+- **CTA 按鈕音效**：所有主要按鈕 + 首頁遊戲卡片點擊時播放 click SFX
+- **觸控手勢 + 漣漪效果**：所有按鈕 touchstart 漣漪動畫，提升觸感回饋
+- **箸拳大改版**：視覺化規則卡片、3 步驟互動教學（可跳過）、AI 角色「大將」（30 句中日雙語台詞 × 6 類情境）、移除猜拳改隨機分配角色、MP3 BGM、Umami 事件追蹤
 
 ### ⚠️ Pending / Known Issues
 
-- **箸拳 UI 優化**：下一步重點，目前設為 coming soon
 - **菊花杯 UI 優化**：需要像可杯一樣做畫面逐頁微調（UX 細節）
-- **iPad pixel perfection**：兩個遊戲都需要更精緻的 iPad 排版調整
+- **iPad pixel perfection**：三個遊戲都需要更精緻的 iPad 排版調整
 - **遊戲中切換語言會 hang**：已移除遊戲中的語言切換按鈕作為 workaround
 - **export*.svg 未使用**：高品質但太大（400-600KB），目前用 PNG
 - **Supabase 事件記錄**：未來可考慮接 Supabase 做更細緻的遊戲數據記錄（方案 B）
