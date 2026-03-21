@@ -9,9 +9,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1210">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="6de48909-2353-4e99-87fa-854079eba9f8"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700&family=Noto+Serif+JP:wght@700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -99,8 +100,10 @@
     80% { opacity: 1; }
     100% { opacity: 0; transform: scale(0.8); }
   }
-
-  /* === Push-Out Animation Keyframes === */
+  @keyframes btnGlow {
+    0%, 100% { box-shadow: 0 4px 16px rgba(192,57,43,0.4); }
+    50% { box-shadow: 0 4px 28px rgba(192,57,43,0.7); }
+  }
   @keyframes pushUp {
     0% { transform: translateY(100%); opacity: 0; }
     50% { transform: translateY(-8px); opacity: 1; }
@@ -113,86 +116,132 @@
   }
 
   /* === Persistent Controls === */
-  .ctrl-bar {
-    position: fixed;
-    top: calc(12px + var(--safe-top));
-    right: 12px;
-    display: flex;
-    gap: 6px;
-    z-index: 200;
-  }
-  .ctrl-btn {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 1px solid var(--surface-2);
-    background: var(--surface);
-    font-size: 22px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    user-select: none;
-  }
-  .ctrl-btn:active { transform: scale(0.9); }
-  #home-btn { font-size: 18px; }
-  #bgm-toggle { font-size: 16px; display: none; }
+  .ctrl-left{position:fixed;top:calc(12px + var(--safe-top));left:12px;z-index:200;}
+  .ctrl-right{position:fixed;top:calc(12px + var(--safe-top));right:12px;display:flex;gap:6px;z-index:200;}
+  .ctrl-btn{width:42px;height:42px;border-radius:50%;border:1px solid rgba(58,45,36,0.6);background:rgba(42,31,26,0.7);font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0.6;}
+  .ctrl-btn:active{opacity:1;transform:scale(0.9);}
+  .ctrl-btn.vol-muted{opacity:0.35;}
+  .ctrl-btn.vol-loud{opacity:1;border-color:rgba(212,168,67,0.6);box-shadow:0 0 10px rgba(212,168,67,0.35);}
+  #home-btn{font-size:16px;}
+  #bgm-toggle{display:none;}
+
+  /* === Ripple effect === */
+  @keyframes rippleEffect{0%{transform:translate(-50%,-50%) scale(0);opacity:0.4;}100%{transform:translate(-50%,-50%) scale(4);opacity:0;}}
+  .ripple-circle{position:absolute;border-radius:50%;width:60px;height:60px;background:rgba(245,230,200,0.25);pointer-events:none;animation:rippleEffect 0.5s ease-out forwards;z-index:0;}
 
   /* === Welcome Screen === */
+  #welcome-screen{
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(139,90,43,0.12) 0%, transparent 70%),
+      repeating-linear-gradient(90deg, rgba(107,68,35,0.03) 0px, rgba(107,68,35,0.03) 1px, transparent 1px, transparent 8px),
+      linear-gradient(180deg, #1e1510 0%, #120d09 100%);
+  }
   .welcome-deco { font-size: 48px; margin-bottom: 8px; }
   .title {
     font-family: 'Noto Serif JP', serif;
     font-size: 52px;
     font-weight: 900;
     color: var(--gold);
-    text-shadow: 0 2px 12px rgba(212,168,67,0.3);
+    text-shadow: 0 2px 16px rgba(212,168,67,0.4), 0 0 60px rgba(212,168,67,0.1);
     letter-spacing: 8px;
-    margin-bottom: 4px;
+    margin-bottom: 0;
+  }
+  .title-romaji {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 11px;
+    color: var(--cream-dim);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
   }
   .subtitle {
     font-family: 'Noto Serif JP', serif;
     font-size: 16px;
     color: var(--cream-dim);
     letter-spacing: 4px;
-    margin-bottom: 32px;
+    margin-bottom: 24px;
   }
   .tagline {
     font-size: 14px;
     color: var(--gold-light);
-    background: var(--surface);
-    padding: 10px 20px;
-    border-radius: 8px;
-    border: 1px solid var(--gold);
+    background: linear-gradient(135deg, rgba(42,31,26,0.9), rgba(58,45,36,0.9));
+    padding: 10px 24px;
+    border-radius: 20px;
+    border: 1px solid rgba(212,168,67,0.4);
     margin-bottom: 24px;
     font-weight: 500;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
   }
+
+  /* === Visual Rule Cards === */
   .rules-box {
-    background: var(--surface);
-    border: 1px solid var(--surface-2);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 32px;
+    background: linear-gradient(180deg, rgba(46,35,25,0.95) 0%, rgba(37,28,20,0.95) 100%);
+    border: 1px solid rgba(212,168,67,0.15);
+    border-radius: 16px;
+    padding: 22px 24px;
+    margin-bottom: 24px;
     text-align: left;
     width: 100%;
     max-width: 400px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03);
+    position: relative;
+    overflow: hidden;
   }
+  .rules-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg, transparent, rgba(212,168,67,0.3), transparent);}
   .rules-box h3 {
     font-family: 'Noto Serif JP', serif;
     color: var(--gold);
-    margin-bottom: 12px;
-    font-size: 15px;
+    margin-bottom: 14px;
+    font-size: 16px;
   }
-  .rules-box ul {
-    list-style: none;
-    font-size: 15px;
-    line-height: 1.8;
+  .rule-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(212,168,67,0.08);
+  }
+  .rule-card:last-child { border-bottom: none; }
+  .rule-card .rule-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+    width: 36px;
+    text-align: center;
+    line-height: 1.2;
+  }
+  .rule-card .rule-text {
+    font-size: 14px;
     color: var(--cream);
+    line-height: 1.7;
   }
-  .rules-box ul li::before { content: '▸ '; color: var(--red-bright); }
+  .rule-card .rule-text strong { color: var(--gold-light); }
+  .rules-highlight {
+    margin-top: 14px;
+    padding: 14px 16px;
+    background: rgba(212,168,67,0.08);
+    border: 1px solid rgba(212,168,67,0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .highlight-icon {
+    font-size: 42px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 2px 12px rgba(212,168,67,0.4));
+    animation: sakeWave 2.5s ease-in-out infinite;
+  }
+  .highlight-text {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 13px;
+    color: var(--cream);
+    line-height: 1.7;
+    text-align: left;
+  }
+  .highlight-text strong { color: var(--gold-light); font-size: 14px; }
 
+  /* === Buttons === */
   .btn {
     font-family: 'Noto Sans JP', sans-serif;
     font-size: 18px;
@@ -205,63 +254,22 @@
     letter-spacing: 2px;
     min-height: 56px;
     touch-action: manipulation;
+    position: relative;
+    overflow: hidden;
   }
   .btn:active { transform: scale(0.96); }
   .btn-primary {
     background: linear-gradient(135deg, var(--red), var(--red-bright));
     color: var(--white);
     box-shadow: 0 4px 16px rgba(192,57,43,0.4);
+    animation: btnGlow 2s infinite;
   }
-  .btn-primary:hover { box-shadow: 0 6px 24px rgba(192,57,43,0.6); }
   .btn-gold {
     background: linear-gradient(135deg, var(--gold), var(--gold-light));
     color: var(--bg);
     box-shadow: 0 4px 16px rgba(212,168,67,0.4);
   }
   .btn-sm { font-size: 14px; padding: 10px 24px; border-radius: 8px; }
-
-  /* === Janken === */
-  .janken-prompt {
-    font-family: 'Noto Serif JP', serif;
-    font-size: 20px;
-    color: var(--gold);
-    margin-bottom: 24px;
-  }
-  .janken-hands { display: flex; gap: 16px; margin-bottom: 24px; }
-  .janken-btn {
-    width: 100px; height: 100px;
-    border-radius: 16px;
-    background: var(--surface);
-    border: 2px solid var(--surface-2);
-    font-size: 48px;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .janken-btn:hover { border-color: var(--gold); transform: translateY(-4px); }
-  .janken-btn:active { transform: scale(0.95); }
-  .janken-btn.disabled { opacity: 0.3; pointer-events: none; }
-  .janken-result { font-size: 24px; margin: 16px 0; min-height: 36px; }
-  .janken-vs {
-    display: flex; align-items: center; gap: 20px;
-    font-size: 48px; margin: 16px 0; min-height: 60px;
-  }
-  .janken-vs span { font-size: 20px; color: var(--cream-dim); }
-
-  /* === Role === */
-  .role-card {
-    background: var(--surface);
-    border: 2px solid var(--gold);
-    border-radius: 16px;
-    padding: 32px; margin: 16px 0;
-    width: 100%; max-width: 360px;
-    animation: bounceIn 0.6s ease;
-  }
-  .role-label { font-size: 14px; color: var(--cream-dim); margin-bottom: 8px; letter-spacing: 2px; }
-  .role-name { font-family: 'Noto Serif JP', serif; font-size: 36px; font-weight: 900; margin-bottom: 8px; }
-  .role-name.parent { color: var(--red-bright); }
-  .role-name.child { color: var(--blue); }
-  .role-desc { font-size: 15px; color: var(--cream); line-height: 1.6; }
 
   /* === Game Screen === */
   #game-screen { justify-content: flex-start; padding-top: 16px; gap: 0; overflow-y: auto; }
@@ -274,7 +282,8 @@
   .score-side { text-align: center; flex: 1; }
   .score-side .label { font-size: 13px; color: var(--cream-dim); letter-spacing: 1px; }
   .score-side .score {
-    font-family: 'Noto Serif JP', serif; font-size: 32px; font-weight: 900; color: var(--gold);
+    font-family: 'Inter', sans-serif; font-size: 32px; font-weight: 700; color: var(--gold);
+    font-variant-numeric: tabular-nums;
   }
   .score-divider { font-size: 20px; color: var(--surface-2); padding: 0 8px; }
   .round-info { font-size: 14px; color: var(--cream-dim); margin-bottom: 16px; letter-spacing: 1px; }
@@ -293,12 +302,30 @@
     display: flex; align-items: center; justify-content: center; gap: 12px;
     padding: 16px; border-radius: 12px;
     background: var(--surface); margin-bottom: 8px; min-height: 100px;
+    position: relative;
   }
   .arena-side.opponent { border: 1px solid var(--surface-2); }
   .arena-side.player { border: 2px solid var(--gold); animation: glow 2s infinite; }
   .arena-side .side-label {
     font-size: 12px; color: var(--cream-dim);
     writing-mode: vertical-rl; letter-spacing: 2px;
+  }
+  .arena-side .side-label .ai-name { color: var(--red-bright); font-weight: 700; }
+
+  /* === AI Dialogue Bubble === */
+  .ai-dialogue {
+    position: absolute; top: -44px; left: 50%; transform: translateX(-50%);
+    background: rgba(58,45,36,0.95); border: 1px solid var(--gold);
+    border-radius: 12px; padding: 8px 14px; font-size: 13px;
+    color: var(--cream); z-index: 20;
+    animation: bounceIn 0.4s ease; max-width: 280px; text-align: center;
+    white-space: nowrap;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .ai-dialogue::after {
+    content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+    border-left: 8px solid transparent; border-right: 8px solid transparent;
+    border-top: 8px solid var(--gold);
   }
 
   /* === Hand Display === */
@@ -317,22 +344,18 @@
   }
   .hand-display .hand-hint { display: block; }
 
-  /* Ready: show fist emoji */
   .hand-display.ready .fist-emoji { display: block; }
   .hand-display.ready .hand-hint { display: none; }
   .hand-display.ready .sticks { display: none; }
 
-  /* Shaking: fist shakes */
   .hand-display.shaking .fist-emoji { display: block; animation: shake 0.3s infinite; }
   .hand-display.shaking .hand-hint { display: none; }
   .hand-display.shaking .sticks { display: none; }
 
-  /* Push out: fist fades, chopsticks push up */
   .hand-display.push-out .fist-emoji { display: block; animation: fistOut 0.3s ease-in forwards; }
   .hand-display.push-out .sticks { display: flex; animation: pushUp 0.5s 0.15s both; }
   .hand-display.push-out .hand-hint { display: none; }
 
-  /* Final revealed state */
   .hand-display.show-sticks .fist-emoji { display: none; }
   .hand-display.show-sticks .sticks { display: flex; }
   .hand-display.show-sticks .hand-hint { display: none; }
@@ -357,6 +380,7 @@
     font-size: 28px; font-weight: 700; cursor: pointer;
     transition: all 0.2s;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    position: relative; overflow: hidden;
   }
   .pick-btn .mini-sticks { display: flex; gap: 3px; height: 12px; }
   .pick-btn .mini-stick { width: 3px; height: 12px; background: var(--red-bright); border-radius: 1px; }
@@ -384,7 +408,7 @@
   /* === Reveal === */
   .reveal-result { width: 100%; max-width: 400px; text-align: center; }
   .reveal-total { font-family: 'Noto Serif JP', serif; font-size: 20px; color: var(--cream); margin: 8px 0; }
-  .reveal-total .num { font-size: 40px; font-weight: 900; color: var(--gold); }
+  .reveal-total .num { font-family: 'Inter', sans-serif; font-size: 40px; font-weight: 700; color: var(--gold); }
   .reveal-winner {
     font-family: 'Noto Serif JP', serif; font-size: 28px; font-weight: 900;
     margin: 12px 0; padding: 12px 24px; border-radius: 12px;
@@ -412,14 +436,42 @@
     margin: 8px 0; letter-spacing: 2px;
   }
 
-  /* === BGM Toast === */
-  .bgm-toast {
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    background: var(--surface); border: 1px solid var(--gold);
-    color: var(--gold-light); padding: 8px 20px; border-radius: 20px;
-    font-size: 13px; font-weight: 500; z-index: 300;
-    animation: toastIn 0.3s ease, toastOut 0.3s 1.5s ease forwards;
+  /* === Confirm Dialog === */
+  .confirm-overlay{position:fixed;inset:0;background:rgba(26,18,16,0.85);display:flex;align-items:center;justify-content:center;z-index:9000;animation:fadeIn 0.2s ease;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+  .confirm-box{background:linear-gradient(180deg, #2e2319 0%, #1e1510 100%);border:1px solid rgba(212,168,67,0.3);border-radius:20px;padding:28px 24px;text-align:center;max-width:300px;width:85%;box-shadow:0 8px 40px rgba(0,0,0,0.5);}
+  .confirm-msg{font-family:'Noto Serif JP',serif;font-size:17px;color:var(--cream);margin-bottom:24px;line-height:1.6;}
+  .confirm-btns{display:flex;gap:12px;justify-content:center;}
+  .confirm-btns button{font-family:'Noto Serif JP',serif;font-size:15px;font-weight:700;padding:10px 24px;border:none;border-radius:12px;cursor:pointer;touch-action:manipulation;min-width:100px;}
+  .confirm-yes{background:linear-gradient(135deg,var(--red),var(--red-bright));color:var(--white);}
+  .confirm-no{background:rgba(255,255,255,0.08);color:var(--cream);border:1px solid rgba(255,255,255,0.15) !important;}
+
+  /* === Tutorial Overlay === */
+  .tutorial-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(26,18,16,0.95);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: var(--safe-top) 20px var(--safe-bottom);
+    animation: fadeIn 0.4s ease;
   }
+  .tutorial-card {
+    background: linear-gradient(180deg, #2e2319, #1e1510);
+    border: 1px solid rgba(212,168,67,0.3); border-radius: 20px;
+    padding: 28px 24px; max-width: 360px; width: 90%;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .tutorial-dots { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; }
+  .tutorial-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--surface-2); transition: background 0.3s; }
+  .tutorial-dot.active { background: var(--gold); }
+  .tutorial-title { font-family: 'Noto Serif JP', serif; font-size: 20px; color: var(--gold); margin-bottom: 16px; }
+  .tutorial-visual { font-size: 42px; margin: 12px 0; line-height: 1.4; }
+  .tutorial-body { font-size: 14px; color: var(--cream); line-height: 1.8; margin-bottom: 20px; }
+  .tutorial-body strong { color: var(--gold-light); }
+  .tutorial-skip { font-size: 13px; color: var(--cream-dim); cursor: pointer; margin-top: 12px; text-decoration: underline; -webkit-tap-highlight-color: transparent; }
+
+  /* === Toast === */
+  .bgm-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--gold);color:var(--gold-light);padding:8px 20px;border-radius:20px;font-size:13px;font-weight:500;z-index:300;animation:toastIn 0.3s ease,toastOut 0.3s 1.5s ease forwards;}
+  .sound-toast{position:fixed;top:calc(50% - 30px);left:50%;transform:translateX(-50%);background:rgba(42,31,26,0.95);border:1.5px solid var(--gold);color:var(--gold-light);padding:14px 28px;border-radius:14px;font-family:'Noto Sans JP',sans-serif;font-size:15px;font-weight:500;z-index:300;animation:toastIn 0.3s ease;white-space:nowrap;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
   @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
   @keyframes toastOut { to { opacity: 0; transform: translateX(-50%) translateY(-10px); } }
 
@@ -427,18 +479,17 @@
      RESPONSIVE DESIGN
      ======================================== */
 
-  @media (max-width: 375px) { .ctrl-btn { width: 44px; height: 44px; font-size: 20px; } }
-  /* Small screens (iPhone SE, 375px) */
+  @media (max-width: 375px) { .ctrl-btn { width: 40px; height: 40px; font-size: 17px; } }
   @media (max-width: 390px) {
     .title { font-size: 38px; letter-spacing: 4px; }
     .subtitle { font-size: 13px; margin-bottom: 20px; }
     .tagline { font-size: 12px; padding: 8px 14px; }
-    .rules-box { padding: 14px; margin-bottom: 20px; }
-    .rules-box ul { font-size: 12px; line-height: 1.7; }
+    .rules-box { padding: 14px 16px; margin-bottom: 16px; }
+    .rule-card .rule-icon { font-size: 22px; width: 28px; }
+    .rule-card .rule-text { font-size: 12px; }
+    .highlight-icon { font-size: 32px; }
+    .highlight-text { font-size: 12px; }
     .btn { font-size: 16px; padding: 12px 36px; }
-    .janken-btn { width: 80px; height: 80px; font-size: 38px; }
-    .role-card { padding: 24px; }
-    .role-name { font-size: 28px; }
     .pick-btn { width: 64px; height: 64px; font-size: 22px; }
     .scoreboard { padding: 10px 14px; }
     .score-side .score { font-size: 26px; }
@@ -447,18 +498,19 @@
     .reveal-winner { font-size: 22px; padding: 10px 16px; }
     .gameover-title { font-size: 26px; }
     .sake-cup { font-size: 60px; }
+    .tutorial-card { padding: 20px 16px; }
+    .tutorial-title { font-size: 18px; }
+    .tutorial-visual { font-size: 36px; }
+    .ai-dialogue { font-size: 12px; max-width: 220px; }
   }
 
-  /* Short screens */
   @media (max-height: 700px) {
     .screen { padding: 16px 16px; }
     .welcome-deco { font-size: 36px; margin-bottom: 4px; }
     .title { font-size: 36px; }
     .subtitle { margin-bottom: 16px; }
     .tagline { margin-bottom: 16px; }
-    .rules-box { padding: 12px; margin-bottom: 16px; }
-    .rules-box ul { font-size: 12px; line-height: 1.6; }
-    .role-card { padding: 20px; margin: 8px 0; }
+    .rules-box { padding: 14px 18px; margin-bottom: 16px; }
     .arena-side { padding: 10px; min-height: 80px; }
     .hand-display { min-height: 60px; }
     .chopstick { height: 36px; }
@@ -468,18 +520,18 @@
     .sake-cup { font-size: 56px; }
   }
 
-  /* Very short / landscape */
   @media (max-height: 550px) {
     .screen { min-height: auto; padding: 12px 12px; justify-content: flex-start; }
     .welcome-deco { display: none; }
     .title { font-size: 30px; margin-bottom: 2px; }
+    .title-romaji { display: none; }
     .subtitle { font-size: 12px; margin-bottom: 8px; }
     .tagline { margin-bottom: 8px; font-size: 11px; }
-    .rules-box { margin-bottom: 8px; padding: 8px; }
-    .rules-box ul { font-size: 11px; line-height: 1.4; }
+    .rules-box { margin-bottom: 8px; padding: 8px 12px; }
+    .rule-card { padding: 6px 0; }
+    .rule-card .rule-icon { font-size: 20px; }
+    .rule-card .rule-text { font-size: 11px; }
     .btn { padding: 10px 28px; font-size: 15px; }
-    .janken-btn { width: 70px; height: 70px; font-size: 34px; }
-    .janken-vs { font-size: 36px; margin: 8px 0; }
     .arena-side { padding: 8px; min-height: 64px; }
     .hand-display { min-height: 50px; }
     .chopstick { height: 30px; width: 6px; }
@@ -487,6 +539,33 @@
     .countdown-text { font-size: 48px; }
     .sake-cup { font-size: 48px; }
   }
+
+  /* iPad / tablet */
+  @media (min-width: 600px) {
+    .screen { padding: calc(40px + var(--safe-top)) 40px calc(40px + var(--safe-bottom)); }
+    .title { font-size: 64px; letter-spacing: 12px; }
+    .title-romaji { font-size: 13px; letter-spacing: 8px; }
+    .tagline { font-size: 18px; padding: 14px 32px; }
+    .rules-box { max-width: 560px; padding: 28px; }
+    .rule-card .rule-icon { font-size: 32px; width: 40px; }
+    .rule-card .rule-text { font-size: 16px; }
+    .highlight-icon { font-size: 48px; }
+    .highlight-text { font-size: 15px; }
+    .btn { font-size: 22px; padding: 18px 56px; min-height: 64px; border-radius: 16px; }
+    .scoreboard { max-width: 500px; padding: 16px 28px; }
+    .score-side .score { font-size: 40px; }
+    .arena { max-width: 500px; }
+    .arena-side { padding: 20px; min-height: 120px; }
+    .pick-btn { width: 80px; height: 80px; font-size: 28px; }
+    .chopstick { width: 10px; height: 56px; }
+    .countdown-text { font-size: 120px; }
+    .tutorial-card { max-width: 440px; padding: 36px 32px; }
+    .tutorial-title { font-size: 24px; }
+    .tutorial-visual { font-size: 56px; }
+    .tutorial-body { font-size: 16px; }
+    .ai-dialogue { font-size: 15px; max-width: 320px; }
+  }
+
   @media (orientation: landscape) {
     body::before { content: ''; position: fixed; inset: 0; background: var(--bg); z-index: 99999; }
     body::after { content: '📱'; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100000; font-size: 48px; animation: rotateTip 1.5s ease-in-out infinite; }
@@ -498,8 +577,10 @@
 <div id="app">
 
   <!-- Persistent Controls -->
-  <div class="ctrl-bar">
-    <button class="ctrl-btn" id="home-btn" onclick="goHome()">🏠</button>
+  <div class="ctrl-left">
+    <button class="ctrl-btn" id="home-btn" onclick="goHome()">↩</button>
+  </div>
+  <div class="ctrl-right">
     <button class="ctrl-btn" id="lang-toggle" onclick="toggleLang()"></button>
     <button class="ctrl-btn" id="bgm-toggle" onclick="toggleBgm()"></button>
     <button class="ctrl-btn" id="mute-toggle" onclick="toggleMute()"></button>
@@ -509,40 +590,18 @@
   <div id="welcome-screen" class="screen active">
     <div class="welcome-deco">🥢</div>
     <h1 class="title">箸拳</h1>
-    <p class="subtitle" data-i18n="subtitle">H A S H I K E N</p>
+    <p class="title-romaji">Hashiken</p>
+    <p class="subtitle" data-i18n="subtitle"></p>
     <div class="tagline" data-i18n="tagline"></div>
     <div class="rules-box">
       <h3 data-i18n="rulesTitle"></h3>
-      <ul id="rules-list"></ul>
+      <div id="rules-cards"></div>
+      <div class="rules-highlight">
+        <div class="highlight-icon">🍶</div>
+        <div class="highlight-text" id="highlight-text"></div>
+      </div>
     </div>
-    <button class="btn btn-primary" onclick="startJanken()" data-i18n="startBtn"></button>
-  </div>
-
-  <!-- ===== JANKEN ===== -->
-  <div id="janken-screen" class="screen">
-    <p class="janken-prompt" id="janken-prompt"></p>
-    <div class="janken-vs" id="janken-vs"></div>
-    <div class="janken-hands">
-      <button class="janken-btn" data-hand="rock" onclick="playJanken('rock')">✊</button>
-      <button class="janken-btn" data-hand="scissors" onclick="playJanken('scissors')">✌️</button>
-      <button class="janken-btn" data-hand="paper" onclick="playJanken('paper')">🖐️</button>
-    </div>
-    <div class="janken-result" id="janken-result"></div>
-  </div>
-
-  <!-- ===== ROLE ===== -->
-  <div id="role-screen" class="screen">
-    <p style="font-size:14px; color:var(--cream-dim); margin-bottom:8px;" data-i18n="roleDecided"></p>
-    <div class="role-card">
-      <div class="role-label" data-i18n="yourRole"></div>
-      <div class="role-name" id="role-name"></div>
-      <div class="role-desc" id="role-desc"></div>
-    </div>
-    <div style="margin-top:8px;">
-      <div style="font-size:13px; color:var(--cream-dim); margin-bottom:4px;" data-i18n="opponentLabel"></div>
-      <div style="font-size:18px; font-weight:700;" id="opponent-role"></div>
-    </div>
-    <button class="btn btn-gold" style="margin-top:24px;" onclick="startGame()" data-i18n="startBattle"></button>
+    <button class="btn btn-primary" onclick="startNewGame()" data-i18n="startBtn"></button>
   </div>
 
   <!-- ===== GAME ===== -->
@@ -554,7 +613,7 @@
       </div>
       <div class="score-divider">—</div>
       <div class="score-side">
-        <div class="label" data-i18n="opponentLabel"></div>
+        <div class="label" id="ai-label"></div>
         <div class="score" id="ai-score">0</div>
       </div>
     </div>
@@ -563,8 +622,8 @@
     <div class="call-preview" id="call-preview"></div>
     <div id="irasshai-box" style="min-height:40px;"></div>
     <div class="arena">
-      <div class="arena-side opponent">
-        <span class="side-label" data-i18n="opponentLabel"></span>
+      <div class="arena-side opponent" id="arena-opponent">
+        <span class="side-label" id="opponent-side-label"></span>
         <div class="hand-display" id="ai-hand">
           <span class="fist-emoji">✊</span>
           <div class="sticks" id="ai-sticks"></div>
@@ -606,36 +665,20 @@ const I18N = {
   _lang: localStorage.getItem('hashiken-lang-v2') || 'zh',
   _strings: {
     ja: {
-      subtitle: 'H A S H I K E N',
+      subtitle: '筷 子 拳',
       tagline: '「負け得」— 負けた者が勝つ',
       rulesTitle: '📜 ルール',
-      rules: [
-        '双方各 <strong>3 本の赤箸</strong> を持つ',
-        '毎ラウンド 0〜3 本を秘密に選ぶ',
-        '<strong>先手（親）</strong>は常に「3」をコール',
-        '<strong>後手（子）</strong>は出す本数により「1」か「5」をコール',
-        '双方の合計 ＝ コール → その方が勝ち',
-        '合計が偶数 → 引き分け、攻守交代',
-        '三本勝負（先取2勝）、負けた方は <strong>罰杯！🍶</strong>',
+      ruleCards: [
+        { icon: '🥢', text: '双方各 <strong>3本の赤箸</strong> を持ち<br>毎ラウンド 0〜3本を秘密に選ぶ' },
+        { icon: '👑', text: '<strong>親（先手）</strong>は常に「3」をコール<br><strong>子（後手）</strong>は「1」か「5」をコール' },
+        { icon: '🎯', text: '双方の合計 ＝ コール → <strong>的中で勝ち！</strong><br>合計が偶数 → <strong>引き分け・攻守交代</strong>' },
       ],
+      rulesHighlight: '三本勝負（先取2勝）<br>負けた方は <strong>罰杯！</strong>',
       startBtn: 'いらっしゃい！',
-      jankenForced: '最初はグー！（第一拳は強制グー）',
-      jankenGo: 'じゃんけんぽん！',
-      tieJanken: 'あいこ！もう一回',
-      tieForced: 'あいこ！（引き分け）',
-      youWinJanken: 'あなたの勝ち！',
-      oppWinJanken: '相手の勝ち！',
-      roleDecided: '役割が決まった！',
-      yourRole: 'あなたの役割',
-      opponentLabel: '相手',
-      startBattle: '対決開始！',
       you: 'あなた',
+      aiName: '👨‍🍳 おやじ',
       roleParent: '先手（親）',
       roleChild: '後手（子）',
-      roleParentDesc: '常に <strong>「3」</strong> をコール<br>箸の合計が3になるように祈れ！',
-      roleChildDesc: '<strong>「1」か「5」</strong> をコール（出す本数で決まる）<br>先に仕掛ける！',
-      oppIsChild: '後手（子）— コール 1 or 5',
-      oppIsParent: '先手（親）— コール 3',
       roundInfo: '第 {n} ラウンド ／ 先取2勝',
       badgeParent: '先手（親）— コール 3',
       badgeChild: '後手（子）— コール 1 or 5',
@@ -643,7 +686,7 @@ const I18N = {
       callPreviewChildAuto: '出す本数で コール が決まる',
       callPreviewChildN: 'あなたのコール：{n}',
       irrashai: 'いらっしゃい！',
-      irrashaiOpp: '相手：いらっしゃい！',
+      irrashaiOpp: 'おやじ：いらっしゃい！',
       pickPrompt: '箸を何本出す？',
       confirmBtn: '出す！',
       selectHint: '選択してください…',
@@ -652,26 +695,26 @@ const I18N = {
       tieRound: 'あいこ！（引き分け）',
       tieDetail: '合計 {n} 本（偶数）→ 攻守交代！',
       winRound: 'あなたの勝ち！',
-      loseRound: '相手の勝ち…',
+      loseRound: 'おやじの勝ち…',
       callHitYou: '合計 {total} 本 ＝ あなたのコール「{call}」→ 的中！',
-      callHitOpp: '合計 {total} 本 ＝ 相手のコール「{call}」→ 的中！',
-      revealSum: 'あなた {pp} 本 ＋ 相手 {ap} 本 ＝',
+      callHitOpp: '合計 {total} 本 ＝ おやじのコール「{call}」→ 的中！',
+      revealSum: 'あなた {pp} 本 ＋ おやじ {ap} 本 ＝',
       parentCallLabel: '{who}（親）→「3」',
       childCallLabel: '{who}（子）→「{call}」',
       seeResult: '結果を見る',
       nextRound: '次のラウンド',
       gameoverWinTitle: 'あなたの勝利！',
       gameoverLoseTitle: 'あなたの負け…',
-      gameoverWinMsg: '最終スコア：<strong>{ps} - {as}</strong><br><br>相手は罰杯を飲み干します…🍶<br>でも「負け得」の精神では、<br><strong>飲める方が本当の勝者！</strong>',
+      gameoverWinMsg: '最終スコア：<strong>{ps} - {as}</strong><br><br>おやじは罰杯を飲み干す…🍶<br>でも「負け得」の精神では、<br><strong>飲める方が本当の勝者！</strong>',
       gameoverLoseMsg: '最終スコア：<strong>{ps} - {as}</strong><br><br>罰杯はあなたのもの！🍶<br>でも忘れないで——<br><strong>「負け得」＝負けた者が勝つ</strong><br>飲み干した後は…',
       gochisou: 'ごちそうさまでした！',
       playAgain: 'もう一局！',
-      confirmHome: 'メインに戻りますか？',
-      bgmMiyako: '🌙 静夜',
-      bgmShamisen: '🎶 宴会',
-      voiceRock: '最初はグー',
-      voiceJanken: 'じゃんけんぽん',
-      voiceIrrashai: 'いらっしゃい',
+      confirmHome: 'ゲームを終了しますか？',
+      confirmNo: 'いいえ',
+      confirmYes: 'はい',
+      bgmMoonlight: '🌙 静夜',
+      bgmSummer: '🏮 夏祭り',
+      bgmFestival: '🎆 祭典',
       voiceSeNo: 'せーの',
       voiceDase: '出せ',
       voiceTie: 'あいこ',
@@ -679,38 +722,76 @@ const I18N = {
       voiceCall1: 'いっぽん',
       voiceCall3: 'さんぼん',
       voiceCall5: 'ごほん',
+      voiceWin: '見事だ！維醺志士の称号を授けよう！',
+      voiceLose: '罰杯一気飲み！これが箸拳の掟だ！',
+      // Tutorial
+      tutStep1Title: 'Step 1：箸を選ぶ',
+      tutStep1Body: '毎ラウンド、あなたとおやじは<br>それぞれ <strong>0〜3本</strong> の箸を秘密に選びます',
+      tutStep2Title: 'Step 2：コールの仕組み',
+      tutStep2Body: '👑 <strong>親（先手）</strong>は常に「3」をコール<br>🛡️ <strong>子（後手）</strong>は出した本数に応じて<br>0〜1本なら「<strong>1</strong>」、2〜3本なら「<strong>5</strong>」をコール',
+      tutStep3Title: 'Step 3：勝敗の決まり方',
+      tutStep3Body: '🎯 合計 ＝ コール → <strong>勝ち！</strong><br>🔄 合計が偶数 → <strong>引き分け・攻守交代</strong><br>🍶 先取2勝、負けた方は <strong>罰杯！</strong>',
+      tutNext: '次へ',
+      tutGotIt: 'わかった！対決開始！',
+      tutSkip: '教学をスキップ',
+      // AI dialogue
+      aiGreet: [
+        'いらっしゃい！今夜も箸で勝負だ！',
+        'よぉ、挑戦者！箸の準備はいいか？',
+        '維醺志士の時間だ！覚悟しろ！',
+        '俺に勝ったら一杯奢ってやるよ…嘘だけど！',
+        '今夜の罰杯は誰のものかな？',
+      ],
+      aiWinRound: [
+        'はっはっは！まだまだだな！',
+        'この勝負もらった！肝臓の準備はいいか？',
+        '俺の箸さばきを見たか！',
+        '一歩近づいたぞ、罰杯への道！',
+        '維醺志士を名乗るなら、もっと頑張れ！',
+      ],
+      aiLoseRound: [
+        'ちっ…やるじゃないか',
+        'くそ！次は負けんぞ！',
+        'まぐれだ、まぐれ！',
+        '俺の肝臓が少し震えたぞ…',
+        'お前、箸の才能あるな…認めんけど！',
+      ],
+      aiTieRound: [
+        '引き分けか…面白くなってきた！',
+        '互角だな…攻守交代！',
+        '偶数か！神様もどっちにするか迷ってるな',
+        'まだ決着がつかんとは…いい勝負だ！',
+      ],
+      aiGameWin: [
+        'はっはっは！罰杯はお前のものだ！乾杯！',
+        '俺に勝とうなんて百年早い！さぁ飲め！',
+        '維醺志士認定！罰杯を飲み干せ！',
+        '今夜の犠牲者はお前だ！明日の二日酔い、覚悟しろ！',
+        'お前の肝臓に「ご愁傷様」！',
+      ],
+      aiGameLose: [
+        'くっ…今夜は負けたか…また来い！',
+        '俺が飲むのか…まぁいい、酒は好きだ！',
+        '負け得だ！飲める俺の方が勝ちだ！',
+        '今日はお前の日だ…認めてやる！',
+        '次こそ…次こそ勝つからな！覚えてろ！',
+      ],
     },
     zh: {
       subtitle: '筷 子 拳',
       tagline: '「負け得」— 輸了才是贏',
       rulesTitle: '📜 遊戲規則',
-      rules: [
-        '雙方各持 <strong>3 根紅筷子</strong>',
-        '每回合秘密選擇出 0～3 根',
-        '<strong>先手（親）</strong>永遠喊「3」',
-        '<strong>後手（子）</strong>依手中筷子喊「1」或「5」',
-        '雙方總和 ＝ 喊數 → 該方獲勝',
-        '總和為偶數 → 平手，交換攻守',
-        '三戰兩勝，最終輸家 <strong>罰杯！🍶</strong>',
+      ruleCards: [
+        { icon: '🥢', text: '雙方各持 <strong>3 根紅筷子</strong><br>每回合秘密選擇出 0～3 根' },
+        { icon: '👑', text: '<strong>親方（先手）</strong>永遠喊「3」<br><strong>子方（後手）</strong>依筷子數喊「1」或「5」' },
+        { icon: '🎯', text: '雙方總和 ＝ 喊數 → <strong>猜中即獲勝！</strong><br>總和為偶數 → <strong>平手，交換攻守</strong>' },
       ],
+      rulesHighlight: '三戰兩勝<br>最終輸家 <strong>罰杯！</strong>',
       startBtn: '開始！',
-      jankenForced: '第一拳強制出石頭！',
-      jankenGo: '猜拳！',
-      tieJanken: '平手！再來一次',
-      tieForced: '平手！',
-      youWinJanken: '你贏了！',
-      oppWinJanken: '對手贏了！',
-      roleDecided: '身分決定！',
-      yourRole: '你的角色',
-      opponentLabel: '對手',
-      startBattle: '開始對決！',
       you: '你',
+      aiName: '👨‍🍳 大將',
       roleParent: '先手（親）— 進攻方',
       roleChild: '後手（子）— 防守方',
-      roleParentDesc: '你永遠喊 <strong>「3」</strong><br>選擇出幾根筷子，祈禱總和剛好為 3！',
-      roleChildDesc: '你喊 <strong>「1」或「5」</strong>（由出的筷子數決定）<br>率先發起挑戰！',
-      oppIsChild: '後手（子）— 喊 1 或 5',
-      oppIsParent: '先手（親）— 永遠喊 3',
       roundInfo: '第 {n} 回合 ／ 先取兩勝',
       badgeParent: '先手（親）— 喊 3',
       badgeChild: '後手（子）— 喊 1 or 5',
@@ -718,7 +799,7 @@ const I18N = {
       callPreviewChildAuto: '出的筷子數決定你的喊數',
       callPreviewChildN: '你的喊數：{n}',
       irrashai: '來吧！',
-      irrashaiOpp: '對手：來吧！',
+      irrashaiOpp: '大將：來吧，開始囉！',
       pickPrompt: '要出幾根筷子？',
       confirmBtn: '出！',
       selectHint: '選擇出幾根…',
@@ -727,26 +808,26 @@ const I18N = {
       tieRound: '平手！',
       tieDetail: '合計 {n} 根（偶數）→ 交換攻守！',
       winRound: '你贏了！',
-      loseRound: '對手贏了…',
+      loseRound: '大將贏了…',
       callHitYou: '合計 {total} 根 ＝ 你的喊數「{call}」→ 猜中！',
-      callHitOpp: '合計 {total} 根 ＝ 對手的喊數「{call}」→ 猜中！',
-      revealSum: '你 {pp} 根 ＋ 對手 {ap} 根 ＝',
+      callHitOpp: '合計 {total} 根 ＝ 大將的喊數「{call}」→ 猜中！',
+      revealSum: '你 {pp} 根 ＋ 大將 {ap} 根 ＝',
       parentCallLabel: '{who}（親）→「3」',
       childCallLabel: '{who}（子）→「{call}」',
       seeResult: '看結果',
       nextRound: '下一回合',
       gameoverWinTitle: '你贏了！',
       gameoverLoseTitle: '你輸了…',
-      gameoverWinMsg: '最終比分：<strong>{ps} - {as}</strong><br><br>對手必須罰杯…🍶<br>但在「負け得」精神中，<br><strong>喝到酒的人才是真正贏家！</strong>',
+      gameoverWinMsg: '最終比分：<strong>{ps} - {as}</strong><br><br>大將必須罰杯…🍶<br>但在「負け得」精神中，<br><strong>喝到酒的人才是真正贏家！</strong>',
       gameoverLoseMsg: '最終比分：<strong>{ps} - {as}</strong><br><br>罰杯是你的！🍶<br>但別忘了——<br><strong>輸了才是贏！</strong><br>乾杯之後…',
       gochisou: '多謝招待！',
       playAgain: '再來一局！',
-      confirmHome: '確定要返回首頁嗎？',
-      bgmMiyako: '🌙 靜夜',
-      bgmShamisen: '🎶 宴會',
-      voiceRock: '剪刀石頭布！',
-      voiceJanken: '出拳！',
-      voiceIrrashai: '來吧，開始囉！',
+      confirmHome: '確定要結束遊戲嗎？',
+      confirmNo: '取消',
+      confirmYes: '確定',
+      bgmMoonlight: '🌙 月夜思鄉',
+      bgmSummer: '🏮 夏日廟會',
+      bgmFestival: '🎆 祭典夜晚',
       voiceSeNo: '準備好了嗎',
       voiceDase: '出！',
       voiceTie: '平手！',
@@ -754,6 +835,60 @@ const I18N = {
       voiceCall1: '一根！',
       voiceCall3: '三根！',
       voiceCall5: '五根！',
+      voiceWin: '厲害！授予你維醺志士的稱號！',
+      voiceLose: '罰杯一口乾！這就是箸拳的規矩！',
+      // Tutorial
+      tutStep1Title: 'Step 1：選擇筷子',
+      tutStep1Body: '每回合你和大將各自<br>秘密選擇出 <strong>0～3 根</strong>筷子',
+      tutStep2Title: 'Step 2：喊數規則',
+      tutStep2Body: '👑 <strong>親方（先手）</strong>永遠喊「3」<br>🛡️ <strong>子方（後手）</strong>依出的筷子數——<br>0～1 根喊「<strong>1</strong>」，2～3 根喊「<strong>5</strong>」',
+      tutStep3Title: 'Step 3：勝負判定',
+      tutStep3Body: '🎯 合計 ＝ 喊數 → <strong>猜中，獲勝！</strong><br>🔄 合計為偶數 → <strong>平手，交換攻守</strong><br>🍶 三戰兩勝，輸家 <strong>罰杯！</strong>',
+      tutNext: '下一步',
+      tutGotIt: '懂了！開始對決！',
+      tutSkip: '跳過教學',
+      // AI dialogue
+      aiGreet: [
+        '來吧！今晚用筷子決勝負！',
+        '喲，挑戰者！筷子握好了嗎？',
+        '維醺志士的時間到了！準備好了嗎？',
+        '你贏我的話請你一杯…騙你的！',
+        '今晚的罰杯會是誰的呢？',
+      ],
+      aiWinRound: [
+        '哈哈哈！你還嫩了點！',
+        '這回合我的！你的肝準備好了嗎？',
+        '看到我的筷子功了嗎！',
+        '離罰杯又近了一步喔！',
+        '想當維醺志士，就拿出點實力！',
+      ],
+      aiLoseRound: [
+        '嘖…算你厲害',
+        '可惡！下次不會輸了！',
+        '運氣好而已，運氣好！',
+        '我的肝抖了一下…',
+        '你還真有筷子天賦…但我不承認！',
+      ],
+      aiTieRound: [
+        '平手嗎…越來越有趣了！',
+        '旗鼓相當…交換攻守！',
+        '偶數！連神明都選不出誰贏',
+        '還分不出勝負…好一場對決！',
+      ],
+      aiGameWin: [
+        '哈哈哈！罰杯是你的！乾杯！',
+        '想贏我？再練一百年吧！快喝！',
+        '維醺志士認證！把罰杯乾了！',
+        '今晚的犧牲品就是你！明天的宿醉，自己承擔！',
+        '給你的肝臟一句「節哀順變」！',
+      ],
+      aiGameLose: [
+        '嘖…今晚算你贏…下次再來！',
+        '要我喝嗎…算了，反正我愛喝酒！',
+        '輸了才是贏！能喝的才是真贏家！',
+        '今天是你的主場…我認了！',
+        '下次…下次一定贏！你給我記住！',
+      ],
     },
   },
   get lang() { return this._lang; },
@@ -776,8 +911,23 @@ const I18N = {
       const key = el.getAttribute('data-i18n');
       el.textContent = this.t(key);
     });
-    const rl = document.getElementById('rules-list');
-    if (rl) rl.innerHTML = this._strings[this._lang].rules.map(r => `<li>${r}</li>`).join('');
+    // Rule cards
+    const rc = document.getElementById('rules-cards');
+    if (rc) {
+      const cards = this._strings[this._lang].ruleCards;
+      rc.innerHTML = cards.map(c =>
+        `<div class="rule-card"><div class="rule-icon">${c.icon}</div><div class="rule-text">${c.text}</div></div>`
+      ).join('');
+    }
+    // Highlight
+    const ht = document.getElementById('highlight-text');
+    if (ht) ht.innerHTML = this.t('rulesHighlight');
+    // AI label
+    const al = document.getElementById('ai-label');
+    if (al) al.innerHTML = this.t('aiName');
+    const osl = document.getElementById('opponent-side-label');
+    if (osl) osl.innerHTML = `<span class="ai-name">${this.t('aiName')}</span>`;
+    // Lang toggle
     document.getElementById('lang-toggle').textContent = this._lang === 'ja' ? '🇹🇼' : '🇯🇵';
   },
 };
@@ -789,220 +939,170 @@ function toggleLang() {
 }
 
 // ============================================================
-// 2. AUDIO MANAGER
+// 2. AUDIO MANAGER (MP3 BGM + Web Audio SFX)
 // ============================================================
+const BGM_ORDER = ['moonlight','summer','festival'];
+const BGM_ICONS = {moonlight:'🌙', summer:'🏮', festival:'🎆'};
+const BGM_KEYS = {moonlight:'bgmMoonlight', summer:'bgmSummer', festival:'bgmFestival'};
+const BGM_FILES = {moonlight:'月夜思鄉.mp3', summer:'夏日廟會.mp3', festival:'祭典夜晚.mp3'};
+const VOL_PRESETS = [
+  {bgm:0, sfx:0, voice:0, icon:'🔇', duck:0},
+  {bgm:0.12, sfx:0.5, voice:1.0, icon:'🔉', duck:0.02},
+  {bgm:0.25, sfx:0.7, voice:1.0, icon:'🔊', duck:0.04},
+];
+
 class AudioManager {
-  constructor() {
-    this.ctx = null;
-    this.masterGain = null;
-    this.musicGain = null;
-    this.sfxGain = null;
-    this.muted = false;
-    this.musicPlaying = false;
-    this._musicInterval = null;
-    this._musicNodes = [];
-    this.bgmStyle = 'miyako'; // 'miyako' | 'shamisen'
-  }
-  init() {
-    if (this.ctx) return;
-    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-    this.masterGain = this.ctx.createGain();
+  constructor(){this.ctx=null;this.masterGain=null;this.sfxGain=null;this.volLevel=parseInt(localStorage.getItem('kochi-vol'))||1;this.musicPlaying=false;this.bgmStyle='moonlight';this._bgmAudio=null;this._bgmCache={};}
+  get muted(){return this.volLevel===0;}
+  init(){
+    if(this.ctx)return;
+    this.ctx=new(window.AudioContext||window.webkitAudioContext)();
+    this.masterGain=this.ctx.createGain();
     this.masterGain.connect(this.ctx.destination);
-    this.musicGain = this.ctx.createGain();
-    this.musicGain.gain.value = 0.25;
-    this.musicGain.connect(this.masterGain);
-    this.sfxGain = this.ctx.createGain();
-    this.sfxGain.gain.value = 0.5;
+    this.sfxGain=this.ctx.createGain();
+    this.sfxGain.gain.value=VOL_PRESETS[this.volLevel].sfx;
     this.sfxGain.connect(this.masterGain);
+    if(this.muted)this.masterGain.gain.value=0;
   }
-  ensureResumed() { if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); }
-  toggleMute() {
-    this.muted = !this.muted;
-    if (this.masterGain) this.masterGain.gain.value = this.muted ? 0 : 1;
-    document.getElementById('mute-toggle').textContent = this.muted ? '🔇' : '🔊';
-    if (this.muted) speechSynthesis.cancel();
+  ensureResumed(){if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();}
+  cycleVolume(){
+    this.volLevel=(this.volLevel+1)%3;
+    localStorage.setItem('kochi-vol',this.volLevel);
+    const p=VOL_PRESETS[this.volLevel];
+    if(this.sfxGain)this.sfxGain.gain.value=p.sfx;
+    if(this.masterGain)this.masterGain.gain.value=this.volLevel===0?0:1;
+    if(this._bgmAudio){
+      if(this.volLevel===0){this._bgmAudio.pause();}
+      else{this._bgmAudio.volume=p.bgm;if(this.musicPlaying)this._bgmAudio.play().catch(()=>{});}
+    }
+    const mb=document.getElementById('mute-toggle');
+    mb.textContent=p.icon;
+    mb.classList.remove('vol-muted','vol-loud');
+    if(this.volLevel===0)mb.classList.add('vol-muted');
+    else if(this.volLevel===2)mb.classList.add('vol-loud');
+    if(this.volLevel===0)speechSynthesis.cancel();
   }
-
-  // --- BGM: Miyako (calm) ---
-  startMusicMiyako() {
-    const ctx = this.ctx;
-    const drone = ctx.createOscillator();
-    drone.type = 'triangle'; drone.frequency.value = 146.83;
-    const dg = ctx.createGain(); dg.gain.value = 0.06;
-    drone.connect(dg); dg.connect(this.musicGain); drone.start();
-    this._musicNodes.push({ osc: drone, gain: dg });
-    const phrase = [293.66,233.08,220,196,155.56,196,220,196,146.83,155.56,196,233.08,220,196,155.56,146.83];
-    const dur = 1.8; let idx = 0;
-    const play = () => {
-      if (!this.musicPlaying) return;
-      const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.value = phrase[idx%phrase.length];
-      const e = ctx.createGain(); const n = ctx.currentTime;
-      e.gain.setValueAtTime(0,n); e.gain.linearRampToValueAtTime(0.08,n+0.3);
-      e.gain.linearRampToValueAtTime(0.04,n+dur*0.7); e.gain.linearRampToValueAtTime(0,n+dur);
-      o.connect(e); e.connect(this.musicGain); o.start(n); o.stop(n+dur); idx++;
-    };
-    play(); this._musicInterval = setInterval(play, dur*1000);
+  // --- MP3 BGM ---
+  _playMP3(key){
+    if(this._bgmAudio){this._bgmAudio.pause();this._bgmAudio.currentTime=0;}
+    if(!this._bgmCache[key]){this._bgmCache[key]=new Audio(BGM_FILES[key]);this._bgmCache[key].loop=true;}
+    this._bgmAudio=this._bgmCache[key];
+    this._bgmAudio.volume=this.muted?0:VOL_PRESETS[this.volLevel].bgm;
+    this._bgmAudio.play().catch(()=>{});
   }
-
-  // --- BGM: Shamisen (lively) ---
-  startMusicShamisen() {
-    const ctx = this.ctx;
-    // Yo scale: D E G A B
-    const phrase = [293.66,329.63,392,440,493.88,440,392,329.63,293.66,392,493.88,440,329.63,392,440,293.66];
-    const dur = 0.4; let idx = 0;
-    const pluck = () => {
-      if (!this.musicPlaying) return;
-      const freq = phrase[idx%phrase.length];
-      const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = freq;
-      const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = freq*2.5; f.Q.value = 3;
-      const e = ctx.createGain(); const n = ctx.currentTime;
-      e.gain.setValueAtTime(0.14,n);
-      e.gain.exponentialRampToValueAtTime(0.001,n+dur*0.85);
-      o.connect(f); f.connect(e); e.connect(this.musicGain); o.start(n); o.stop(n+dur);
-      // Taiko beat every 4 notes
-      if (idx%4===0) {
-        const t = ctx.createOscillator(); t.type = 'triangle';
-        t.frequency.setValueAtTime(100,n); t.frequency.exponentialRampToValueAtTime(40,n+0.2);
-        const tg = ctx.createGain(); tg.gain.setValueAtTime(0.18,n); tg.gain.exponentialRampToValueAtTime(0.001,n+0.25);
-        t.connect(tg); tg.connect(this.musicGain); t.start(n); t.stop(n+0.25);
-      }
-      idx++;
-    };
-    pluck(); this._musicInterval = setInterval(pluck, dur*1000);
-  }
-
-  startMusic() {
-    if (this.musicPlaying) return;
-    this.init(); this.musicPlaying = true;
-    if (this.bgmStyle === 'shamisen') this.startMusicShamisen();
-    else this.startMusicMiyako();
-  }
-  stopMusic() {
-    this.musicPlaying = false;
-    if (this._musicInterval) { clearInterval(this._musicInterval); this._musicInterval = null; }
-    this._musicNodes.forEach(({osc,gain}) => {
-      try { gain.gain.linearRampToValueAtTime(0,this.ctx.currentTime+0.5); osc.stop(this.ctx.currentTime+0.6); } catch(e){}
-    });
-    this._musicNodes = [];
-  }
-
+  startMusic(){if(this.musicPlaying)return;this.init();this.musicPlaying=true;this._playMP3(this.bgmStyle);}
+  stopMusic(){this.musicPlaying=false;if(this._bgmAudio){this._bgmAudio.pause();this._bgmAudio.currentTime=0;}}
   // --- SFX ---
-  playClick() {
-    this.init(); const c=this.ctx,n=c.currentTime;
-    const o=c.createOscillator(); o.type='sine'; o.frequency.value=1200;
-    const g=c.createGain(); g.gain.setValueAtTime(0.15,n); g.gain.exponentialRampToValueAtTime(0.001,n+0.08);
-    o.connect(g); g.connect(this.sfxGain); o.start(n); o.stop(n+0.08);
+  playClick(){
+    this.init();const c=this.ctx,n=c.currentTime;
+    const o=c.createOscillator();o.type='sine';o.frequency.value=1200;
+    const g=c.createGain();g.gain.setValueAtTime(0.15,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.08);
+    o.connect(g);g.connect(this.sfxGain);o.start(n);o.stop(n+0.08);
   }
-  playJankenSfx() {
-    this.init(); const c=this.ctx,n=c.currentTime;
-    const o=c.createOscillator(); o.type='square'; o.frequency.value=800;
-    const g=c.createGain(); g.gain.setValueAtTime(0.08,n); g.gain.exponentialRampToValueAtTime(0.001,n+0.1);
-    o.connect(g); g.connect(this.sfxGain); o.start(n); o.stop(n+0.1);
-  }
-  playCountdown() {
-    this.init(); const c=this.ctx,n=c.currentTime;
-    const o=c.createOscillator(); o.type='triangle';
-    o.frequency.setValueAtTime(120,n); o.frequency.exponentialRampToValueAtTime(50,n+0.3);
-    const g=c.createGain(); g.gain.setValueAtTime(0.5,n); g.gain.exponentialRampToValueAtTime(0.001,n+0.4);
-    o.connect(g); g.connect(this.sfxGain); o.start(n); o.stop(n+0.4);
+  playCountdown(){
+    this.init();const c=this.ctx,n=c.currentTime;
+    const o=c.createOscillator();o.type='triangle';
+    o.frequency.setValueAtTime(120,n);o.frequency.exponentialRampToValueAtTime(50,n+0.3);
+    const g=c.createGain();g.gain.setValueAtTime(0.5,n);g.gain.exponentialRampToValueAtTime(0.001,n+0.4);
+    o.connect(g);g.connect(this.sfxGain);o.start(n);o.stop(n+0.4);
     const bs=c.sampleRate*0.05,b=c.createBuffer(1,bs,c.sampleRate),d=b.getChannelData(0);
-    for(let i=0;i<bs;i++) d[i]=(Math.random()*2-1)*(1-i/bs);
-    const ns=c.createBufferSource(); ns.buffer=b;
-    const ng=c.createGain(); ng.gain.value=0.2; ns.connect(ng); ng.connect(this.sfxGain); ns.start(n);
+    for(let i=0;i<bs;i++)d[i]=(Math.random()*2-1)*(1-i/bs);
+    const ns=c.createBufferSource();ns.buffer=b;
+    const ng=c.createGain();ng.gain.value=0.2;ns.connect(ng);ng.connect(this.sfxGain);ns.start(n);
   }
-  playReveal() {
-    this.init(); const c=this.ctx,n=c.currentTime;
+  playReveal(){
+    this.init();const c=this.ctx,n=c.currentTime;
     [293.66,349.23,440].forEach((f,i)=>{
-      const o=c.createOscillator(); o.type='sawtooth';
-      const g=c.createGain(); g.gain.setValueAtTime(0,n); g.gain.linearRampToValueAtTime(0.1,n+0.05);
-      g.gain.exponentialRampToValueAtTime(0.001,n+0.8); o.frequency.value=f;
-      o.connect(g); g.connect(this.sfxGain); o.start(n+i*0.02); o.stop(n+0.9);
+      const o=c.createOscillator();o.type='sawtooth';
+      const g=c.createGain();g.gain.setValueAtTime(0,n);g.gain.linearRampToValueAtTime(0.1,n+0.05);
+      g.gain.exponentialRampToValueAtTime(0.001,n+0.8);o.frequency.value=f;
+      o.connect(g);g.connect(this.sfxGain);o.start(n+i*0.02);o.stop(n+0.9);
     });
   }
-  playWin() {
-    this.init(); const c=this.ctx,n=c.currentTime;
+  playWin(){
+    this.init();const c=this.ctx,n=c.currentTime;
     [293.66,392,440,587.33].forEach((f,i)=>{
-      const o=c.createOscillator(); o.type='sine';
-      const g=c.createGain(); const t=n+i*0.12;
-      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.15,t+0.04);
-      g.gain.exponentialRampToValueAtTime(0.001,t+0.4); o.frequency.value=f;
-      o.connect(g); g.connect(this.sfxGain); o.start(t); o.stop(t+0.4);
+      const o=c.createOscillator();o.type='sine';
+      const g=c.createGain();const t=n+i*0.12;
+      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.15,t+0.04);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.4);o.frequency.value=f;
+      o.connect(g);g.connect(this.sfxGain);o.start(t);o.stop(t+0.4);
     });
   }
-  playLose() {
-    this.init(); const c=this.ctx,n=c.currentTime;
-    const o=c.createOscillator(); o.type='sine';
-    o.frequency.setValueAtTime(440,n); o.frequency.exponentialRampToValueAtTime(110,n+0.8);
-    const g=c.createGain(); g.gain.setValueAtTime(0.15,n); g.gain.linearRampToValueAtTime(0,n+0.8);
-    o.connect(g); g.connect(this.sfxGain); o.start(n); o.stop(n+0.8);
+  playLose(){
+    this.init();const c=this.ctx,n=c.currentTime;
+    const o=c.createOscillator();o.type='sine';
+    o.frequency.setValueAtTime(440,n);o.frequency.exponentialRampToValueAtTime(110,n+0.8);
+    const g=c.createGain();g.gain.setValueAtTime(0.15,n);g.gain.linearRampToValueAtTime(0,n+0.8);
+    o.connect(g);g.connect(this.sfxGain);o.start(n);o.stop(n+0.8);
   }
-  playTie() {
-    this.init(); const c=this.ctx,n=c.currentTime;
+  playTie(){
+    this.init();const c=this.ctx,n=c.currentTime;
     [0,0.2].forEach(off=>{
-      const o=c.createOscillator(); o.type='triangle'; o.frequency.value=293.66;
-      const g=c.createGain(); const t=n+off;
-      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.12,t+0.03);
+      const o=c.createOscillator();o.type='triangle';o.frequency.value=293.66;
+      const g=c.createGain();const t=n+off;
+      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.12,t+0.03);
       g.gain.exponentialRampToValueAtTime(0.001,t+0.25);
-      o.connect(g); g.connect(this.sfxGain); o.start(t); o.stop(t+0.25);
+      o.connect(g);g.connect(this.sfxGain);o.start(t);o.stop(t+0.25);
     });
   }
-  playSake() {
-    this.init(); const c=this.ctx,n=c.currentTime;
+  playSake(){
+    this.init();const c=this.ctx,n=c.currentTime;
     for(let i=0;i<12;i++){
-      const o=c.createOscillator(); o.type='sine'; o.frequency.value=200+Math.random()*400;
-      const g=c.createGain(); const t=n+i*0.08+Math.random()*0.03;
-      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.06,t+0.015);
+      const o=c.createOscillator();o.type='sine';o.frequency.value=200+Math.random()*400;
+      const g=c.createGain();const t=n+i*0.08+Math.random()*0.03;
+      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.06,t+0.015);
       g.gain.exponentialRampToValueAtTime(0.001,t+0.06);
-      o.connect(g); g.connect(this.sfxGain); o.start(t); o.stop(t+0.06);
+      o.connect(g);g.connect(this.sfxGain);o.start(t);o.stop(t+0.06);
     }
   }
 }
 const audio = new AudioManager();
 
-function toggleMute() { audio.toggleMute(); }
-function toggleBgm() {
-  audio.bgmStyle = audio.bgmStyle === 'miyako' ? 'shamisen' : 'miyako';
-  const label = audio.bgmStyle === 'miyako' ? t('bgmMiyako') : t('bgmShamisen');
-  $('bgm-toggle').textContent = audio.bgmStyle === 'miyako' ? '🌙' : '🎶';
-  // Toast
-  const toast = document.createElement('div');
-  toast.className = 'bgm-toast';
-  toast.textContent = label;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 2000);
-  // Restart music if playing
-  if (audio.musicPlaying) { audio.stopMusic(); audio.startMusic(); }
+function toggleMute(){audio.cycleVolume();}
+function toggleBgm(){
+  const cur=BGM_ORDER.indexOf(audio.bgmStyle);
+  audio.bgmStyle=BGM_ORDER[(cur+1)%BGM_ORDER.length];
+  $('bgm-toggle').textContent=BGM_ICONS[audio.bgmStyle];
+  const toast=document.createElement('div');toast.className='bgm-toast';toast.textContent=t(BGM_KEYS[audio.bgmStyle]);
+  document.body.appendChild(toast);setTimeout(()=>toast.remove(),2000);
+  if(audio.musicPlaying){audio.stopMusic();audio.startMusic();}
+  if(typeof umami!=='undefined')umami.track('bgm-switch',{game:'hashiken',to:audio.bgmStyle});
 }
 
 // ============================================================
-// 3. VOICE MANAGER
+// 3. VOICE MANAGER (with BGM ducking)
 // ============================================================
 class VoiceManager {
-  constructor() { this.jaVoice = null; this.zhVoice = null; this.ready = false; }
-  init() {
-    if (this.ready) return;
-    const v = speechSynthesis.getVoices();
-    this.jaVoice = v.find(x=>x.name==='Kyoko') || v.find(x=>x.name==='O-Ren') || v.find(x=>x.lang&&x.lang.startsWith('ja')) || null;
-    this.zhVoice = v.find(x=>/Meijia|Mei-Jia/i.test(x.name)) || v.find(x=>x.lang&&x.lang.startsWith('zh-TW')) || v.find(x=>x.lang&&x.lang.startsWith('zh')) || null;
-    this.ready = true;
+  constructor(){this.jaVoice=null;this.zhVoice=null;this.ready=false;}
+  init(){
+    if(this.ready)return;
+    const v=speechSynthesis.getVoices();
+    this.jaVoice=v.find(x=>x.name==='Kyoko')||v.find(x=>x.name==='O-Ren')||v.find(x=>x.lang&&x.lang.startsWith('ja'))||null;
+    this.zhVoice=v.find(x=>/Meijia|Mei-Jia/i.test(x.name))||v.find(x=>x.lang&&x.lang.startsWith('zh-TW'))||v.find(x=>x.lang&&x.lang.startsWith('zh'))||null;
+    this.ready=true;
   }
-  speak(text, opts={}) {
-    if (audio.muted) return;
-    if (!this.ready) this.init();
-    const lang = opts.lang || (I18N.lang === 'zh' ? 'zh' : 'ja');
-    const u = new SpeechSynthesisUtterance(text);
-    if (lang === 'zh') { u.lang = 'zh-TW'; if (this.zhVoice) u.voice = this.zhVoice; }
-    else { u.lang = 'ja-JP'; if (this.jaVoice) u.voice = this.jaVoice; }
-    u.rate = opts.rate||1; u.pitch = opts.pitch||1; u.volume = opts.volume||1;
+  _duckBGM(){if(audio._bgmAudio&&!audio.muted)audio._bgmAudio.volume=VOL_PRESETS[audio.volLevel].duck;}
+  _unduckBGM(){if(audio.muted)return;if(audio._bgmAudio)audio._bgmAudio.volume=VOL_PRESETS[audio.volLevel].bgm;}
+  speak(text,opts={}){
+    if(audio.muted)return;
+    if(!this.ready)this.init();
+    const lang=opts.lang||(I18N.lang==='zh'?'zh':'ja');
+    const u=new SpeechSynthesisUtterance(text);
+    if(lang==='zh'){u.lang='zh-TW';if(this.zhVoice)u.voice=this.zhVoice;}
+    else{u.lang='ja-JP';if(this.jaVoice)u.voice=this.jaVoice;}
+    u.rate=opts.rate||1;u.pitch=opts.pitch||1;u.volume=VOL_PRESETS[audio.volLevel].voice;
+    this._duckBGM();
+    u.onend=()=>this._unduckBGM();
+    u.onerror=()=>this._unduckBGM();
     speechSynthesis.cancel();
     speechSynthesis.speak(u);
   }
 }
 const voice = new VoiceManager();
-if (typeof speechSynthesis !== 'undefined')
-  speechSynthesis.addEventListener('voiceschanged', () => { voice.ready=false; voice.init(); });
+if(typeof speechSynthesis!=='undefined')
+  speechSynthesis.addEventListener('voiceschanged',()=>{voice.ready=false;voice.init();});
 
-// Mobile browsers require speechSynthesis to be "unlocked" by a user gesture.
 let _speechUnlocked=false;
 function unlockSpeech(){
   if(_speechUnlocked||typeof speechSynthesis==='undefined')return;
@@ -1016,279 +1116,320 @@ function unlockSpeech(){
 document.addEventListener('click',unlockSpeech,true);
 document.addEventListener('touchstart',unlockSpeech,true);
 
-function getNumberCall(n) { return t({1:'voiceCall1',3:'voiceCall3',5:'voiceCall5'}[n]||''); }
+function getNumberCall(n){return t({1:'voiceCall1',3:'voiceCall3',5:'voiceCall5'}[n]||'');}
 
 // ============================================================
-// 4. GAME STATE & LOGIC
+// 4. UI HELPERS
 // ============================================================
-const state = { playerRole:null, playerScore:0, aiScore:0, round:1, playerPick:null, aiPick:null };
-
-function $(id) { return document.getElementById(id); }
-function show(screenId) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+function $(id){return document.getElementById(id);}
+function show(screenId){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $(screenId).classList.add('active');
-  // BGM toggle visibility
-  $('bgm-toggle').style.display = 'flex';
+  $('bgm-toggle').style.display='flex';
+  const isWelcome=screenId==='welcome-screen';
+  $('lang-toggle').style.display=isWelcome?'flex':'none';
+  $('home-btn').textContent=isWelcome?'🏠':'↩';
 }
-function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
-function randInt(a,b) { return Math.floor(Math.random()*(b-a+1))+a; }
+function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+function randInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
 
-// Home button
-function goHome() {
-  if (confirm(t('confirmHome'))) { audio.stopMusic(); window.location.href = 'index.html'; }
+function showSoundToast(){
+  const t=document.createElement('div');t.className='sound-toast';
+  t.textContent='🔊 '+(I18N.lang==='ja'?'音声をオンにしてお楽しみください！':'請開啟手機聲音，體驗最佳效果！');
+  document.body.appendChild(t);
+  setTimeout(()=>{t.style.transition='opacity 0.5s';t.style.opacity='0';setTimeout(()=>t.remove(),500);},1800);
+}
+
+// Custom confirm dialog
+function goHome(){
+  const onWelcome=document.querySelector('#welcome-screen.active');
+  if(onWelcome){window.location.href='index.html';return;}
+  const ov=document.createElement('div');ov.className='confirm-overlay';
+  ov.innerHTML=`<div class="confirm-box"><div class="confirm-msg">${t('confirmHome')}</div><div class="confirm-btns"><button class="confirm-no" id="confirm-no">${t('confirmNo')}</button><button class="confirm-yes" id="confirm-yes">${t('confirmYes')}</button></div></div>`;
+  document.body.appendChild(ov);
+  ov.querySelector('#confirm-no').onclick=()=>ov.remove();
+  ov.querySelector('#confirm-yes').onclick=()=>{ov.remove();audio.stopMusic();show('welcome-screen');};
+  ov.addEventListener('click',(e)=>{if(e.target===ov)ov.remove();});
+}
+
+// AI Dialogue bubble
+function showAiDialogue(category){
+  const lines=I18N._strings[I18N.lang][category];
+  if(!lines||!lines.length)return;
+  const text=lines[Math.floor(Math.random()*lines.length)];
+  const existing=document.querySelector('.ai-dialogue');
+  if(existing)existing.remove();
+  const bubble=document.createElement('div');
+  bubble.className='ai-dialogue';
+  bubble.textContent=text;
+  const arena=document.getElementById('arena-opponent');
+  arena.appendChild(bubble);
+  // Also speak the dialogue
+  voice.speak(text,{rate:1.0,pitch:0.95});
+  setTimeout(()=>{if(bubble.parentNode)bubble.remove();},3500);
+}
+
+// Ripple effect
+function addRipple(el,e){
+  if(!el||el.classList.contains('disabled'))return;
+  const rect=el.getBoundingClientRect();
+  const x=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+  const y=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
+  const r=document.createElement('span');
+  r.className='ripple-circle';r.style.left=x+'px';r.style.top=y+'px';
+  const pos=getComputedStyle(el).position;
+  if(pos==='static')el.style.position='relative';
+  const ov=getComputedStyle(el).overflow;
+  if(ov!=='hidden')el.style.overflow='hidden';
+  el.appendChild(r);
+  r.addEventListener('animationend',()=>r.remove());
+}
+document.addEventListener('touchstart',function(e){
+  const btn=e.target.closest('.btn,.ctrl-btn,.pick-btn');
+  if(btn)addRipple(btn,e);
+},{passive:true});
+document.addEventListener('mousedown',function(e){
+  const btn=e.target.closest('.btn,.ctrl-btn,.pick-btn');
+  if(btn)addRipple(btn,e);
+});
+
+// ============================================================
+// 5. TUTORIAL
+// ============================================================
+function showTutorial(){
+  let step=0;
+  const steps=[
+    {title:'tutStep1Title',body:'tutStep1Body',visual:'🥢🥢🥢'},
+    {title:'tutStep2Title',body:'tutStep2Body',visual:'👑 ↔ 🛡️'},
+    {title:'tutStep3Title',body:'tutStep3Body',visual:'🎯 🔄 🍶'},
+  ];
+  const ov=document.createElement('div');
+  ov.className='tutorial-overlay';
+
+  function renderStep(){
+    const s=steps[step];
+    const isLast=step===steps.length-1;
+    ov.innerHTML=`
+      <div class="tutorial-card">
+        <div class="tutorial-dots">${steps.map((_,i)=>`<div class="tutorial-dot${i===step?' active':''}"></div>`).join('')}</div>
+        <div class="tutorial-title">${t(s.title)}</div>
+        <div class="tutorial-visual">${s.visual}</div>
+        <div class="tutorial-body">${t(s.body)}</div>
+        <button class="btn btn-gold btn-sm" id="tut-next">${isLast?t('tutGotIt'):t('tutNext')}</button>
+        <div class="tutorial-skip" id="tut-skip">${t('tutSkip')}</div>
+      </div>
+    `;
+    ov.querySelector('#tut-next').onclick=()=>{
+      audio.playClick();
+      if(isLast){finishTutorial();}
+      else{step++;renderStep();}
+    };
+    ov.querySelector('#tut-skip').onclick=()=>{audio.playClick();finishTutorial();};
+  }
+
+  function finishTutorial(){
+    localStorage.setItem('hashiken-tutorial-done','1');
+    ov.remove();
+    beginGame();
+  }
+
+  renderStep();
+  document.body.appendChild(ov);
+}
+
+// ============================================================
+// 6. GAME STATE & LOGIC
+// ============================================================
+const state = {playerRole:null,playerScore:0,aiScore:0,round:1,playerPick:null,aiPick:null};
+let _gameStartTime=0;
+
+function startNewGame(){
+  audio.init();audio.ensureResumed();audio.playClick();
+  // Random role
+  state.playerRole=Math.random()<0.5?'parent':'child';
+  state.playerScore=0;state.aiScore=0;state.round=1;state.playerPick=null;state.aiPick=null;
+  // Tutorial check
+  if(!localStorage.getItem('hashiken-tutorial-done')){
+    showTutorial();
+    return;
+  }
+  beginGame();
+}
+
+function beginGame(){
+  showSoundToast();
+  audio.startMusic();
+  _gameStartTime=Date.now();
+  if(typeof umami!=='undefined')umami.track('hashiken-start',{lang:I18N.lang,tutorialSkipped:!!localStorage.getItem('hashiken-tutorial-done')});
+  show('game-screen');
+  startRound();
 }
 
 // ===== Fist helpers =====
-function setHandState(handId, state) {
-  const el = $(handId);
-  el.className = 'hand-display' + (state ? ' ' + state : '');
+function setHandState(handId,st){
+  const el=$(handId);
+  el.className='hand-display'+(st?' '+st:'');
 }
-function renderSticks(sticksId, count) {
-  const c = $(sticksId);
-  let h = '';
-  for (let i = 0; i < 3; i++) h += `<div class="chopstick ${i < count ? '' : 'hidden'}"></div>`;
-  c.innerHTML = h;
-}
-
-// ===== Janken =====
-let jankenForced = true;
-function startJanken() {
-  audio.init(); audio.ensureResumed(); audio.startMusic();
-  jankenForced = true;
-  show('janken-screen');
-  $('janken-prompt').textContent = t('jankenForced');
-  $('janken-result').textContent = '';
-  $('janken-vs').innerHTML = '';
-  voice.speak(t('voiceRock'));
-  document.querySelectorAll('.janken-btn').forEach(b => b.classList.toggle('disabled', b.dataset.hand !== 'rock'));
-}
-const HAND_EMOJI = { rock:'✊', scissors:'✌️', paper:'🖐️' };
-function jankenWinner(a,b) {
-  if (a===b) return 'tie';
-  if ((a==='rock'&&b==='scissors')||(a==='scissors'&&b==='paper')||(a==='paper'&&b==='rock')) return 'a';
-  return 'b';
-}
-async function playJanken(hand) {
-  audio.playJankenSfx();
-  const btns = document.querySelectorAll('.janken-btn');
-  btns.forEach(b => b.classList.add('disabled'));
-  if (jankenForced) {
-    $('janken-vs').innerHTML = `${HAND_EMOJI.rock}<span>VS</span>${HAND_EMOJI.rock}`;
-    $('janken-result').innerHTML = `<span style="color:var(--gold)">${t('tieForced')}</span>`;
-    await wait(1200);
-    jankenForced = false;
-    $('janken-prompt').textContent = t('jankenGo');
-    $('janken-result').textContent = ''; $('janken-vs').innerHTML = '';
-    voice.speak(t('voiceJanken'), {rate:1.1});
-    btns.forEach(b => b.classList.remove('disabled'));
-    return;
-  }
-  const aiHand = ['rock','scissors','paper'][randInt(0,2)];
-  $('janken-vs').innerHTML = `${HAND_EMOJI[hand]}<span>VS</span>${HAND_EMOJI[aiHand]}`;
-  const result = jankenWinner(hand, aiHand);
-  if (result === 'tie') {
-    $('janken-result').innerHTML = `<span style="color:var(--gold)">${t('tieJanken')}</span>`;
-    audio.playTie(); await wait(1000);
-    $('janken-result').textContent = ''; $('janken-vs').innerHTML = '';
-    voice.speak(t('voiceJanken'), {rate:1.1});
-    btns.forEach(b => b.classList.remove('disabled'));
-    return;
-  }
-  if (result === 'a') {
-    state.playerRole = 'parent';
-    $('janken-result').innerHTML = `<span style="color:var(--green)">${t('youWinJanken')}</span>`;
-    audio.playWin();
-  } else {
-    state.playerRole = 'child';
-    $('janken-result').innerHTML = `<span style="color:var(--red-bright)">${t('oppWinJanken')}</span>`;
-    audio.playLose();
-  }
-  await wait(1200);
-  showRole();
+function renderSticks(sticksId,count){
+  const c=$(sticksId);
+  let h='';
+  for(let i=0;i<3;i++)h+=`<div class="chopstick ${i<count?'':'hidden'}"></div>`;
+  c.innerHTML=h;
 }
 
-// ===== Role =====
-function showRole() {
-  show('role-screen');
-  const rn=$('role-name'), rd=$('role-desc'), opp=$('opponent-role');
-  if (state.playerRole==='parent') {
-    rn.textContent=t('roleParent'); rn.className='role-name parent';
-    rd.innerHTML=t('roleParentDesc');
-    opp.innerHTML=`<span style="color:var(--blue)">${t('oppIsChild')}</span>`;
-  } else {
-    rn.textContent=t('roleChild'); rn.className='role-name child';
-    rd.innerHTML=t('roleChildDesc');
-    opp.innerHTML=`<span style="color:var(--red-bright)">${t('oppIsParent')}</span>`;
+// ===== Game Round =====
+function startRound(){
+  state.playerPick=null;state.aiPick=null;
+  $('player-score').textContent=state.playerScore;
+  $('ai-score').textContent=state.aiScore;
+  $('round-info').textContent=t('roundInfo',{n:state.round});
+
+  const badge=$('game-role-badge');
+  if(state.playerRole==='parent'){
+    badge.textContent=t('badgeParent');badge.className='role-badge parent';
+  }else{
+    badge.textContent=t('badgeChild');badge.className='role-badge child';
   }
-}
+  $('call-preview').textContent=state.playerRole==='parent'?t('callPreviewParent'):t('callPreviewChildAuto');
 
-// ===== Game =====
-function startGame() { show('game-screen'); startRound(); }
-
-function startRound() {
-  state.playerPick = null; state.aiPick = null;
-  $('player-score').textContent = state.playerScore;
-  $('ai-score').textContent = state.aiScore;
-  $('round-info').textContent = t('roundInfo', {n:state.round});
-
-  const badge = $('game-role-badge');
-  if (state.playerRole==='parent') {
-    badge.textContent = t('badgeParent'); badge.className = 'role-badge parent';
-  } else {
-    badge.textContent = t('badgeChild'); badge.className = 'role-badge child';
+  const iBox=$('irasshai-box');
+  if(state.playerRole==='child'){
+    iBox.innerHTML=`<div class="irasshai">${t('irrashai')}</div>`;
+  }else{
+    iBox.innerHTML=`<div class="irasshai" style="color:var(--blue)">${t('irrashaiOpp')}</div>`;
   }
-  $('call-preview').textContent = state.playerRole==='parent' ? t('callPreviewParent') : t('callPreviewChildAuto');
 
-  const iBox = $('irasshai-box');
-  if (state.playerRole==='child') {
-    iBox.innerHTML = `<div class="irasshai">${t('irrashai')}</div>`;
-  } else {
-    iBox.innerHTML = `<div class="irasshai" style="color:var(--blue)">${t('irrashaiOpp')}</div>`;
-  }
-  voice.speak(t('voiceIrrashai'), {rate:0.9, pitch:1.1});
+  // AI dialogue on round 1
+  if(state.round===1)setTimeout(()=>showAiDialogue('aiGreet'),600);
 
-  // Reset hand displays
-  setHandState('ai-hand', '');
-  setHandState('player-hand', '');
-  $('player-hint').textContent = t('selectHint');
-  $('ai-sticks').innerHTML = '';
-  $('player-sticks').innerHTML = '';
+  setHandState('ai-hand','');
+  setHandState('player-hand','');
+  $('player-hint').textContent=t('selectHint');
+  $('ai-sticks').innerHTML='';
+  $('player-sticks').innerHTML='';
 
   renderPickButtons();
-  $('confirm-wrap').innerHTML = '';
-  $('reveal-result').style.display = 'none';
-  $('pick-section').style.display = 'block';
+  $('confirm-wrap').innerHTML='';
+  $('reveal-result').style.display='none';
+  $('pick-section').style.display='block';
 }
 
-function renderPickButtons() {
-  let html = '';
-  for (let n = 0; n <= 3; n++) {
-    let sticks = '';
-    for (let i = 0; i < n; i++) sticks += '<div class="mini-stick"></div>';
-    html += `<button class="pick-btn" data-n="${n}" onclick="pickChopsticks(${n})">${n}<div class="mini-sticks">${sticks}</div></button>`;
+function renderPickButtons(){
+  let html='';
+  for(let n=0;n<=3;n++){
+    let sticks='';
+    for(let i=0;i<n;i++)sticks+='<div class="mini-stick"></div>';
+    html+=`<button class="pick-btn" data-n="${n}" onclick="pickChopsticks(${n})">${n}<div class="mini-sticks">${sticks}</div></button>`;
   }
-  $('pick-buttons').innerHTML = html;
+  $('pick-buttons').innerHTML=html;
 }
 
-function pickChopsticks(n) {
+function pickChopsticks(n){
   audio.playClick();
-  state.playerPick = n;
-  document.querySelectorAll('.pick-btn').forEach(b => b.classList.toggle('selected', parseInt(b.dataset.n)===n));
-
-  // Show fist emoji on player side
-  setHandState('player-hand', 'ready');
-
-  if (state.playerRole==='child') {
-    const call = (n<=1)?1:5;
-    $('call-preview').textContent = t('callPreviewChildN', {n:call});
+  state.playerPick=n;
+  document.querySelectorAll('.pick-btn').forEach(b=>b.classList.toggle('selected',parseInt(b.dataset.n)===n));
+  setHandState('player-hand','ready');
+  if(state.playerRole==='child'){
+    const call=(n<=1)?1:5;
+    $('call-preview').textContent=t('callPreviewChildN',{n:call});
   }
-  $('confirm-wrap').innerHTML = `<button class="btn btn-gold btn-sm" onclick="confirmPick()">${t('confirmBtn')}</button>`;
+  $('confirm-wrap').innerHTML=`<button class="btn btn-gold btn-sm" onclick="confirmPick()">${t('confirmBtn')}</button>`;
 }
 
-async function confirmPick() {
-  if (state.playerPick===null) return;
+async function confirmPick(){
+  if(state.playerPick===null)return;
   audio.playClick();
-  $('pick-section').style.display = 'none';
-  $('confirm-wrap').innerHTML = '';
+  $('pick-section').style.display='none';
+  $('confirm-wrap').innerHTML='';
 
-  state.aiPick = aiChoose();
+  state.aiPick=aiChoose();
 
-  // Show both fists ready
-  setHandState('player-hand', 'ready');
-  setHandState('ai-hand', 'ready');
+  setHandState('player-hand','ready');
+  setHandState('ai-hand','ready');
 
-  // Prepare sticks (hidden for now)
-  renderSticks('player-sticks', state.playerPick);
-  renderSticks('ai-sticks', state.aiPick);
+  renderSticks('player-sticks',state.playerPick);
+  renderSticks('ai-sticks',state.aiPick);
 
   await wait(300);
 
-  // Shake during countdown
-  setHandState('player-hand', 'shaking');
-  setHandState('ai-hand', 'shaking');
+  setHandState('player-hand','shaking');
+  setHandState('ai-hand','shaking');
 
   await showCountdown();
 
-  // Push-out animation
-  setHandState('player-hand', 'push-out');
-  setHandState('ai-hand', 'push-out');
+  setHandState('player-hand','push-out');
+  setHandState('ai-hand','push-out');
   audio.playReveal();
 
   await wait(700);
 
-  // Final state
-  setHandState('player-hand', 'show-sticks');
-  setHandState('ai-hand', 'show-sticks');
+  setHandState('player-hand','show-sticks');
+  setHandState('ai-hand','show-sticks');
 
   revealResult();
 }
 
-function aiChoose() {
-  const role = state.playerRole==='parent' ? 'child' : 'parent';
-  const w = role==='parent' ? [1,2,2,3] : [2,2,3,2];
+function aiChoose(){
+  const role=state.playerRole==='parent'?'child':'parent';
+  const w=role==='parent'?[1,2,2,3]:[2,2,3,2];
   return weightedRandom(w);
 }
-function weightedRandom(w) {
-  const tot=w.reduce((a,b)=>a+b,0); let r=Math.random()*tot;
-  for(let i=0;i<w.length;i++){r-=w[i];if(r<=0)return i;} return w.length-1;
+function weightedRandom(w){
+  const tot=w.reduce((a,b)=>a+b,0);let r=Math.random()*tot;
+  for(let i=0;i<w.length;i++){r-=w[i];if(r<=0)return i;}return w.length-1;
 }
 
-async function showCountdown() {
-  const ov = document.createElement('div');
-  ov.className = 'countdown-overlay';
+async function showCountdown(){
+  const ov=document.createElement('div');
+  ov.className='countdown-overlay';
   document.body.appendChild(ov);
-  ov.innerHTML = `<div class="countdown-text">${t('seNo')}</div>`;
-  audio.playCountdown(); voice.speak(t('voiceSeNo'), {rate:0.8,pitch:0.9});
+  ov.innerHTML=`<div class="countdown-text">${t('seNo')}</div>`;
+  audio.playCountdown();voice.speak(t('voiceSeNo'),{rate:0.8,pitch:0.9});
   await wait(900);
-  ov.innerHTML = `<div class="countdown-text">${t('dase')}</div>`;
-  audio.playCountdown(); voice.speak(t('voiceDase'), {rate:1.2,pitch:1.2});
+  ov.innerHTML=`<div class="countdown-text">${t('dase')}</div>`;
+  audio.playCountdown();voice.speak(t('voiceDase'),{rate:1.2,pitch:1.2});
   await wait(600);
   document.body.removeChild(ov);
 }
 
-function revealResult() {
-  const pp=state.playerPick, ap=state.aiPick, total=pp+ap;
+function revealResult(){
+  const pp=state.playerPick,ap=state.aiPick,total=pp+ap;
 
-  let playerCall, aiCall;
-  if (state.playerRole==='parent') { playerCall=3; aiCall=(ap<=1)?1:5; }
-  else { playerCall=(pp<=1)?1:5; aiCall=3; }
+  let playerCall,aiCall;
+  if(state.playerRole==='parent'){playerCall=3;aiCall=(ap<=1)?1:5;}
+  else{playerCall=(pp<=1)?1:5;aiCall=3;}
 
-  let resultType, resultText, detailText;
-  if (total%2===0) {
-    resultType='tie'; resultText=t('tieRound'); detailText=t('tieDetail',{n:total});
-  } else if (total===3) {
-    if (state.playerRole==='parent') {
-      resultType='win'; resultText=t('winRound'); detailText=t('callHitYou',{total,call:3}); state.playerScore++;
-    } else {
-      resultType='lose'; resultText=t('loseRound'); detailText=t('callHitOpp',{total,call:3}); state.aiScore++;
-    }
-  } else {
-    if (state.playerRole==='child') {
-      resultType='win'; resultText=t('winRound'); detailText=t('callHitYou',{total,call:playerCall}); state.playerScore++;
-    } else {
-      resultType='lose'; resultText=t('loseRound'); detailText=t('callHitOpp',{total,call:aiCall}); state.aiScore++;
-    }
+  let resultType,resultText,detailText;
+  if(total%2===0){
+    resultType='tie';resultText=t('tieRound');detailText=t('tieDetail',{n:total});
+  }else if(total===playerCall){
+    resultType='win';resultText=t('winRound');detailText=t('callHitYou',{total,call:playerCall});state.playerScore++;
+  }else if(total===aiCall){
+    resultType='lose';resultText=t('loseRound');detailText=t('callHitOpp',{total,call:aiCall});state.aiScore++;
+  }else{
+    // Neither call matches (e.g., total=1 but parent=3 and child=5) - tie
+    resultType='tie';resultText=t('tieRound');detailText=t('tieDetail',{n:total});
   }
 
   setTimeout(()=>{
-    if(resultType==='win'){audio.playWin(); voice.speak(getNumberCall(state.playerRole==='parent'?3:playerCall));}
-    else if(resultType==='lose'){audio.playLose(); voice.speak(getNumberCall(state.playerRole==='parent'?aiCall:3));}
-    else{audio.playTie(); voice.speak(t('voiceTie'));}
-  }, 350);
+    if(resultType==='win'){audio.playWin();showAiDialogue('aiLoseRound');}
+    else if(resultType==='lose'){audio.playLose();showAiDialogue('aiWinRound');}
+    else{audio.playTie();showAiDialogue('aiTieRound');}
+  },500);
 
-  $('player-score').textContent = state.playerScore;
-  $('ai-score').textContent = state.aiScore;
+  $('player-score').textContent=state.playerScore;
+  $('ai-score').textContent=state.aiScore;
 
-  const pWho = state.playerRole==='parent'?t('you'):t('opponentLabel');
-  const cWho = state.playerRole==='child'?t('you'):t('opponentLabel');
-  const pCol = state.playerRole==='parent'?'var(--red-bright)':'var(--blue)';
-  const cCol = state.playerRole==='child'?'var(--blue)':'var(--red-bright)';
-  const cCall = state.playerRole==='child'?playerCall:aiCall;
-  const isGO = state.playerScore>=2||state.aiScore>=2;
+  const pWho=state.playerRole==='parent'?t('you'):t('aiName');
+  const cWho=state.playerRole==='child'?t('you'):t('aiName');
+  const pCol=state.playerRole==='parent'?'var(--red-bright)':'var(--blue)';
+  const cCol=state.playerRole==='child'?'var(--blue)':'var(--red-bright)';
+  const cCall=state.playerRole==='child'?playerCall:aiCall;
+  const isGO=state.playerScore>=2||state.aiScore>=2;
 
-  const r = $('reveal-result');
-  r.style.display = 'block';
-  r.innerHTML = `
+  const r=$('reveal-result');
+  r.style.display='block';
+  r.innerHTML=`
     <div style="font-size:12px;color:var(--cream-dim);margin-bottom:4px;">
       <span style="color:${pCol}">${t('parentCallLabel',{who:pWho})}</span> ｜
       <span style="color:${cCol}">${t('childCallLabel',{who:cWho,call:cCall})}</span>
@@ -1300,44 +1441,56 @@ function revealResult() {
   `;
 }
 
-function nextRound(resultType) {
-  if (state.playerScore>=2) { gameOver(true); return; }
-  if (state.aiScore>=2) { gameOver(false); return; }
-  if (resultType==='tie') state.playerRole = state.playerRole==='parent'?'child':'parent';
+function nextRound(resultType){
+  audio.playClick();
+  if(state.playerScore>=2){gameOver(true);return;}
+  if(state.aiScore>=2){gameOver(false);return;}
+  if(resultType==='tie')state.playerRole=state.playerRole==='parent'?'child':'parent';
   state.round++;
   startRound();
 }
 
-function gameOver(playerWins) {
+function gameOver(playerWins){
   show('gameover-screen');
-  audio.stopMusic(); audio.playSake();
-  const ps=state.playerScore, as=state.aiScore;
-  if (playerWins) {
-    $('gameover-title').innerHTML = `<span style="color:var(--green)">${t('gameoverWinTitle')}</span>`;
-    $('gameover-msg').innerHTML = t('gameoverWinMsg',{ps,as});
-    $('gochisou').style.display = 'none';
-  } else {
-    $('gameover-title').innerHTML = `<span style="color:var(--red-bright)">${t('gameoverLoseTitle')}</span>`;
-    $('gameover-msg').innerHTML = t('gameoverLoseMsg',{ps,as});
-    $('gochisou').textContent = t('gochisou');
-    $('gochisou').style.display = 'block';
-    setTimeout(()=>voice.speak(t('voiceGochisou'),{rate:0.8,pitch:0.9}), 1500);
+  audio.stopMusic();audio.playSake();
+  const ps=state.playerScore,as=state.aiScore;
+  const duration=Math.round((Date.now()-_gameStartTime)/1000);
+
+  if(playerWins){
+    $('gameover-title').innerHTML=`<span style="color:var(--green)">${t('gameoverWinTitle')}</span>`;
+    $('gameover-msg').innerHTML=t('gameoverWinMsg',{ps,as});
+    $('gochisou').style.display='none';
+    setTimeout(()=>{showAiDialogue('aiGameLose');voice.speak(t('voiceWin'),{rate:0.9});},1000);
+  }else{
+    $('gameover-title').innerHTML=`<span style="color:var(--red-bright)">${t('gameoverLoseTitle')}</span>`;
+    $('gameover-msg').innerHTML=t('gameoverLoseMsg',{ps,as});
+    $('gochisou').textContent=t('gochisou');
+    $('gochisou').style.display='block';
+    setTimeout(()=>{showAiDialogue('aiGameWin');voice.speak(t('voiceLose'),{rate:0.8,pitch:0.9});},1000);
   }
+
+  if(typeof umami!=='undefined')umami.track('hashiken-complete',{
+    winner:playerWins?'player':'ai',playerScore:ps,aiScore:as,rounds:state.round,duration,lang:I18N.lang
+  });
 }
 
-function resetAll() {
-  state.playerRole=null; state.playerScore=0; state.aiScore=0;
-  state.round=1; state.playerPick=null; state.aiPick=null;
+function resetAll(){
+  audio.playClick();
+  state.playerRole=null;state.playerScore=0;state.aiScore=0;
+  state.round=1;state.playerPick=null;state.aiPick=null;
   audio.stopMusic();
   show('welcome-screen');
 }
 
 // ===== Init =====
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded',()=>{
   I18N.updateDOM();
-  $('mute-toggle').textContent = '🔊';
-  $('bgm-toggle').textContent = audio.bgmStyle==='miyako' ? '🌙' : '🎶';
-  if (typeof speechSynthesis!=='undefined' && speechSynthesis.getVoices().length>0) voice.init();
+  const _mb=$('mute-toggle');
+  _mb.textContent=VOL_PRESETS[audio.volLevel].icon;
+  if(audio.volLevel===0)_mb.classList.add('vol-muted');
+  else if(audio.volLevel===2)_mb.classList.add('vol-loud');
+  $('bgm-toggle').textContent=BGM_ICONS[audio.bgmStyle];
+  if(typeof speechSynthesis!=='undefined'&&speechSynthesis.getVoices().length>0)voice.init();
 });
 </script>
 </body>

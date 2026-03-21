@@ -361,6 +361,33 @@
       </div>
     </div>
 
+    <!-- HASHIKEN EVENTS -->
+    <div class="event-group">
+      <div class="event-group-title">🥢 箸拳（Hashiken）</div>
+
+      <div class="event-card">
+        <div class="event-name">hashiken-start</div>
+        <div class="event-trigger">觸發時機：按下<strong>「開始對決！」</strong>進入遊戲時</div>
+        <div class="event-fields">
+          <span class="field-tag"><span class="field-key">lang</span> 語言 (zh/ja)</span>
+          <span class="field-tag"><span class="field-key">tutorialSkipped</span> 是否跳過教學</span>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-name">hashiken-complete</div>
+        <div class="event-trigger">觸發時機：三戰兩勝結束，進入<strong>結算畫面</strong>時</div>
+        <div class="event-fields">
+          <span class="field-tag"><span class="field-key">winner</span> 獲勝方 (player/ai)</span>
+          <span class="field-tag"><span class="field-key">playerScore</span> 玩家得分</span>
+          <span class="field-tag"><span class="field-key">aiScore</span> AI 得分</span>
+          <span class="field-tag"><span class="field-key">rounds</span> 總回合數</span>
+          <span class="field-tag"><span class="field-key">duration</span> 遊戲時長（秒）</span>
+          <span class="field-tag"><span class="field-key">lang</span> 語言 (zh/ja)</span>
+        </div>
+      </div>
+    </div>
+
     <!-- BGM EVENT -->
     <div class="event-group">
       <div class="event-group-title">🎵 BGM 偏好</div>
@@ -369,7 +396,7 @@
         <div class="event-name">bgm-switch</div>
         <div class="event-trigger">觸發時機：玩家點擊 <strong>BGM 切換按鈕</strong>時</div>
         <div class="event-fields">
-          <span class="field-tag"><span class="field-key">game</span> 在哪個遊戲 (bekuhai/kikuhai)</span>
+          <span class="field-tag"><span class="field-key">game</span> 在哪個遊戲 (bekuhai/kikuhai/hashiken)</span>
           <span class="field-tag"><span class="field-key">to</span> 切到哪首 (enkai/moonlight/summer/festival)</span>
         </div>
       </div>
