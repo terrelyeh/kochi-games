@@ -560,7 +560,7 @@ const BGM_FILES={moonlight:'月夜思鄉.mp3',summer:'夏日廟會.mp3',festival
 
 const VOL_PRESETS=[{bgm:0,sfx:0,voice:0,icon:'🔇',duck:0},{bgm:0.12,sfx:0.5,voice:1.0,icon:'🔉',duck:0.02},{bgm:0.25,sfx:0.7,voice:1.0,icon:'🔊',duck:0.04}];
 class AudioManager{
-  constructor(){this.ctx=null;this.masterGain=null;this.musicGain=null;this.sfxGain=null;this.volLevel=parseInt(localStorage.getItem('kochi-vol'))||1;this.musicPlaying=false;this.bgmStyle='moonlight';this._bgmAudio=null;this._bgmCache={};}
+  constructor(){this.ctx=null;this.masterGain=null;this.musicGain=null;this.sfxGain=null;const _sv=localStorage.getItem('kochi-vol');this.volLevel=_sv!==null?parseInt(_sv):2;this.musicPlaying=false;this.bgmStyle='moonlight';this._bgmAudio=null;this._bgmCache={};}
   get muted(){return this.volLevel===0;}
   init(){if(this.ctx)return;this.ctx=new(window.AudioContext||window.webkitAudioContext)();this.masterGain=this.ctx.createGain();this.masterGain.connect(this.ctx.destination);this.musicGain=this.ctx.createGain();this.musicGain.gain.value=1.0;this.musicGain.connect(this.masterGain);this.sfxGain=this.ctx.createGain();this.sfxGain.gain.value=VOL_PRESETS[this.volLevel].sfx;this.sfxGain.connect(this.masterGain);}
   ensureResumed(){if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();}

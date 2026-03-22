@@ -952,7 +952,7 @@ const VOL_PRESETS = [
 ];
 
 class AudioManager {
-  constructor(){this.ctx=null;this.masterGain=null;this.sfxGain=null;this.volLevel=parseInt(localStorage.getItem('kochi-vol'))||1;this.musicPlaying=false;this.bgmStyle='moonlight';this._bgmAudio=null;this._bgmCache={};}
+  constructor(){this.ctx=null;this.masterGain=null;this.sfxGain=null;const _sv=localStorage.getItem('kochi-vol');this.volLevel=_sv!==null?parseInt(_sv):2;this.musicPlaying=false;this.bgmStyle='moonlight';this._bgmAudio=null;this._bgmCache={};}
   get muted(){return this.volLevel===0;}
   init(){
     if(this.ctx)return;
