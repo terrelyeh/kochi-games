@@ -770,6 +770,7 @@ function startGame(){
   if(typeof umami!=='undefined')umami.track('kikuhai-start',{cups:state.cupCount,lang:I18N.lang});
   initCups();
   show('game-screen');
+  renderCups();
   startTurn();
 }
 
@@ -794,7 +795,6 @@ function updateInfoBar(){
 }
 
 function startTurn(){
-  renderCups();
   updateInfoBar();
   $('game-hint').style.display='none';
   $('tension-text').style.opacity='0';
@@ -1125,6 +1125,7 @@ function nextRound(){
   state.busy=false;
   initCups();
   show('game-screen');
+  renderCups();
   startTurn();
 }
 
