@@ -729,7 +729,7 @@ const BGM_ICONS={enkai:'🏋️',moonlight:'🌙',summer:'🏮',festival:'🎆'}
 const BGM_KEYS={enkai:'bgmEnkai',moonlight:'bgmMoonlight',summer:'bgmSummer',festival:'bgmFestival'};
 const BGM_FILES={enkai:'bgm-kenshinso.mp3',moonlight:'月夜思鄉.mp3',summer:'夏日廟會.mp3',festival:'祭典夜晚.mp3'};
 
-const VOL_PRESETS=[{bgm:0,sfx:0,voice:0,icon:'🔇',duck:0},{bgm:0.12,sfx:0.5,voice:1.0,icon:'🔉',duck:0.02},{bgm:0.25,sfx:0.7,voice:1.0,icon:'🔊',duck:0.04}];
+const VOL_PRESETS=[{bgm:0,sfx:0,voice:0,icon:'🔇',duck:0},{bgm:0.2,sfx:0.6,voice:1.0,icon:'🔉',duck:0.03},{bgm:0.5,sfx:1.0,voice:1.0,icon:'🔊',duck:0.08}];
 class AudioManager{
   constructor(){this.ctx=null;this.masterGain=null;this.musicGain=null;this.sfxGain=null;const _sv=localStorage.getItem('kochi-vol');this.volLevel=_sv!==null?parseInt(_sv):2;this.musicPlaying=false;this.bgmStyle='enkai';this._bgmAudio=null;this._bgmCache={};}
   get muted(){return this.volLevel===0;}
