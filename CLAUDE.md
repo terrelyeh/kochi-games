@@ -1,6 +1,6 @@
 # CLAUDE.md — 萬華世界の維醺志士
 
-> Last updated: 2026-03-21
+> Last updated: 2026-03-30
 
 ## Project Overview
 
@@ -25,8 +25,8 @@
 ```
 kochi-games/
 ├── index.html          # 首頁（遊戲選單）
-├── bekuhai.html        # 可杯（獨樂酒杯遊戲）— 82KB, 已完成大量 UI 優化
-├── kikuhai.html        # 菊花杯（清酒版俄羅斯輪盤）— 56KB, 剛完成基礎版
+├── bekuhai.html        # 可杯（獨樂酒杯遊戲）— 已完成大量 UI 優化 + 自訂頭像
+├── kikuhai.html        # 菊之花（清酒版俄羅斯輪盤）— 基礎版完成
 ├── hashiken.html       # 箸拳（1v1 AI 對戰）— 已完成大改版（教學+AI角色+MP3 BGM）
 ├── bgm-kenshinso.mp3   # 健身操 BGM（3MB）— 可杯專用
 ├── 月夜思鄉.mp3        # 月夜思鄉 BGM（3.4MB）— 兩遊戲共用
@@ -53,17 +53,18 @@ kochi-games/
 ├── yy-head.png         # YY Q版頭像
 ├── kaya-head.png       # Kaya Q版頭像
 ├── analytics-intro.html # 數據追蹤方案說明頁（團隊分享用，noindex）
-├── cup-*.png (舊版)    # 舊的去背圖（有白邊，已不使用）
-├── export*.svg         # 高品質 SVG（400-600KB，未使用）
+├── table-tent.html     # 沙龍分享用地牌（A5，含 QR code，noindex）
+├── table-tent-red.html # 地牌朱紅配色版
+├── table-tent-blue.html# 地牌藏藍配色版
 ```
 
 ## 三個遊戲的使用模式
 
 | 遊戲 | 人數 | 手機使用方式 | 狀態 |
 |------|------|------------|------|
-| **可杯** bekuhai | 4～8 人 | 手機平放桌上，大家圍著看 | ✅ UI 大幅優化完成 |
-| **菊花杯** kikuhai | 不限（不輸入名字）| 手機放桌上，推到不同人面前翻杯 | ⚠️ 基礎版完成，需要 UI 優化 |
-| **箸拳** hashiken | 1 人 vs AI | 一人手持手機對戰 AI（大將） | ✅ 大改版完成（教學、AI 角色、語音台詞） |
+| **可杯** bekuhai | 4～8 人 | 手機平放桌上，大家圍著看 | ✅ UI 優化 + 自訂頭像 |
+| **菊之花** kikuhai | 不限（不輸入名字）| 手機放桌上，推到不同人面前翻杯 | ⚠️ 基礎版完成，需要 UI 優化 |
+| **箸拳** hashiken | 1 人 vs AI | 一人手持手機對戰 AI（大將） | ✅ 大改版完成 |
 
 ## Conventions
 
@@ -74,9 +75,8 @@ kochi-games/
 
 ### 音頻規則
 - **所有 BGM 皆為 MP3**（已移除所有合成 BGM oscillator 代碼）
-- **三段音量控制**：🔇 靜音 → 🔉 普通 → 🔊 大聲，`localStorage 'kochi-vol'` 跨遊戲共用
-- `VOL_PRESETS` 陣列定義各段的 bgm/sfx/voice/duck 音量
-- SFX 走 Web Audio API（sfxGain 0.5）
+- **兩段音量控制**：🔇 靜音 ↔ 🔊 有聲，`localStorage 'kochi-vol'` 跨遊戲共用（太大聲調手機音量）
+- `VOL_PRESETS` 陣列只有 2 段：`[{靜音}, {bgm:0.5, sfx:1.0, voice:1.0}]`
 - Voice volume = 1.0（要切過環境噪音）
 - MP3 BGM 靜音用 pause/play，不用 volume=0
 - `_bgmCache` 物件快取 Audio 元素，避免重複建立
@@ -92,8 +92,13 @@ kochi-games/
 - 字體載入用 `<link>` preconnect，不用 `@import`
 - 木紋背景桌面風格（bekuhai table-screen）
 
-### 可杯預設玩家名
-1=政道, 2=Fish, 3=Winnie, 4=蔡旻辰, 5=小光頭, 6=琬蒨, 7=YY, 8=Kaya（預設 5 人，支援 4～8 人）
+### 可杯玩家系統
+- 預設玩家名：1=政道, 2=Fish, 3=Winnie, 4=蔡旻辰, 5=小光頭, 6=琬蒨, 7=YY, 8=Kaya（預設 5 人，支援 4～8 人）
+- **自訂頭像**：座席安排頁點頭像 → 放大預覽 + 「更換頭像」按鈕 → 從相簿選照片
+  - Canvas API 壓縮至 200×200px JPEG（quality 0.7，~20KB）
+  - 存 `localStorage 'kochi-avatar-{playerIndex}'`，跨 session 保留
+  - 「重設」按鈕恢復預設 Q 版頭像
+  - 遊戲桌面、排行榜也會顯示自訂頭像
 
 ### 數據分析（Umami Cloud）
 - **Website ID**: `6de48909-2353-4e99-87fa-854079eba9f8`
@@ -112,38 +117,13 @@ kochi-games/
 
 ## Current Status
 
-### ✅ Completed
+功能清單詳見 [README.md](README.md)。三個遊戲皆已上線，首頁統一標「萬華獨家」。
 
-- **可杯 UI 大改版**：木紋圓桌俯瞰、真實杯子/陀螺 PNG、座墊式座位、全螢幕 Overlay 優化
-- **可杯語音系統**：每種杯型 8 句隨機語音（含維醺志士梗＋人多起鬨台詞）、中日雙語
-- **可杯 Q版真人頭像**：8 張夥伴 cute 版頭像（政道/Fish/Winnie/蔡旻辰/小光頭/琬蒨/YY/Kaya），取代 emoji
-- **頭像放大互動**：點擊任何玩家頭像全螢幕放大 + 搖頭晃腦醉態動畫（遊戲桌面 + 座席安排都支援）
-- **下一回合按鈕定位修復**：golden label 出現在對應玩家頭像附近（不再固定螢幕底部），帶脈搏動畫
-- **玩家重新排序**：預設順序改為 政道→Fish→Winnie→蔡旻辰→小光頭，預設 5 人（最多 8 人）
-- **座墊放大**：Q版頭像從 72→84px，更醒目
-- **支援 4～8 人**：人數上限從 6 擴展到 8，新增琬蒨/YY 頭像，7-8 人座墊自動縮小避免擠
-- **菊花杯基礎版**：6/9/12/15 杯模式、翻杯動畫、緊張感語音、iPad RWD
-- **手機優先框架**：Safe area、橫屏遮罩、觸控優化、字體載入優化
-- **首頁**：可杯（萬華獨家）→ 菊花杯（萬華獨家）→ 箸拳（NEW）
-- **自製確認彈窗**：取代原生 confirm()
-- **PWA 支援**：manifest + service worker + 自訂 icon（乾杯！維醺志士）
-- **杯子圖片換乾淨去背版**：cup-*-clear.png（使用者重新去背提供）
-- **菊花杯語音節奏修復**：翻杯後加「下面一位〜」按鈕，語音不再被截斷
-- **聲音提醒 toast**：進入設定頁時提示開啟手機聲音
-- **全 MP3 BGM 系統**：移除所有合成 BGM，改用 MP3（可杯 4 首，菊花杯 3 首）
-- **Umami 數據分析**：自訂事件追蹤遊玩行為（開局/結束/BGM 切換），團隊說明頁 analytics-intro.html
-- **三段音量控制**：🔇🔉🔊 三段循環，取代 binary mute toggle，跨遊戲共用 localStorage
-- **CTA 按鈕音效**：所有主要按鈕 + 首頁遊戲卡片點擊時播放 click SFX
-- **觸控手勢 + 漣漪效果**：所有按鈕 touchstart 漣漪動畫，提升觸感回饋
-- **箸拳大改版**：視覺化規則卡片、3 步驟互動教學（可跳過）、AI 角色「大將」（30 句中日雙語台詞 × 6 類情境）、移除猜拳改隨機分配角色、MP3 BGM、Umami 事件追蹤
+### 🔜 Next Steps / Known Issues
 
-### ⚠️ Pending / Known Issues
-
-- **菊花杯 UI 優化**：需要像可杯一樣做畫面逐頁微調（UX 細節）
+- **菊之花 UI 優化**：需要像可杯一樣做畫面逐頁微調（UX 細節）
 - **iPad pixel perfection**：三個遊戲都需要更精緻的 iPad 排版調整
 - **遊戲中切換語言會 hang**：已移除遊戲中的語言切換按鈕作為 workaround
-- **export*.svg 未使用**：高品質但太大（400-600KB），目前用 PNG
-- **Supabase 事件記錄**：未來可考慮接 Supabase 做更細緻的遊戲數據記錄（方案 B）
 
 ## Deployment
 
@@ -163,12 +143,11 @@ git add <files> && git commit -m "message" && git push
 - **Edit tool "not unique" 錯誤**：bekuhai.html 有 ja/zh 兩段 I18N，改字串時要提供足夠上下文區分
 - **Edit tool "file not read" 錯誤**：長檔案在多次編輯後需要重新 read 才能繼續 edit
 - **遊戲中切換語言會 hang**：根本原因未修，目前用隱藏語言按鈕 workaround
-- **BGM 音量統一 0.08**：所有 BGM 皆為 MP3，duck 時降至 0.01，不再有合成 BGM 音量差異
 - **手機語音 unlock**：必須在使用者首次 touchstart/click 時呼叫 unlockSpeech()
-- **SVG 檔案太大無法直接 Read**：需要用 offset/limit 分段讀
 - **改完檔案要記得 push**：之前多次改了本地但忘記 push，使用者在線上看不到更新
 - **PWA icon 不會自動更新**：改了 icon 後使用者需要刪除主畫面捷徑重新加入
-- **safe-overlay 的 pointer-events**：之前設了 pointer-events:none 導致按鈕無法點擊，已修復
-- **菊花杯翻杯間語音重疊**：需要 await speakAsync 等語音講完，加按鈕讓玩家控制節奏
-- **next-round 按鈕 z-index**：不要把按鈕放在 `.seat` 元素內（stacking context 會被 koma-area z:10 和 spin-btn-wrap z:20 擋住），應 append 到 `table-layout` 並用 z-index:50
-- **座位定位用 getSeatPositions()**：按鈕位置用 `seatPos.y > 55 ? y-9 : y+10` 決定在頭像上方或下方
+- **菊之花翻杯間語音重疊**：需要 await speakAsync 等語音講完，加按鈕讓玩家控制節奏
+- **菊之花 renderCups 閃爍**：`renderCups()` 只在開局/新一輪呼叫，`startTurn()` 不重建 DOM（已修）
+- **next-round 按鈕 z-index**：不要把按鈕放在 `.seat` 元素內，應 append 到 `table-layout` 並用 z-index:50
+- **自訂頭像 localStorage 容量**：200×200 JPEG ~20KB × 8 人 = ~160KB，遠低於 5MB 上限
+- **自訂頭像按 playerIndex 存**：key 是 `kochi-avatar-{index}`（不是 name），改名不影響頭像
